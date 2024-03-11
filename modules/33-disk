@@ -22,12 +22,9 @@ excluded_mounts=(
 
 # shellcheck disable=SC2046
 disks="$(
-  df -h --local --print-type $(printf " -x %s" "${excluded_types[@]}") \
-    # remove excluded types
+  df -h --local --print-type $(printf " -x %s" "${excluded_types[@]}") \ 
     | grep -v $(printf " -e %s\$" "${excluded_mounts[@]}") \
-    # remove the headers
     | tail -n +2 \
-    # exclude duplicates, and sort by the 7th key, ie "Mounted On"
     | sort -u -k 7)"
 
 text=""
