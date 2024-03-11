@@ -2,7 +2,9 @@
 
 # Source the config
 # shellcheck source=config.sh.example
-source "${CONFIG_PATH}"
+if [[ -f "$CONFIG_PATH" ]]; then
+  source "${CONFIG_PATH}"
+fi
 
 # Provide default values for obligatory settings
 # Colors
