@@ -4,8 +4,19 @@ set -euo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
-loads=$(cut -d ' ' -f '1,2,3' /proc/loadavg)
-nproc=$(nproc)
+if [[ -f /proc/loadavg ]]; then
+  loads=$(cut -d ' ' -f '1,2,3' /proc/loadavg)
+else
+  loads=$(uptime | sed -e 's/.*load average: //' -e 's/,//g')
+fi
+
+
+if command -v nproc >/dev/null; then
+  nproc=$(nproc)
+elif  command -v sysctl; then
+  nproc=$(sysctl -n hw.ncpu)
+fi
+
 warning_threshold=$(bc -l <<< "${nproc} * 0.9")
 error_threshold=$(bc -l <<< "${nproc} * 1.5")
 
@@ -14,4 +25,4 @@ for load in ${loads}; do
     text+="$(print_color "${load}" "${load}" "${warning_threshold}" "${error_threshold}"), "
 done
 
-print_columns "Load average" "${text::-2}"
+print_columns "Load average" "${text::-2} $CD(across $nproc cores)$CN"
