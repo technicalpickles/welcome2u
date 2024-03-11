@@ -17,12 +17,22 @@ fi
 # Source the framework
 source "${BASE_DIR}/framework.sh"
 
+# find a grep with pcre support (-P)
+if command -v ggrep >/dev/null; then
+  grep="ggrep"
+else
+  grep="grep"
+fi
+
 # Run the modules and collect output
 output=""
+
 # shellcheck disable=SC2010
-modules="$(ls -1 "${BASE_DIR}/modules" | grep -P '^(?<!\d)\d{2}(?!\d)-')"
+modules="$(ls -1 "${BASE_DIR}/modules" | $grep -P '^(?<!\d)\d{2}(?!\d)-')"
 while read -r module; do
+    if [[ -n "${exclude_modules[@]}" && $exclude_modules =~ $module ]]; then continue; fi
     if ! module_output=$("${BASE_DIR}/modules/${module}" 2> /dev/null); then continue; fi
+
     output+="${module_output}"
     [[ -n "${module_output}" ]] && output+=$'\n'
 done <<< "${modules}"

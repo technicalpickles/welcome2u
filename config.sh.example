@@ -15,3 +15,13 @@ services["docker"]="Docker"
 services["sshd"]="SSH"
 services["fail2ban"]="Fail2Ban"
 services["ufw"]="UFW"
+
+# exclude_modules=(
+#   00-banner
+#   40-tmux
+# )
+
+fortune_files=(
+  computers
+  science
+)
