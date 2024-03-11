@@ -5,14 +5,30 @@ set -euo pipefail
 source "${BASE_DIR}/framework.sh"
 
 excluded_types=(
+    "devfs"
     "devtmpfs"
     "ecryptfs"
     "squashfs"
     "tmpfs"
 )
+excluded_mounts=(
+  "/System/Volumes/Hardware"
+  "/System/Volumes/Update"
+  "/System/Volumes/VM"
+  "/System/Volumes/iSCPreboot"
+  "/System/Volumes/Preboot"
+  "/System/Volumes/xarts"
+)
 
 # shellcheck disable=SC2046
-disks="$(df -h --local --print-type $(printf " -x %s" "${excluded_types[@]}") | tail -n +2 | sort -u -k 7)"
+disks="$(
+  df -h --local --print-type $(printf " -x %s" "${excluded_types[@]}") \
+    # remove excluded types
+    | grep -v $(printf " -e %s\$" "${excluded_mounts[@]}") \
+    # remove the headers
+    | tail -n +2 \
+    # exclude duplicates, and sort by the 7th key, ie "Mounted On"
+    | sort -u -k 7)"
 
 text=""
 while IFS= read -r disk; do
