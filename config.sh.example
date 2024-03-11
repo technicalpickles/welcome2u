@@ -4,6 +4,7 @@ CO="\e[32m"  # Ok
 CW="\e[33m"  # Warning
 CE="\e[31m"  # Error
 CN="\e[0m"   # None
+CD="\e[2m"   # DIM
 
 # Max width used for components in second column
 WIDTH=50
