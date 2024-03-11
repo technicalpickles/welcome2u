@@ -4,6 +4,6 @@ set -euo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
-quote="$(fortune -s | fold -sw "${WIDTH}")"
+quote="$(fortune "${quote_files[@]}" | fold -sw "${WIDTH}")"
 
 print_columns "Quote" "${quote}"
