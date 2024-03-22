@@ -4,39 +4,78 @@ set -euo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
-freeh=$(free -h)
-freem=$(free -m)
+if type free > /dev/null 2>&1; then
+  freeh=$(free -h)
+  freem=$(free -m)
 
-ram() {
-    local memory total used available label percentage bar
-    memory=$(awk '/Mem/ {print $2,$3,$7}' <<< "${freeh}")
-    IFS=" " read -r total used available <<< "${memory}"
-    label=$(print_split "${WIDTH}" "RAM - ${used::-1} used, ${available::-1} available" "/ ${total::-1}")
+  ram() {
+      local memory total used available label percentage bar
+      memory=$(awk '/Mem/ {print $2,$3,$7}' <<< "${freeh}")
+      IFS=" " read -r total used available <<< "${memory}"
+      label=$(print_split "${WIDTH}" "RAM - ${used::-1} used, ${available::-1} available" "/ ${total::-1}")
 
-    percentage=$(awk '/Mem/ {printf "%.0f", ($2-$7)/$2*100}' <<< "${freem}")
-    bar=$(print_bar "${WIDTH}" "${percentage}")
+      percentage=$(awk '/Mem/ {printf "%.0f", ($2-$7)/$2*100}' <<< "${freem}")
+      bar=$(print_bar "${WIDTH}" "${percentage}")
 
+      printf "%s\n%s" "${label}" "${bar}"
+  }
+
+  swap() {
+      local swap total used available label percentage bar
+
+      # Return if no swap
+      [[ "$(awk '/Swap/ {print $2}' <<< "${freem}")" == 0 ]] && return
+
+      swap=$(awk '/Swap/ {print $2,$3,$4}' <<< "${freeh}")
+      IFS=" " read -r total used available <<< "${swap}"
+      label=$(print_split "${WIDTH}" "Swap - ${used::-1} used, ${available::-1} available" "/ ${total::-1}")
+
+      percentage=$(awk '/Swap/ {printf "%.0f", $3/$2*100}' <<< "${freem}")
+      bar=$(print_bar "${WIDTH}" "${percentage}")
+
+      printf "%s\n%s" "${label}" "${bar}"
+  }
+
+  out=$(ram)
+  swap=$(swap)
+  [[ -n "${swap}" ]] && out+="\n${swap}"
+
+  print_columns "Memory" "${out}"
+elif type vm_stat > /dev/null 2>&1; then
+  function ram() {
+    local installed_memory total_consumed free_memory label percentage bar total_memory
+    installed_memory=$(echo "scale=2; $(sysctl -n hw.memsize) / 1024 / 1024 / 1000" | bc)
+    total_consumed=0
+
+    for key in 'wired down' 'active' 'inactive'; do
+      total_consumed=$(echo "$total_consumed + $(get_paged_memory_usage "$key")" | bc)
+    done
+
+    free_memory=$(echo "$installed_memory - $total_consumed" | bc)
+
+    label=$(print_split "${WIDTH}" "RAM - ${total_consumed::-1}G used, ${free_memory::-1}G available" "/ ${installed_memory::-1}G")
+
+    percent_used=$(echo "scale=2; $total_consumed * 100 / $installed_memory" | bc)
+    bar=$(print_bar "${WIDTH}" "${percent_used}")
     printf "%s\n%s" "${label}" "${bar}"
-}
+  }
 
-swap() {
-    local swap total used available label percentage bar
+  function get_paged_memory_usage() {
+    local match_string paging mvar paged_val gigabyte_val
+    match_string=$1
+    paging=4096
+    mvar=3
 
-    # Return if no swap
-    [[ "$(awk '/Swap/ {print $2}' <<< "${freem}")" == 0 ]] && return
+    if [[ $match_string =~ \  ]]; then
+      mvar=4
+    fi
 
-    swap=$(awk '/Swap/ {print $2,$3,$4}' <<< "${freeh}")
-    IFS=" " read -r total used available <<< "${swap}"
-    label=$(print_split "${WIDTH}" "Swap - ${used::-1} used, ${available::-1} available" "/ ${total::-1}")
+    paged_val=$(vm_stat | grep "Pages ${match_string}:" | awk -v mvar="$mvar" '{ print $mvar}')
+    gigabyte_val=$(echo "scale=2; ($paged_val * $paging) / 1024 / 1024 / 1000" | bc)
+    echo $gigabyte_val
+  }
 
-    percentage=$(awk '/Swap/ {printf "%.0f", $3/$2*100}' <<< "${freem}")
-    bar=$(print_bar "${WIDTH}" "${percentage}")
 
-    printf "%s\n%s" "${label}" "${bar}"
-}
-
-out=$(ram)
-swap=$(swap)
-[[ -n "${swap}" ]] && out+="\n${swap}"
-
-print_columns "Memory" "${out}"
+  out=$(ram)
+  print_columns "Memory" "${out}"
+fi
