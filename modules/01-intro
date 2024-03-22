@@ -16,6 +16,7 @@ intro_fonts=(
   rectangles
 )
 font=${intro_fonts[ $RANDOM % ${#intro_fonts[@]} ]}
+fortune=$(fortune -s intro)
 
-intro=$(fortune intro | figlet -f "$font" | lolcat --force)
-print_columns "" "${intro}"
+intro=$(echo "$fortune" | figlet -w "$WIDTH" -f "$font" | lolcat --force)
+print_columns "" "\n${intro}"
