@@ -1,4 +1,8 @@
 # shellcheck shell=bash
+# . bt.sh                            # source bt.sh
+# bt_init                            # initialize
+# bt_start "source framework.sh"
+
 
 # Source the config
 # shellcheck source=config.sh.example
@@ -157,7 +161,10 @@ print_truncate() {
 # Strips ANSI color codes from given string
 # $1 - text to strip
 strip_ansi() {
+    key=$((date +%s%N;  echo $1) | md5sum)
+    # bt_start "strip_ansi $key"
     echo -e "$1" | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"
+    # bt_end "strip_ansi $key"
 }
 
 # Following is basically simple `column` reimplementation because it doesn't work consistently.
@@ -173,7 +180,10 @@ columnize() {
     right_lines=()   # Lines in right column
     max_left_width=0 # Max width of left column line
     # Iterate over lines and populate above variables
+    bt_start "columnize populate variables"
     while IFS="$3" read -r line; do
+        key=$((date +%s%N;  echo $line) | md5sum)
+        # bt_start "columnize line $key"
         left="$(echo -e "${line}" | cut -d "$2" -f 1)"
         right="$(echo -e "${line}" | cut -d "$2" -f 2)"
         left_lines+=("${left}")
@@ -181,12 +191,19 @@ columnize() {
         visible_left=$(strip_ansi "${left}")
         left_widths+=(${#visible_left})
         [[ ${#visible_left} -gt ${max_left_width} ]] && max_left_width=${#visible_left}
+        # bt_end "columnize line $key"
     done <<< "$1"
+    bt_end "columnize populate variables"
 
     # Iterate over lines and print them while padding left column with spaces
+    bt_start "columnize padding"
     for ((i = 0; i < ${#left_lines[@]} - 1; i++)); do
         padding_width=$((max_left_width - left_widths[i]))
         padding=$(print_n " " ${padding_width})
         echo -e "${left_lines[${i}]}${padding}  ${right_lines[${i}]}"
     done
+    bt_end "columnize padding"
 }
+
+# bt_end "source framework.sh"
+# bt_cleanup

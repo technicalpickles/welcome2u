@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
+. bt.sh                            # source bt.sh
+bt_init                            # initialize
 
 set -euo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
+bt_start "choose intro font"
 intro_fonts=(
   bell
   big
@@ -16,7 +19,12 @@ intro_fonts=(
   rectangles
 )
 font=${intro_fonts[ $RANDOM % ${#intro_fonts[@]} ]}
+bt_end "choose intro font"
+bt_start "fortune"
 fortune=$(fortune -s intro)
+bt_end "fortune"
 
 intro=$(echo "$fortune" | figlet -w "$WIDTH" -f "$font" | lolcat --force)
 print_columns "" "\n${intro}"
+
+bt_cleanup

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+. bt.sh                            # source bt.sh
+bt_init                            # initialize
 
 set -euo pipefail
 # shellcheck source=./framework.sh
@@ -25,3 +27,5 @@ else
 fi
 
 print_columns "Docker" "${text::-2}"
+
+bt_cleanup
