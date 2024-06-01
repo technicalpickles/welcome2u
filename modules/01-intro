@@ -20,11 +20,14 @@ intro_fonts=(
 )
 font=${intro_fonts[ $RANDOM % ${#intro_fonts[@]} ]}
 bt_end "choose intro font"
+
 bt_start "fortune"
 fortune=$(fortune -s intro)
 bt_end "fortune"
 
+bt_start "figlet+lolcat"
 intro=$(echo "$fortune" | figlet -w "$WIDTH" -f "$font" | lolcat --force)
+bt_end "figlet+lolcat"
 print_columns "" "\n${intro}"
 
 bt_cleanup
