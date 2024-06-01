@@ -2,7 +2,7 @@
 . bt.sh                            # source bt.sh
 bt_init                            # initialize
 
-set -euo pipefail
+set -eo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
