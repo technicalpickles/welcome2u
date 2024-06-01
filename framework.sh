@@ -173,6 +173,11 @@ strip_ansi() {
 # $2 - column separator
 # $3 - row separator
 columnize() {
+    local output cut_field_delimiter bash_field_separator
+    output="$1"
+    cut_field_delimiter="$2"
+    bash_field_separator="$3"
+
     local left_lines left_widths right_lines max_left_width left right visible_left \
         padding_width padding
     left_lines=()    # Lines in left column
@@ -181,18 +186,17 @@ columnize() {
     max_left_width=0 # Max width of left column line
     # Iterate over lines and populate above variables
     bt_start "columnize populate variables"
-    while IFS="$3" read -r line; do
-        key=$((date +%s%N;  echo $line) | md5sum)
-        # bt_start "columnize line $key"
-        left="$(echo -e "${line}" | cut -d "$2" -f 1)"
-        right="$(echo -e "${line}" | cut -d "$2" -f 2)"
+    while IFS="$bash_field_separator" read -r line; do
+        left="$(echo -e "${line}" | cut -d "$cut_field_delimiter" -f 1)"
+        right="$(echo -e "${line}" | cut -d "$cut_field_delimiter" -f 2)"
         left_lines+=("${left}")
         right_lines+=("${right}")
+
+        # keep track of the widest left column
         visible_left=$(strip_ansi "${left}")
         left_widths+=(${#visible_left})
         [[ ${#visible_left} -gt ${max_left_width} ]] && max_left_width=${#visible_left}
-        # bt_end "columnize line $key"
-    done <<< "$1"
+    done <<< "$output"
     bt_end "columnize populate variables"
 
     # Iterate over lines and print them while padding left column with spaces
