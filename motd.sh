@@ -28,26 +28,49 @@ else
 fi
 
 # Run the modules and collect output
-output=""
-
 bt_start "determine modules"
 # shellcheck disable=SC2010
 modules="$(ls -1 "${BASE_DIR}/modules" | $grep -P '^(?<!\d)\d{2}(?!\d)-' | $grep -v $(printf " -e %s" "${exclude_modules[@]}"))"
 bt_end "determine modules"
 
+# keep track of pids in order
+module_pids=()
+# keep track of output files for each pid
+declare -A module_outputs
+
 bt_start "call modules"
 while read -r module; do
     bt_start "call ${module}"
-    module_output=$("${BASE_DIR}/modules/${module}" 2> /dev/null)
-    bt_end "call ${module}"
-    if [ "$?" != 0 ]; then continue; fi
+    module_path="${BASE_DIR}/modules/${module}"
 
-    bt_start "append $module output"
-    output+="${module_output}"
-    [[ -n "${module_output}" ]] && output+=$'\n'
-    bt_end "append $module output"
+    # create temp file to output to
+    output_file=$(mktemp)
+
+    # run in background, and save to output
+    "${module_path}" > "$output_file" 2> /dev/null &
+    pid=$!
+    # remember the pid and output file
+    module_pids+=($pid)
+    module_outputs[$pid]=$output_file
+
+    bt_end "call ${module}"
 done <<< "${modules}"
 bt_end "call modules"
+
+# iterate over module outputs to build output
+output=""
+for pid in "${module_pids[@]}"; do
+    bt_start "wait ${pid}"
+    wait "$pid"
+    bt_end "wait ${pid}"
+    
+    bt_start "read ${pid} output"
+    module_output=$(cat "${module_outputs[$pid]}")
+    output+="$module_output"
+    bt_end "read ${pid} output"
+    # remove the temp file
+    rm -f "${module_outputs[$pid]}"
+done
 
 # Print the output in pretty columns
 bt_start "columnize"
