@@ -4,7 +4,7 @@ set -euo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
-ip_v4=$(curl ifconfig.me/ip)
+ip_v4=$(curl --max-time 0.5 ifconfig.me/ip)
 
 text=$(print_wrap "${WIDTH}" "${ip_v4}")
 
