@@ -18,8 +18,11 @@ excluded_mounts=(
   "/System/Volumes/iSCPreboot"
   "/System/Volumes/Preboot"
   "/System/Volumes/xarts"
+  "/System/Volumes/Update/mnt1"
+  "/System/Volumes/Update/SFR/mnt1"
 )
 
+# TODO: seems to rely on coreutils's df
 # shellcheck disable=SC2046
 disks="$(
   df -h --local --print-type $(printf " -x %s" "${excluded_types[@]}") \
