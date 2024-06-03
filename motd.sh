@@ -57,13 +57,15 @@ while read -r module; do
 done <<< "${modules}"
 bt_end "call modules"
 
+# wait for it all to finish
+bt_start "wait"
+wait "${module_pids[@]}"
+bt_end "wait"
+
 # iterate over module outputs to build output
 output=""
+bt_start "build output"
 for pid in "${module_pids[@]}"; do
-    bt_start "wait ${pid}"
-    wait "$pid"
-    bt_end "wait ${pid}"
-    
     bt_start "read ${pid} output"
     module_output=$(cat "${module_outputs[$pid]}")
     output+="$module_output"
@@ -71,6 +73,7 @@ for pid in "${module_pids[@]}"; do
     # remove the temp file
     rm -f "${module_outputs[$pid]}"
 done
+bt_end "build output"
 
 # Print the output in pretty columns
 bt_start "columnize"
