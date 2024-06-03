@@ -70,7 +70,7 @@ elif type vm_stat > /dev/null 2>&1; then
 
     local match_string paging mvar paged_val gigabyte_val
     match_string=$1
-    paging=4096
+    paging=16384
     mvar=3
 
     if [[ $match_string =~ \  ]]; then
