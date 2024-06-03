@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+. bt.sh                            # source bt.sh
+bt_init                            # initialize
 
-set -euo pipefail
+set -eo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
@@ -43,6 +45,8 @@ if type free > /dev/null 2>&1; then
   print_columns "Memory" "${out}"
 elif type vm_stat > /dev/null 2>&1; then
   function ram() {
+    bt_start "ram"
+
     local installed_memory total_consumed free_memory label percentage bar total_memory
     installed_memory=$(echo "scale=2; $(sysctl -n hw.memsize) / 1024 / 1024 / 1000" | bc)
     total_consumed=0
@@ -58,9 +62,12 @@ elif type vm_stat > /dev/null 2>&1; then
     percent_used=$(echo "scale=2; $total_consumed * 100 / $installed_memory" | bc)
     bar=$(print_bar "${WIDTH}" "${percent_used}")
     printf "%s\n%s" "${label}" "${bar}"
+    bt_end "ram"
   }
 
   function get_paged_memory_usage() {
+    # bt_start "get_paged_memory_usage"
+
     local match_string paging mvar paged_val gigabyte_val
     match_string=$1
     paging=4096
@@ -73,6 +80,7 @@ elif type vm_stat > /dev/null 2>&1; then
     paged_val=$(vm_stat | grep "Pages ${match_string}:" | awk -v mvar="$mvar" '{ print $mvar}')
     gigabyte_val=$(echo "scale=2; ($paged_val * $paging) / 1024 / 1024 / 1000" | bc)
     echo $gigabyte_val
+    # bt_end "get_paged_memory_usage"
   }
 
 

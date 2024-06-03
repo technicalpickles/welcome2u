@@ -30,10 +30,12 @@ fi
 # Run the modules and collect output
 output=""
 
-# shellcheck disable=SC2010
 bt_start "determine modules"
+# shellcheck disable=SC2010
 modules="$(ls -1 "${BASE_DIR}/modules" | $grep -P '^(?<!\d)\d{2}(?!\d)-' | $grep -v $(printf " -e %s" "${exclude_modules[@]}"))"
 bt_end "determine modules"
+
+bt_start "call modules"
 while read -r module; do
     bt_start "call ${module}"
     module_output=$("${BASE_DIR}/modules/${module}" 2> /dev/null)
@@ -45,6 +47,7 @@ while read -r module; do
     [[ -n "${module_output}" ]] && output+=$'\n'
     bt_end "append $module output"
 done <<< "${modules}"
+bt_end "call modules"
 
 # Print the output in pretty columns
 bt_start "columnize"

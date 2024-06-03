@@ -1,7 +1,7 @@
 # shellcheck shell=bash
-# . bt.sh                            # source bt.sh
-# bt_init                            # initialize
-# bt_start "source framework.sh"
+. bt.sh                            # source bt.sh
+bt_init                            # initialize
+# bt_start "source framework.sh $BASHPID"
 
 
 # Source the config
@@ -209,5 +209,5 @@ columnize() {
     bt_end "columnize padding"
 }
 
-# bt_end "source framework.sh"
-# bt_cleanup
+# bt_end "source framework.sh $BASHPID"
+bt_cleanup
