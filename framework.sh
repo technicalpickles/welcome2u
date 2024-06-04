@@ -1,6 +1,6 @@
 # shellcheck shell=bash
-. bt.sh                            # source bt.sh
-bt_init                            # initialize
+. "$BASE_DIR/bt.sh"
+bt_init
 # bt_start "source framework.sh $BASHPID"
 
 

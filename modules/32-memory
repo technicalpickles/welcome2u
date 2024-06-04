@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-. bt.sh                            # source bt.sh
+. "$BASE_DIR/bt.sh"                            # source bt.sh
 bt_init                            # initialize
 
 set -eo pipefail

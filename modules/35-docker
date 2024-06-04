@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-. bt.sh                            # source bt.sh
-bt_init                            # initialize
+. "$BASE_DIR/bt.sh"
+bt_init
 
 set -euo pipefail
 # shellcheck source=./framework.sh
