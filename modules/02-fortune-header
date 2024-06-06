@@ -6,7 +6,9 @@ source "${BASE_DIR}/framework.sh"
 
 # fortune_width=$WIDTH
 fortune_width=80
+bt_start "fortune-header fortune"
 quote="$(fortune "${quote_files[@]}" | fold -sw "${fortune_width}")"
+bt_end "fortune-header fortune"
 
 print_columns "" "\n$CD${quote}$CN\n"
 

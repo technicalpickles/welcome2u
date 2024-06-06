@@ -18,12 +18,13 @@ excluded_modules = [
   "41-updates",
 
   # we'll do our own versions of these in 01-intro
-  "00-banner"
+  "00-banner",
+  "50-quote"
 ]
 
 config_path="#{base_dir}/config.sh"
 
-thread_outputs = {}
+thread_readers = {}
 
 enabled_modules = Dir.glob("#{base_dir}/modules/*").sort!.delete_if { |f| excluded_modules.include?(File.basename(f)) }
 enabled_modules.each do |module_path|
@@ -44,14 +45,27 @@ enabled_modules.each do |module_path|
     end
   end
   module_thread.name = module_base
-  thread_outputs[module_thread] = reader
+  thread_readers[module_thread] = reader
 end
 
 
-thread_outputs.each do |thread, reader|
-  BT.time "join #{thread.name}" do
-    thread.join
+thread_outputs = {}
+
+BT.time "join thread and read output" do
+  thread_readers.each do |thread, reader|
+    BT.time "join #{thread.name}" do
+      thread.join
+    end
+    thread_outputs[thread] = reader.read
+    reader.close
   end
-  puts reader.read
-  reader.close
+end
+
+BT.time "determine left column width" do
+
+end
+BT.time "output" do
+  thread_outputs.each do |thread, output|
+    puts output
+  end
 end

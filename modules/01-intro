@@ -18,13 +18,16 @@ intro_fonts=(
 font=${intro_fonts[ $RANDOM % ${#intro_fonts[@]} ]}
 bt_end "choose intro font"
 
-bt_start "fortune"
+bt_start "intro fortune"
 fortune=$(fortune -s intro)
-bt_end "fortune"
+bt_end "intro fortune"
 
 bt_start "figlet+lolcat"
-intro=$(echo "$fortune" | figlet -w "$WIDTH" -f "$font" | lolcat --force)
+intro=$(echo "$fortune" | figlet -w "$WIDTH" -d "$(brew --prefix figlet)/share/figlet/fonts" -f "$font" | lolcat --force-color)
 bt_end "figlet+lolcat"
+
+bt_start "intro print_columns"
 print_columns "" "\n${intro}"
+bt_end "intro print_columns"
 
 bt_cleanup
