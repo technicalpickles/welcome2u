@@ -1,1 +1,6 @@
 config.sh
+
+
+# Added by cargo
+
+/target
