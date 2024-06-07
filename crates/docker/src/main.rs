@@ -39,8 +39,8 @@ async fn conc(arg: (Docker, &ContainerSummary)) {
             .unwrap();
 
     let name = info.name.as_ref().unwrap();
-    let state = info.state;
-    let status = match state.as_ref().unwrap().status {
+    let state = info.state.as_ref().unwrap();
+    let status = match state.status {
             Some(ContainerStateStatusEnum::EMPTY) => format!(""),
             Some(ContainerStateStatusEnum::CREATED) => format!(""),
             Some(ContainerStateStatusEnum::RUNNING) => format!("Up"),
@@ -48,8 +48,8 @@ async fn conc(arg: (Docker, &ContainerSummary)) {
             Some(ContainerStateStatusEnum::RESTARTING) => format!(""),
             Some(ContainerStateStatusEnum::REMOVING) => format!(""),
             Some(ContainerStateStatusEnum::EXITED) => {
-                let exit_code = state.as_ref().unwrap().exit_code.unwrap_or(0);
-                let finished_at = state.as_ref().unwrap().finished_at.as_ref().unwrap().as_str();
+                let exit_code = state.exit_code.unwrap_or(0);
+                let finished_at = state.finished_at.as_ref().unwrap().as_str();
 
                 format!(
                     "Exited ({}) {}",
