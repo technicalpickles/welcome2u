@@ -9,10 +9,24 @@ use bollard::{
     Docker,
 };
 
+use iso8601_timestamp::{Timestamp};
+
+use std::time::{Duration};
+
 use std::default::Default;
 
 use futures_util::stream;
 use futures_util::stream::StreamExt;
+
+fn timeago(str : &str) -> String {
+    let now = Timestamp::now_utc();
+
+    let timestamp = Timestamp::parse(str).unwrap();
+    let iso8601_duration = (*now - *timestamp).as_seconds_f32(); 
+    let duration = Duration::from_secs_f32(iso8601_duration);
+
+    timeago::Formatter::new().convert(duration)
+}
 
 async fn conc(arg: (Docker, &ContainerSummary)) {
     let (docker, container) = arg;
@@ -33,14 +47,15 @@ async fn conc(arg: (Docker, &ContainerSummary)) {
             Some(ContainerStateStatusEnum::RESTARTING) => format!(""),
             Some(ContainerStateStatusEnum::REMOVING) => format!(""),
             Some(ContainerStateStatusEnum::EXITED) => {
-                let exit_code = info.state.unwrap().exit_code.unwrap_or(0);
-                // let finished_at = info.state.unwrap().finished_at.unwrap();
-                // let exited_at = 
+                let state = info.state;
+                let exit_code = state.as_ref().unwrap().exit_code.unwrap_or(0);
+
+                let finished_at = state.as_ref().unwrap().finished_at.as_ref().unwrap().as_str();
+
                 format!(
                     "Exited ({}) {}",
                     exit_code,
-                    ""
-                    // timeago::Formatter::new().convert(info.state.unwrap().finished_at.unwrap().to_string())
+                    timeago(finished_at),
                 )
             },
             Some(ContainerStateStatusEnum::DEAD) => format!(""),
