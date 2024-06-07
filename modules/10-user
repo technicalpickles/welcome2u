@@ -13,5 +13,5 @@ hostname=${HOSTNAME:-$(hostname)}
 bt_end "hostname"
 
 bt_start "user print_columns"
-print_columns "Logged as" "${user}@${hostname}"
+print_columns "Logged as" "$(target/debug/user)"
 bt_end "user print_columns"

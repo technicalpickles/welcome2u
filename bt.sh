@@ -2,6 +2,12 @@
 # Usage: . bt.sh; bt_init; [ bt_start "foo"; bt_end "foo"; ... ]; bt_cleanup
 # Simple timechart-like tracing for bash.
 
+BT_INIT="${BT_INIT:-}"
+BT_DISABLED="${BT_DISABLED:-}"
+BT_DISABLE_CPUSAMPLE="${BT_DISABLE_CPUSAMPLE:-}"
+BT_CPUSAMPLE_PID="${BT_CPUSAMPLE_PID:-}"
+BT_DEBUG="${BT_DEBUG:-}"
+
 bt_sample_cpu_idle () {
   local sample_interval_s=1
   local sample_count=1

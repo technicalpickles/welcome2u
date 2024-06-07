@@ -4,12 +4,4 @@ set -euo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
-if [[ "$(uname -o)" = "Darwin" ]]; then
-  NAME="macOS"
-  VERSION=$(sw_vers -productVersion)
-else
-  # shellcheck disable=SC1091
-  source "/etc/os-release"
-fi
-
-print_columns "OS" "${NAME} ${VERSION:-}"
+print_columns "OS" "$(target/debug/os)"
