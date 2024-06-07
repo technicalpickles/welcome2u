@@ -7,5 +7,4 @@ edition = "2021"
 
 [dependencies]
 figlet-rs = "0.1.5"
-lolcat = "1.5.0"
 rand = "0.8.5"
