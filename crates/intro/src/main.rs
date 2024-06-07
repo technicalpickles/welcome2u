@@ -5,7 +5,6 @@ use rand::{
     Rng,
 };
 use std::{
-    env,
     fmt,
     error::Error,
     fs::File,
@@ -64,16 +63,15 @@ impl Fortunes {
         Self::new(content)
     }
 
-    pub fn print_one(&self) {
-        match &self.choose_one() {
-            Ok(fortune) => println!("{}", fortune),
-            Err(_) => {
-                println!("No fortunes found");
-                return;
-            }
-        }
-
-    }
+    // pub fn print_one(&self) {
+    //     match &self.choose_one() {
+    //         Ok(fortune) => println!("{}", fortune),
+    //         Err(_) => {
+    //             println!("No fortunes found");
+    //             return;
+    //         }
+    //     }
+    // }
 
     pub fn choose_one(&self) -> Result<&String, NoFortunesError> {
         let fortunes = &self.0;
