@@ -1,0 +1,15 @@
+[package]
+name = "docker"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bollard = "0.16.1"
+future-utils = "0.12.1"
+futures-util = "0.3.30"
+iso8601 = "0.6.1"
+isolang = "2.4.0"
+timeago = "0.4.2"
+tokio = { version = "1.38.0", features = ["full"] }
