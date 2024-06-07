@@ -3,12 +3,8 @@ set -euo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
-bt_start "intro fortune"
-fortune=$(fortune -s intro)
-bt_end "intro fortune"
-
 bt_start "figlet+lolcat"
-intro=$(target/debug/intro "$fortune" | lolcat --force-color)
+intro=$(target/debug/intro | lolcat --force-color)
 bt_end "figlet+lolcat"
 
 bt_start "intro print_columns"
