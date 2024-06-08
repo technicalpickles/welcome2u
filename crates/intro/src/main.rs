@@ -34,7 +34,6 @@ impl Fortunes {
     pub fn new(content: String) -> Result<Fortunes, Box<dyn Error>> {
         let fortunes = content
             .split("\n%\n")
-            .into_iter()
             .map(|it| it.to_string())
             .collect();
         Ok(Self(fortunes))
@@ -63,16 +62,6 @@ impl Fortunes {
         Self::new(content)
     }
 
-    // pub fn print_one(&self) {
-    //     match &self.choose_one() {
-    //         Ok(fortune) => println!("{}", fortune),
-    //         Err(_) => {
-    //             println!("No fortunes found");
-    //             return;
-    //         }
-    //     }
-    // }
-
     pub fn choose_one(&self) -> Result<&String, NoFortunesError> {
         let fortunes = &self.0;
         if fortunes.is_empty() {
@@ -81,12 +70,35 @@ impl Fortunes {
         let mut rng = rand::thread_rng();
         let index = rng.gen_range(0..fortunes.len());
 
-        return Ok(&fortunes[index]);
+        Ok(&fortunes[index])
     }
 }
 
-fn main() {
-    // possible font list
+fn choose_fortune() -> Result<String, NoFortunesError> {
+    let fortune_path = String::from("/opt/homebrew/opt/fortune/share/games/fortunes/intro");
+    let fortune_file = Fortunes::from_file(&fortune_path).unwrap();
+    let fortune = fortune_file.choose_one()?;
+
+    Ok(fortune.to_string())
+}
+
+enum FigletErrors {
+}
+
+fn figlet(font: String, message: String) -> Result<String, FigletErrors> {
+    let font_directory = "/opt/homebrew/opt/figlet";
+    let font_path = format!("{}/share/figlet/fonts/{}.flf", font_directory, font);
+
+    let font = match FIGfont::from_file(font_path.as_str()) {
+        Ok(font) => font,
+        Err(error) => panic!("Could not load font from {}: {}", font_path, error),
+    };
+
+    let figure = font.convert(&message).unwrap();
+    Ok(figure.to_string())
+}
+
+fn random_font() -> String {
     let fonts = [
         "bell",
         "big",
@@ -98,9 +110,13 @@ fn main() {
         "jazmine",
         "rectangles",
     ];
-    let fortune_path = String::from("/opt/homebrew/opt/fortune/share/games/fortunes/intro");
-    let fortune_file = Fortunes::from_file(&fortune_path).unwrap();
-    let fortune = match fortune_file.choose_one() {
+    let mut rng = thread_rng();
+    let font_choice = fonts.choose(&mut rng);
+    font_choice.unwrap().to_string()
+}
+
+fn main() {
+    let fortune = match choose_fortune() {
         Ok(fortune) => fortune,
         Err(_) => {
             println!("No fortunes found");
@@ -108,20 +124,16 @@ fn main() {
         }
     };
 
-    let font_directory = "/opt/homebrew/opt/figlet";
+    let font_choice = random_font();
+    let figure_result = figlet(font_choice, fortune);
 
-    // choose a random font
-    let mut rng = thread_rng();
-    let font_choice = fonts.choose(&mut rng);
-    let font_path = format!("{}/share/figlet/fonts/{}.flf", font_directory, font_choice.unwrap());
-
-    let font = match FIGfont::from_file(font_path.as_str()) {
-        Ok(font) => font,
-        Err(error) => panic!("Could not load font from {}: {}", font_path, error),
+    let figure = match figure_result {
+        Ok(figure) => figure,
+        Err(_) => {
+            println!("Could not generate figure");
+            return;
+        }
     };
 
-    let figure = font.convert(&fortune);
-    assert!(figure.is_some());
-
-    println!("{}", figure.unwrap());
+    println!("{}", figure);
 }
