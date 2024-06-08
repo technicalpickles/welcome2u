@@ -254,6 +254,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "fortune"
+version = "0.1.0"
+dependencies = [
+ "rand",
+]
+
+[[package]]
 name = "futures-channel"
 version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -535,6 +542,7 @@ name = "intro"
 version = "0.1.0"
 dependencies = [
  "figlet-rs",
+ "fortune",
  "rand",
 ]
 
