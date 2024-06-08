@@ -26,6 +26,6 @@ else
     done <<< "${containers}"
 fi
 
-print_columns "Docker" "${text::-2}"
+print_columns "Docker" "$(target/debug/docker)"
 
 bt_cleanup

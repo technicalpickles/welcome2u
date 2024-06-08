@@ -1,6 +1,8 @@
 extern crate bollard;
 extern crate futures_util;
-extern crate timeago;
+
+use chrono;
+use chrono_humanize::{Accuracy, HumanTime, Tense};
 
 use bollard::{
     container::{InspectContainerOptions, ListContainersOptions},
@@ -11,22 +13,22 @@ use bollard::{
 
 use iso8601_timestamp::{Timestamp};
 
-use std::time::{Duration};
-
 use std::default::Default;
 
 use futures_util::stream;
 use futures_util::stream::StreamExt;
 
-fn timeago(str : &str) -> String {
+fn duration_since(str : &str) -> String {
     let now = Timestamp::now_utc();
 
     let timestamp = Timestamp::parse(str).unwrap();
     let iso8601_duration = (*now - *timestamp).as_seconds_f32(); 
-    let duration = Duration::from_secs_f32(iso8601_duration);
+    let dt = chrono::Duration::seconds(iso8601_duration.round() as i64);
+    let ht = HumanTime::from(dt);
 
-    timeago::Formatter::new().convert(duration)
+    ht.to_text_en(Accuracy::Rough, Tense::Present)
 }
+    
 
 async fn conc(arg: (Docker, &ContainerSummary)) {
     let (docker, container) = arg;
@@ -40,28 +42,32 @@ async fn conc(arg: (Docker, &ContainerSummary)) {
 
     let name = info.name.as_ref().unwrap();
     let state = info.state.as_ref().unwrap();
-    let status = match state.status {
-            Some(ContainerStateStatusEnum::EMPTY) => format!(""),
-            Some(ContainerStateStatusEnum::CREATED) => format!(""),
-            Some(ContainerStateStatusEnum::RUNNING) => format!("Up"),
-            Some(ContainerStateStatusEnum::PAUSED) => format!(""),
-            Some(ContainerStateStatusEnum::RESTARTING) => format!(""),
-            Some(ContainerStateStatusEnum::REMOVING) => format!(""),
-            Some(ContainerStateStatusEnum::EXITED) => {
-                let exit_code = state.exit_code.unwrap_or(0);
-                let finished_at = state.finished_at.as_ref().unwrap().as_str();
 
+    let exit_code = state.exit_code.unwrap_or(0);
+    let started_at = state.started_at.as_ref().unwrap().as_str();
+    let finished_at = state.finished_at.as_ref().unwrap().as_str();
+
+    let human_status = match state.status {
+            Some(ContainerStateStatusEnum::EMPTY) => format!("Empty"),
+            Some(ContainerStateStatusEnum::CREATED) => format!("Created"),
+            Some(ContainerStateStatusEnum::RUNNING) => {
+                format!("Up {}", duration_since(started_at))
+            },
+            Some(ContainerStateStatusEnum::PAUSED) => format!("Paused"),
+            Some(ContainerStateStatusEnum::RESTARTING) => format!("Restarting"),
+            Some(ContainerStateStatusEnum::REMOVING) => format!("Removing"),
+            Some(ContainerStateStatusEnum::EXITED) => {
                 format!(
-                    "Exited ({}) {}",
+                    "Exited ({}) {} ago",
                     exit_code,
-                    timeago(finished_at),
+                    duration_since(finished_at),
                 )
             },
-            Some(ContainerStateStatusEnum::DEAD) => format!(""),
+            Some(ContainerStateStatusEnum::DEAD) => format!("Dead"),
             None => format!(""),
     };
 
-    println!( "{}\t{}", name, status )
+    println!( "{}\t{}", name, human_status)
 }
 
 #[tokio::main]
