@@ -1,17 +1,3 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-# shellcheck source=./framework.sh
-source "${BASE_DIR}/framework.sh"
-
-bt_start "user"
-user=${USER:-$(id -un)}
-bt_end "user"
-
-bt_start "hostname"
-hostname=${HOSTNAME:-$(hostname)}
-bt_end "hostname"
-
-bt_start "user print_columns"
-print_columns "Logged as" "$(target/debug/user)"
-bt_end "user print_columns"
+exec target/debug/user
