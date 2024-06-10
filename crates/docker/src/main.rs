@@ -1,6 +1,8 @@
 extern crate bollard;
 extern crate futures_util;
 
+use human_panic::setup_panic;
+
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 
 use bollard::{
@@ -13,12 +15,9 @@ use iso8601_timestamp::Timestamp;
 
 use std::default::Default;
 
-use futures_util::stream;
-use futures_util::stream::StreamExt;
-
 struct ContainerInfo {
     name: String,
-    status: String,
+    human_status: String,
 }
 
 struct DockerInfo {
@@ -75,7 +74,9 @@ async fn conc(arg: (Docker, &ContainerSummary)) {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
+async fn main() {
+    setup_panic!();
+
     let docker = Docker::connect_with_socket(
         "unix:///Users/josh.nichols/.colima/gusto/docker.sock",
         5,
@@ -83,18 +84,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     )
     .unwrap();
 
-    let options = ListContainersOptions::<String> {
+    let options = Some(ListContainersOptions::<String> {
         all: true,
         ..Default::default()
+    });
+
+    let res = docker.list_containers(options).await;
+    let containers = match res {
+        Ok(containers) => containers,
+        Err(e) => {
+            panic!("unable to communicate with Docker: {}", e);
+        }
     };
-
-    let containers = &docker.list_containers(Some(options)).await?;
-
-    let docker_stream = stream::repeat(docker);
-    docker_stream
-        .zip(stream::iter(containers))
-        .for_each_concurrent(2, conc)
-        .await;
-
-    Ok(())
 }
