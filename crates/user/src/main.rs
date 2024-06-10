@@ -36,5 +36,5 @@ impl UserInfo {
 fn main() {
     let info = UserInfo::collect();
     let user = format!("{}@{}", info.username(), info.hostname());
-    println!("{} {}", Blue.paint("Logged in as:"), user);
+    println!("{}: {}", Blue.paint("Logged in as"), user);
 }
