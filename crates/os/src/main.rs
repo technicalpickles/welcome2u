@@ -1,6 +1,6 @@
-use ansi_term::Colour::Blue;
+use display::format_label;
 
 fn main() {
     let info = os_info::get();
-    println!("{}: {}", Blue.paint("OS"), info)
+    println!("{}{}", format_label("OS"), info)
 }

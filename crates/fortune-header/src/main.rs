@@ -24,5 +24,5 @@ fn main() {
     let message = indent(&message, "       ");
     let message = Style::default().dimmed().paint(message);
 
-    println!("{}", message)
+    println!("{}", message);
 }

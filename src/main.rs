@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Command::new("target/debug/os"),
         Command::new("modules/20-uptime"),
         Command::new("modules/30-load"),
-        Command::new("modules/32-memory"),
+        Command::new("target/debug/memory"),
         Command::new("modules/33-disk"),
         Command::new("target/debug/docker"),
     ];

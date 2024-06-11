@@ -63,7 +63,7 @@ async fn conc(arg: (Docker, &ContainerSummary)) {
     };
 
     // TODO be smarter about width
-    println!("\t{:<40}\t{}", name, human_status)
+    println!("{:16}{:<40} {}", "", name, human_status)
 }
 
 #[tokio::main]

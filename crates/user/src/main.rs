@@ -39,5 +39,5 @@ fn main() {
     let user = format!("{}@{}", info.username(), info.hostname());
     let label = format_label("Logged in as");
 
-    println!("{label} {user}");
+    println!("{label}{user}");
 }

@@ -1,5 +1,7 @@
 use sysinfo::System;
 
+use display::format_label;
+
 use fmtsize::{FmtSize, Conventional};
 
 struct MemoryInfo {
@@ -46,7 +48,8 @@ impl MemoryInfo {
 fn main() {
     let memory_info = MemoryInfo::collect();
     println!(
-        "RAM - {} used, {} available / {}",
+        "{}RAM - {} used, {} available / {}",
+        format_label("Memory"),
         memory_info.used_memory(),
         memory_info.available_memory(),
         memory_info.total_memory(),
