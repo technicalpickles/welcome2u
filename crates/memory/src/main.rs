@@ -1,6 +1,6 @@
 use sysinfo::System;
 
-use display::format_label;
+use display::print_segment;
 
 use fmtsize::{FmtSize, Conventional};
 
@@ -47,11 +47,13 @@ impl MemoryInfo {
 
 fn main() {
     let memory_info = MemoryInfo::collect();
-    println!(
-        "{}RAM - {} used, {} available / {}",
-        format_label("Memory"),
-        memory_info.used_memory(),
-        memory_info.available_memory(),
-        memory_info.total_memory(),
+    print_segment(
+        "RAM",
+        format!(
+            "RAM - {} used, {} available / {}",
+            memory_info.used_memory(),
+            memory_info.available_memory(),
+            memory_info.total_memory(),
+        ).as_str(),
     );
 }

@@ -1,6 +1,7 @@
-use display::format_label;
+use display::print_segment;
 
 fn main() {
     let info = os_info::get();
-    println!("{}{}", format_label("OS"), info)
+
+    print_segment("OS", &info.to_string());
 }

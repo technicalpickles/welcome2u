@@ -1,6 +1,6 @@
 use users::{get_user_by_uid, get_current_uid};
 
-use display::format_label;
+use display::print_segment;
 
 struct UserInfo {
     username: String,
@@ -35,9 +35,7 @@ impl UserInfo {
 
 fn main() {
     let info = UserInfo::collect();
-
     let user = format!("{}@{}", info.username(), info.hostname());
-    let label = format_label("Logged in as");
 
-    println!("{label}{user}");
+    print_segment("Logged in as", &user);
 }
