@@ -1,6 +1,6 @@
 use users::{get_user_by_uid, get_current_uid};
 
-use ansi_term::Colour::Blue;
+use display::format_label;
 
 struct UserInfo {
     username: String,
@@ -35,6 +35,9 @@ impl UserInfo {
 
 fn main() {
     let info = UserInfo::collect();
+
     let user = format!("{}@{}", info.username(), info.hostname());
-    println!("{}: {}", Blue.paint("Logged in as"), user);
+    let label = format_label("Logged in as");
+
+    println!("{label} {user}");
 }

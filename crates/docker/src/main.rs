@@ -1,6 +1,8 @@
 extern crate bollard;
 extern crate futures_util;
 
+use display::format_label;
+
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 
 use bollard::{
@@ -15,17 +17,6 @@ use std::default::Default;
 
 use futures_util::stream;
 use futures_util::stream::StreamExt;
-
-struct ContainerInfo {
-    name: String,
-    status: String,
-}
-
-struct DockerInfo {
-    running: bool,
-    containers: Vec<ContainerInfo>,
-}
-
 
 fn duration_since(str: &str) -> String {
     let now = Timestamp::now_utc();
@@ -71,7 +62,8 @@ async fn conc(arg: (Docker, &ContainerSummary)) {
         None => String::new(),
     };
 
-    println!("{}\t{}", name, human_status)
+    // TODO be smarter about width
+    println!("\t{:<40}\t{}", name, human_status)
 }
 
 #[tokio::main]
@@ -87,6 +79,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         all: true,
         ..Default::default()
     };
+
+    println!("{}", format_label("Docker"));
 
     let containers = &docker.list_containers(Some(options)).await?;
 

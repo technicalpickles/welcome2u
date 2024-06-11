@@ -263,12 +263,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "display"
+version = "0.1.0"
+dependencies = [
+ "ansi_term",
+]
+
+[[package]]
 name = "docker"
 version = "0.1.0"
 dependencies = [
  "bollard",
  "chrono",
  "chrono-humanize",
+ "display",
  "futures-util",
  "human-panic",
  "iso8601-timestamp",
@@ -323,6 +331,15 @@ name = "fortune"
 version = "0.1.0"
 dependencies = [
  "rand",
+]
+
+[[package]]
+name = "fortune-header"
+version = "0.1.0"
+dependencies = [
+ "ansi_term",
+ "fortune",
+ "textwrap",
 ]
 
 [[package]]
@@ -1056,6 +1073,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
 
 [[package]]
+name = "smawk"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b7c388c1b5e93756d0c740965c41e8822f866621d41acbdf6336a6a168f8840c"
+
+[[package]]
 name = "socket2"
 version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1089,6 +1112,17 @@ dependencies = [
  "once_cell",
  "rayon",
  "windows",
+]
+
+[[package]]
+name = "textwrap"
+version = "0.16.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23d434d3f8967a09480fb04132ebe0a3e088c173e6d0ee7897abbdf4eab0f8b9"
+dependencies = [
+ "smawk",
+ "unicode-linebreak",
+ "unicode-width",
 ]
 
 [[package]]
@@ -1304,6 +1338,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
 
 [[package]]
+name = "unicode-linebreak"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b09c83c3c29d37506a3e260c08c03743a6bb66a9cd432c6934ab501a190571f"
+
+[[package]]
 name = "unicode-normalization"
 version = "0.1.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1311,6 +1351,12 @@ checksum = "a56d1686db2308d901306f92a263857ef59ea39678a5458e7cb17f01415101f5"
 dependencies = [
  "tinyvec",
 ]
+
+[[package]]
+name = "unicode-width"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0336d538f7abc86d282a4189614dfaa90810dfc2c6f6427eaf88e16311dd225d"
 
 [[package]]
 name = "url"
@@ -1327,7 +1373,7 @@ dependencies = [
 name = "user"
 version = "0.1.0"
 dependencies = [
- "ansi_term",
+ "display",
  "hostname",
  "users",
 ]

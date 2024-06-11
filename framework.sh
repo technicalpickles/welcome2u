@@ -1,6 +1,6 @@
 # shellcheck shell=bash
-. "$BASE_DIR/bt.sh"
-bt_init
+# . "$BASE_DIR/bt.sh"
+# bt_init
 # bt_start "source framework.sh $BASHPID"
 
 
@@ -197,7 +197,7 @@ columnize() {
         left_widths+=(${#visible_left})
         [[ ${#visible_left} -gt ${max_left_width} ]] && max_left_width=${#visible_left}
     done <<< "$output"
-    bt_end "columnize populate variables"
+    # bt_end "columnize populate variables"
 
     # Iterate over lines and print them while padding left column with spaces
     bt_start "columnize padding"
@@ -206,8 +206,8 @@ columnize() {
         padding=$(print_n " " ${padding_width})
         echo -e "${left_lines[${i}]}${padding}  ${right_lines[${i}]}"
     done
-    bt_end "columnize padding"
+    # bt_end "columnize padding"
 }
 
 # bt_end "source framework.sh $BASHPID"
-bt_cleanup
+# bt_cleanup

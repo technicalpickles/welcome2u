@@ -3,12 +3,12 @@ set -euo pipefail
 # shellcheck source=./framework.sh
 source "${BASE_DIR}/framework.sh"
 
-bt_start "figlet+lolcat"
+# bt_start "figlet+lolcat"
 intro=$(target/debug/intro | lolcat --force-color)
-bt_end "figlet+lolcat"
+# bt_end "figlet+lolcat"
 
-bt_start "intro print_columns"
+# bt_start "intro print_columns"
 print_columns "" "\n${intro}"
-bt_end "intro print_columns"
+# bt_end "intro print_columns"
 
-bt_cleanup
+# bt_cleanup

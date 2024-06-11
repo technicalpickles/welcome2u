@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 
 [workspace]
-members = ["crates/*"]
-default-members = ["crates/*"]
+members = ["crates/*", "."]
+default-members = ["crates/*", "."]
