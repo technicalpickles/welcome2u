@@ -56,4 +56,5 @@ fn main() {
             memory_info.total_memory(),
         ).as_str(),
     );
+
 }
