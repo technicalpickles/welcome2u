@@ -26,10 +26,6 @@ fn figlet(font: String, message: String) -> Result<String, FigletErrors> {
     Ok(figure.to_string())
 }
 
-fn lolcat(s: String) -> String {
-    "".to_string()
-}
-
 fn random_font() -> String {
     let fonts = [
         "bell",

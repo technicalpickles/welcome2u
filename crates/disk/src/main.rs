@@ -4,11 +4,7 @@ use ratatui::{prelude::*, widgets::*};
 use std::path::Path;
 use sysinfo::Disks;
 
-use crossterm::{
-    event::{self, KeyCode, KeyEventKind},
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-    ExecutableCommand,
-};
+
 use ratatui::{
     prelude::{CrosstermBackend, Stylize, Terminal},
     widgets::Paragraph,
