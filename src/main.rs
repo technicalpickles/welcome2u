@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         processes.push(child);
     }
 
-    // once the child processes have started, we can wait for them to finish 
+    // once the child processes have started, we can wait for them to finish
     // and get their output
     for child in processes {
         let output = child.wait_with_output()?;

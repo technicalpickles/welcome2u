@@ -1,4 +1,4 @@
-use users::{get_user_by_uid, get_current_uid};
+use users::{get_current_uid, get_user_by_uid};
 
 use display::print_segment;
 
@@ -9,10 +9,7 @@ struct UserInfo {
 
 impl UserInfo {
     fn new(username: String, hostname: String) -> Self {
-        Self {
-            username,
-            hostname,
-        }
+        Self { username, hostname }
     }
 
     fn username(&self) -> &str {

@@ -1,11 +1,7 @@
 use figlet_rs::FIGfont;
-use rand::{
-    thread_rng,
-    seq::SliceRandom,
-};
+use rand::{seq::SliceRandom, thread_rng};
 
-use fortune::{NoFortunesError, Fortunes};
-
+use fortune::{Fortunes, NoFortunesError};
 
 fn choose_fortune() -> Result<String, NoFortunesError> {
     let fortune_path = String::from("/opt/homebrew/opt/fortune/share/games/fortunes/intro");
@@ -15,8 +11,7 @@ fn choose_fortune() -> Result<String, NoFortunesError> {
     Ok(fortune.to_string())
 }
 
-enum FigletErrors {
-}
+enum FigletErrors {}
 
 fn figlet(font: String, message: String) -> Result<String, FigletErrors> {
     let font_directory = "/opt/homebrew/opt/figlet";
@@ -31,7 +26,7 @@ fn figlet(font: String, message: String) -> Result<String, FigletErrors> {
     Ok(figure.to_string())
 }
 
-fn lolcat(s : String) -> String {
+fn lolcat(s: String) -> String {
     "".to_string()
 }
 

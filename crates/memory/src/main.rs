@@ -2,7 +2,7 @@ use sysinfo::System;
 
 use display::print_segment;
 
-use fmtsize::{FmtSize, Conventional};
+use fmtsize::{Conventional, FmtSize};
 
 struct MemoryInfo {
     used_memory: String,
@@ -31,10 +31,9 @@ impl MemoryInfo {
         Self::new(used_memory, available_memory, total_memory)
     }
 
-
-    fn used_memory(&self) -> &str { 
+    fn used_memory(&self) -> &str {
         &self.used_memory
-    } 
+    }
 
     fn available_memory(&self) -> &str {
         &self.available_memory
@@ -54,7 +53,7 @@ fn main() {
             memory_info.used_memory(),
             memory_info.available_memory(),
             memory_info.total_memory(),
-        ).as_str(),
+        )
+        .as_str(),
     );
-
 }

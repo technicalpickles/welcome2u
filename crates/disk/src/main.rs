@@ -1,8 +1,8 @@
-use sysinfo::Disks;
-use std::path::Path;
-use fmtsize::{FmtSize, Conventional};
-use ratatui::{prelude::*, widgets::*};
 use ansi_term::Colour::Blue;
+use fmtsize::{Conventional, FmtSize};
+use ratatui::{prelude::*, widgets::*};
+use std::path::Path;
+use sysinfo::Disks;
 
 use crossterm::{
     event::{self, KeyCode, KeyEventKind},
@@ -22,25 +22,21 @@ fn main() -> Result<()> {
     };
     let mut terminal = Terminal::with_options(backend, options)?;
 
-
-
     let disks = Disks::new_with_refreshed_list();
 
-    let excluded_mount_points = [
-        Path::new("/System/Volumes/Data"),
-    ];
+    let excluded_mount_points = [Path::new("/System/Volumes/Data")];
 
     terminal.draw(|frame| {
         let layout = Layout::default()
             .direction(Direction::Horizontal)
-            .constraints(vec![
-                Constraint::Length(16),
-                Constraint::Fill(1),
-            ]);
+            .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
         let [label_area, data_area] = layout.areas(frame.size());
 
-        frame.render_widget(Paragraph::new(Blue.bold().paint("Disk").to_string()), label_area);
+        frame.render_widget(
+            Paragraph::new(Blue.bold().paint("Disk").to_string()),
+            label_area,
+        );
         for disk in &disks {
             if excluded_mount_points.contains(&disk.mount_point()) {
                 continue;
@@ -58,19 +54,23 @@ fn main() -> Result<()> {
             let total_space = total_space.fmt_size(Conventional).to_string();
             let used_space = used_space.fmt_size(Conventional).to_string();
 
-            let text = format!("{} ({}) - {} used, {} free / {}", name, mount_point, used_space, free_space, total_space);
+            let text = format!(
+                "{} ({}) - {} used, {} free / {}",
+                name, mount_point, used_space, free_space, total_space
+            );
 
-            frame.render_widget(LineGauge::default()
-                .block(Block::default().title(text))
-                .gauge_style(
-                    Style::default()
-                        .fg(Color::Red)
-                        .bg(Color::Green)
-                        .add_modifier(Modifier::BOLD),
-                )
-                .line_set(symbols::line::THICK)
-                .ratio(ratio),
-                data_area
+            frame.render_widget(
+                LineGauge::default()
+                    .block(Block::default().title(text))
+                    .gauge_style(
+                        Style::default()
+                            .fg(Color::Red)
+                            .bg(Color::Green)
+                            .add_modifier(Modifier::BOLD),
+                    )
+                    .line_set(symbols::line::THICK)
+                    .ratio(ratio),
+                data_area,
             );
         }
     })?;

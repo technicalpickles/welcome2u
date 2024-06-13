@@ -37,17 +37,17 @@ impl Fortunes {
         let file_path = Path::new(&path);
         if !file_path.exists() {
             return Err(io::Error::new(
-                    io::ErrorKind::NotFound,
-                    format!("The fortune file '{path}' does not exist"),
+                io::ErrorKind::NotFound,
+                format!("The fortune file '{path}' does not exist"),
             )
-                .into());
+            .into());
         }
         if file_path.is_dir() {
             return Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    format!("'{path}' is a directory, not a file"),
+                io::ErrorKind::InvalidInput,
+                format!("'{path}' is a directory, not a file"),
             )
-                .into());
+            .into());
         }
         let mut file = File::open(file_path)?;
         let mut content = String::new();
