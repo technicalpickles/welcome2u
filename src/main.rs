@@ -3,6 +3,9 @@ use std::process::{Command, Stdio};
 use std::env;
 use std::error::Error;
 
+use display::MotdSegement;
+use fortune_header::FortuneHeaderSegment;
+
 fn main() -> Result<(), Box<dyn Error>> {
     env::set_var("BASE_DIR", ".");
     env::set_var("CONFIG_PATH", "./config.sh");
@@ -11,7 +14,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let commands = vec![
         Command::new("target/debug/intro"),
-        Command::new("target/debug/fortune-header"),
+        // Command::new("target/debug/fortune_header"),
         Command::new("target/debug/user"),
         Command::new("target/debug/os"),
         Command::new("modules/20-uptime"),
@@ -20,6 +23,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         Command::new("modules/33-disk"),
         Command::new("target/debug/docker"),
     ];
+
+    let fortune = FortuneHeaderSegment::new();
+    fortune.render();
 
     // spawn all child processes in the background
     for mut command in commands {

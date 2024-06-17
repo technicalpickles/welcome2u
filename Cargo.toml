@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+fortune_header = { path = "crates/fortune_header" }
+display = { path = "crates/display" }
 
 [workspace]
 members = ["crates/*", "."]

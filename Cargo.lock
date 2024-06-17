@@ -459,6 +459,10 @@ checksum = "de853764b47027c2e862a995c34978ffa63c1501f2e15f987ba11bd4f9bba193"
 [[package]]
 name = "fancy-motd"
 version = "0.1.0"
+dependencies = [
+ "display",
+ "fortune_header",
+]
 
 [[package]]
 name = "figlet-rs"
@@ -495,10 +499,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "fortune-header"
+name = "fortune_header"
 version = "0.1.0"
 dependencies = [
  "ansi_term",
+ "display",
  "fortune",
  "textwrap",
 ]
