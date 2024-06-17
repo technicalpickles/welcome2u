@@ -63,12 +63,9 @@ fn main() {
 
     let seed = rand::random::<f64>() * 1_000_000.0;
     let freq = 0.1;
-    // default is 1.0 ... increase the number to have it spread out a lil less, ie not changing as
-    // much
+    // default is 1.0 ... increase the number to have it spread out a lil less, ie not changing as much
     let spread = 5.0;
     let inverse = false;
-
-    // printli
 
     figure.lines().for_each(|line| {
         lolcat::print_rainbow(line, freq, seed, spread, inverse);
