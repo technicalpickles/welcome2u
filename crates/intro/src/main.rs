@@ -29,7 +29,7 @@ fn figlet(font: String, message: String) -> Result<String, FigletErrors> {
 fn random_font() -> String {
     let fonts = [
         "bell",
-        // "big", # seems broken
+        // "big", # seems broken from figlet-rs code?
         "slant",
         "contessa",
         "computer",
@@ -61,5 +61,17 @@ fn main() {
         }
     };
 
-    println!("{}", figure);
+    let seed = rand::random::<f64>() * 1_000_000.0;
+    let freq = 0.1;
+    // default is 1.0 ... increase the number to have it spread out a lil less, ie not changing as
+    // much
+    let spread = 5.0;
+    let inverse = false;
+
+    // printli
+
+    figure.lines().for_each(|line| {
+        lolcat::print_rainbow(line, freq, seed, spread, inverse);
+        println!();
+    });
 }

@@ -10,14 +10,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut processes = Vec::new();
 
     let commands = vec![
-        Command::new("modules/01-intro"),
+        Command::new("target/debug/intro"),
         Command::new("target/debug/fortune-header"),
         Command::new("target/debug/user"),
         Command::new("target/debug/os"),
         Command::new("modules/20-uptime"),
         Command::new("modules/30-load"),
         Command::new("target/debug/memory"),
-        Command::new("target/debug/disk"),
+        Command::new("modules/33-disk"),
         Command::new("target/debug/docker"),
     ];
 
