@@ -408,6 +408,7 @@ name = "fancy-motd"
 version = "0.1.0"
 dependencies = [
  "display",
+ "heading",
  "quote 0.1.0",
 ]
 
@@ -543,6 +544,7 @@ dependencies = [
 name = "heading"
 version = "0.1.0"
 dependencies = [
+ "display",
  "figlet-rs",
  "fortune",
  "lolcat",

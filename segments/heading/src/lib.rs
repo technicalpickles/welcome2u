@@ -1,5 +1,6 @@
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
+use display::MotdSegement;
 
 use fortune::{Fortunes, NoFortunesError};
 
@@ -13,7 +14,7 @@ fn choose_fortune() -> Result<String, NoFortunesError> {
 
 enum FigletErrors {}
 
-fn figlet(font: String, message: String) -> Result<String, FigletErrors> {
+fn figlet(font: String, message: &str) -> Result<String, FigletErrors> {
     let font_directory = "/opt/homebrew/opt/figlet";
     let font_path = format!("{}/share/figlet/fonts/{}.flf", font_directory, font);
 
@@ -43,32 +44,38 @@ fn random_font() -> String {
     font_choice.unwrap().to_string()
 }
 
-fn main() {
-    let message = match choose_fortune() {
-        Ok(message) => message,
-        Err(_) => {
-            println!("No fortunes found");
-            return;
+pub struct HeadingSegment {
+    pub heading: String
+}
+
+impl HeadingSegment {
+    pub fn new() -> Self {
+        Self {
+            heading: choose_fortune().unwrap()
         }
-    };
+    }
+}
 
-    let font_choice = random_font();
-    let figure = match figlet(font_choice, message) {
-        Ok(figure) => figure,
-        Err(_) => {
-            println!("Could not generate figure");
-            return;
-        }
-    };
+impl MotdSegement for HeadingSegment {
+    fn render(&self) {
+        let font_choice = random_font();
+        let figure = match figlet(font_choice, &self.heading) {
+            Ok(figure) => figure,
+            Err(_) => {
+                println!("Could not generate figure");
+                return;
+            }
+        };
 
-    let seed = rand::random::<f64>() * 1_000_000.0;
-    let freq = 0.1;
-    // default is 1.0 ... increase the number to have it spread out a lil less, ie not changing as much
-    let spread = 5.0;
-    let inverse = false;
+        let seed = rand::random::<f64>() * 1_000_000.0;
+        let freq = 0.1;
+        // default is 1.0 ... increase the number to have it spread out a lil less, ie not changing as much
+        let spread = 5.0;
+        let inverse = false;
 
-    figure.lines().for_each(|line| {
-        lolcat::print_rainbow(line, freq, seed, spread, inverse);
-        println!();
-    });
+        figure.lines().for_each(|line| {
+            lolcat::print_rainbow(line, freq, seed, spread, inverse);
+            println!();
+        });
+    }
 }
