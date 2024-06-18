@@ -1,10 +1,12 @@
 [package]
-name = "os"
+name = "quote"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-os_info = "3.8.2"
-display = { path = "../display" }
+ansi_term = "0.12.1"
+fortune = { path = "../../crates/fortune" }
+display = { path = "../../crates/display" }
+textwrap = "0.16.1"

@@ -4,7 +4,7 @@ use std::env;
 use std::error::Error;
 
 use display::MotdSegement;
-use fortune_header::FortuneHeaderSegment;
+use quote::FortuneHeaderSegment;
 
 fn main() -> Result<(), Box<dyn Error>> {
     env::set_var("BASE_DIR", ".");
@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut processes = Vec::new();
 
     let commands = vec![
-        Command::new("target/debug/intro"),
+        Command::new("target/debug/heading"),
         // Command::new("target/debug/fortune_header"),
         Command::new("target/debug/user"),
         Command::new("target/debug/os"),
