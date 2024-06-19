@@ -19,17 +19,11 @@ pub struct FortuneHeaderSegment {
     fortune: String
 }
 
-impl FortuneHeaderSegment {
-    pub fn new() -> Self {
+impl Default for FortuneHeaderSegment {
+    fn default() -> Self {
         Self {
             fortune: choose_fortune().unwrap()
         }
-    }
-}
-
-impl Default for FortuneHeaderSegment {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

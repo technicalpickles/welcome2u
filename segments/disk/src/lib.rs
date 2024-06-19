@@ -13,16 +13,9 @@ use ratatui::{
 };
 use std::io::stdout;
 
+#[derive(Default)]
 pub struct DiskSegment {
     disks : Vec<Disk>
-}
-
-impl DiskSegment {
-    pub fn new() -> Self {
-        Self {
-            disks: vec![]
-        }
-    }
 }
 
 struct Disk {

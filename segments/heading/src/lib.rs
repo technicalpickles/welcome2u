@@ -51,16 +51,11 @@ pub struct HeadingSegment {
     pub heading: String
 }
 
-impl HeadingSegment {
-    pub fn new() -> Self {
+impl Default for HeadingSegment {
+    fn default() -> Self {
         Self {
             heading: choose_fortune().unwrap()
         }
-    }
-}
-impl Default for HeadingSegment {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
