@@ -1,6 +1,7 @@
 use ansi_term::Style;
 use fortune::{Fortunes, NoFortunesError};
 use textwrap::indent;
+use anyhow::Result;
 
 use display::MotdSegement;
 
@@ -26,13 +27,20 @@ impl FortuneHeaderSegment {
     }
 }
 
+impl Default for FortuneHeaderSegment {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MotdSegement for FortuneHeaderSegment {
-    fn render(&self) {
+    fn render(&mut self) -> Result<()> {
         let content = textwrap::fill(&self.fortune, 80);
         let content = indent(&content, "       ");
         let content = Style::default().dimmed().paint(content);
 
         println!("{}", content);
         println!();
+        Ok(())
     }
 }

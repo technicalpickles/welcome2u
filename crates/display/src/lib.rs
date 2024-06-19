@@ -1,4 +1,5 @@
 use ansi_term::Colour::Blue;
+use anyhow::Result;
 
 pub fn format_label(text: &str) -> String {
     let text = format!("{}:", text);
@@ -12,7 +13,10 @@ pub fn print_segment(label: &str, contents: &str) {
 }
 
 pub trait MotdSegement {
-    fn render(&self);
+    fn prepare(&mut self) -> Result<()> {
+        Ok(())
+    }
+    fn render(&mut self) -> Result<()>;
 }
 
 pub struct Single {
@@ -28,8 +32,9 @@ impl Single {
 }
 
 impl MotdSegement for Single {
-    fn render(&self) {
+    fn render(&mut self) -> Result<()>  {
         println!("{}", self.content);
+        Ok(())
     }
 }
 
@@ -48,7 +53,8 @@ impl LabelWithContent {
 }
 
 impl MotdSegement for LabelWithContent {
-    fn render(&self) {
+    fn render(&mut self) -> Result<()> {
         print_segment(&self.label, &self.content);
+        Ok(())
     }
 }

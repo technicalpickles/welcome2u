@@ -9,6 +9,8 @@ edition = "2021"
 quote = { path = "segments/quote" }
 heading = { path = "segments/heading" }
 display = { path = "crates/display" }
+thiserror = "1.0.61"
+anyhow = "1.0.86"
 
 [workspace]
 members = ["crates/*", "segments/*", "."]

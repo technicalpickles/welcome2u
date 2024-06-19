@@ -1,6 +1,8 @@
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
 use display::MotdSegement;
+use anyhow::Result;
+use thiserror::Error;
 
 use fortune::{Fortunes, NoFortunesError};
 
@@ -12,9 +14,10 @@ fn choose_fortune() -> Result<String, NoFortunesError> {
     Ok(fortune.to_string())
 }
 
-enum FigletErrors {}
+#[derive(Error, Debug)]
+enum FigletError {}
 
-fn figlet(font: String, message: &str) -> Result<String, FigletErrors> {
+fn figlet(font: String, message: &str) -> Result<String> {
     let font_directory = "/opt/homebrew/opt/figlet";
     let font_path = format!("{}/share/figlet/fonts/{}.flf", font_directory, font);
 
@@ -23,7 +26,7 @@ fn figlet(font: String, message: &str) -> Result<String, FigletErrors> {
         Err(error) => panic!("Could not load font from {}: {}", font_path, error),
     };
 
-    let figure = font.convert(&message).unwrap();
+    let figure = font.convert(message).unwrap();
     Ok(figure.to_string())
 }
 
@@ -55,17 +58,16 @@ impl HeadingSegment {
         }
     }
 }
+impl Default for HeadingSegment {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl MotdSegement for HeadingSegment {
-    fn render(&self) {
+    fn render(&mut self) -> Result<()> { 
         let font_choice = random_font();
-        let figure = match figlet(font_choice, &self.heading) {
-            Ok(figure) => figure,
-            Err(_) => {
-                println!("Could not generate figure");
-                return;
-            }
-        };
+        let figure = figlet(font_choice, &self.heading)?;
 
         let seed = rand::random::<f64>() * 1_000_000.0;
         let freq = 0.1;
@@ -77,5 +79,7 @@ impl MotdSegement for HeadingSegment {
             lolcat::print_rainbow(line, freq, seed, spread, inverse);
             println!();
         });
+
+        Ok(())
     }
 }

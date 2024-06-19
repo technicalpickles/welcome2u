@@ -11,3 +11,5 @@ rand = "0.8.5"
 fortune = { path = "../../crates/fortune" }
 lolcat = { path = "../../crates/lolcat" }
 display = { path = "../../crates/display" }
+anyhow = "1.0.86"
+thiserror = "1.0.61"
