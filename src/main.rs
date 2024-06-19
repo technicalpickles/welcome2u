@@ -7,14 +7,14 @@ use thiserror::Error;
 use display::MotdSegement;
 
 struct CommandSegment {
-    command_to_run : String,
+    command : String,
     output: String,
 }
 
 impl CommandSegment {
-    fn new(command_to_run: &str) -> Self{
+    fn new(command: &str) -> Self{
         Self {
-            command_to_run: command_to_run.to_string(),
+            command: command.to_string(),
             output: "".to_string()
         }
     }
@@ -37,7 +37,7 @@ enum CommandError {
 impl MotdSegement for CommandSegment {
     fn prepare(&mut self) -> Result<()> {
         // TODO can we avoid cloning this?
-        let mut command = Command::new(self.command_to_run.clone());
+        let mut command = Command::new(self.command.clone());
 
         let child = match command.stdout(Stdio::piped()).spawn() {
             Ok(child) => child,
@@ -49,7 +49,7 @@ impl MotdSegement for CommandSegment {
         if !output.status.success() {
             let error = CommandError::Failed {
                 // TODO can we avoid a clone?
-                command_ran: self.command_to_run.clone(),
+                command_ran: self.command.clone(),
                 status: output.status,
 
             };
