@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 quote = { path = "segments/quote" }
 heading = { path = "segments/heading" }
+disk = { path = "segments/disk" }
 display = { path = "crates/display" }
 thiserror = "1.0.61"
 anyhow = "1.0.86"

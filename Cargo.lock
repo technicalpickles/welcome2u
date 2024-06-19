@@ -363,11 +363,14 @@ name = "disk"
 version = "0.1.0"
 dependencies = [
  "ansi_term",
+ "anyhow",
  "crossterm",
+ "display",
  "fmtsize",
  "humanize-bytes",
  "ratatui",
  "sysinfo",
+ "thiserror",
 ]
 
 [[package]]
@@ -415,6 +418,7 @@ name = "fancy-motd"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "disk",
  "display",
  "heading",
  "quote 0.1.0",
