@@ -16,7 +16,7 @@ pub trait MotdSegement {
     fn prepare(&mut self) -> Result<()> {
         Ok(())
     }
-    fn render(&mut self) -> Result<()>;
+    fn render(&self) -> Result<()>;
 }
 
 pub struct Single {
@@ -32,7 +32,7 @@ impl Single {
 }
 
 impl MotdSegement for Single {
-    fn render(&mut self) -> Result<()>  {
+    fn render(&self) -> Result<()>  {
         println!("{}", self.content);
         Ok(())
     }
@@ -53,7 +53,7 @@ impl LabelWithContent {
 }
 
 impl MotdSegement for LabelWithContent {
-    fn render(&mut self) -> Result<()> {
+    fn render(&self) -> Result<()> {
         print_segment(&self.label, &self.content);
         Ok(())
     }

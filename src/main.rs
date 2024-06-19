@@ -63,7 +63,7 @@ impl MotdSegement for CommandSegment {
         Ok(())
     }
 
-    fn render(&mut self) -> Result<()> {
+    fn render(&self) -> Result<()> {
         print!("{}", self.output);
         Ok(())
     }

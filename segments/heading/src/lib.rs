@@ -65,7 +65,7 @@ impl Default for HeadingSegment {
 }
 
 impl MotdSegement for HeadingSegment {
-    fn render(&mut self) -> Result<()> { 
+    fn render(&self) -> Result<()> { 
         let font_choice = random_font();
         let figure = figlet(font_choice, &self.heading)?;
 

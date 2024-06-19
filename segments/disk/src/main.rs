@@ -6,7 +6,7 @@ use sysinfo::Disks;
 
 
 use ratatui::{
-    prelude::{CrosstermBackend, Stylize, Terminal},
+    prelude::{CrosstermBackend, Terminal},
     widgets::Paragraph,
 };
 use std::io::{stdout, Result};

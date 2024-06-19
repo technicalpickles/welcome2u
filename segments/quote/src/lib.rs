@@ -34,7 +34,7 @@ impl Default for FortuneHeaderSegment {
 }
 
 impl MotdSegement for FortuneHeaderSegment {
-    fn render(&mut self) -> Result<()> {
+    fn render(&self) -> Result<()> {
         let content = textwrap::fill(&self.fortune, 80);
         let content = indent(&content, "       ");
         let content = Style::default().dimmed().paint(content);
