@@ -78,11 +78,11 @@ fn main() -> Result<()> {
     let mut segments : Vec<Box<dyn MotdSegement>> = vec![
         Box::<heading::HeadingSegment>::default(),
         Box::<quote::FortuneHeaderSegment>::default(),
-        // Box::new(CommandSegment::new("target/debug/user")),
-        // Box::new(CommandSegment::new("target/debug/os")),
+        Box::new(CommandSegment::new("target/debug/user")),
+        Box::new(CommandSegment::new("target/debug/os")),
         // Box::new(CommandSegment::new("modules/20-uptime")),
         // Box::new(CommandSegment::new("modules/30-load")),
-        // Box::new(CommandSegment::new("target/debug/memory")),
+        Box::new(CommandSegment::new("target/debug/memory")),
         Box::<disk::DiskSegment>::default(),
         // Box::new(CommandSegment::new("target/debug/docker"))
     ];
