@@ -1,5 +1,6 @@
 use ansi_term::Colour::Blue;
 use anyhow::Result;
+use std::fmt::Debug;
 
 pub fn format_label(text: &str) -> String {
     let text = format!("{}:", text);
@@ -12,13 +13,14 @@ pub fn print_segment(label: &str, contents: &str) {
     println!("{}{}", format_label(label), contents);
 }
 
-pub trait MotdSegement {
+pub trait MotdSegement: Debug {
     fn prepare(&mut self) -> Result<()> {
         Ok(())
     }
     fn render(&self) -> Result<()>;
 }
 
+#[derive(Debug)]
 pub struct Single {
     content: String
 }
@@ -38,6 +40,7 @@ impl MotdSegement for Single {
     }
 }
 
+#[derive(Debug)]
 pub struct LabelWithContent {
     label: String,
     content: String,

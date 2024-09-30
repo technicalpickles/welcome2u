@@ -3,9 +3,11 @@ use std::process::{Command, Stdio, ExitStatus};
 use std::env;
 use anyhow::Result;
 use thiserror::Error;
+use anyhow::Context;
 
 use display::MotdSegement;
 
+#[derive(Debug)]
 struct CommandSegment {
     command : String,
     output: String,
@@ -76,21 +78,21 @@ fn main() -> Result<()> {
     let mut segments : Vec<Box<dyn MotdSegement>> = vec![
         Box::<heading::HeadingSegment>::default(),
         Box::<quote::FortuneHeaderSegment>::default(),
-        Box::new(CommandSegment::new("target/debug/user")),
-        Box::new(CommandSegment::new("target/debug/os")),
-        Box::new(CommandSegment::new("modules/20-uptime")),
-        Box::new(CommandSegment::new("modules/30-load")),
-        Box::new(CommandSegment::new("target/debug/memory")),
+        // Box::new(CommandSegment::new("target/debug/user")),
+        // Box::new(CommandSegment::new("target/debug/os")),
+        // Box::new(CommandSegment::new("modules/20-uptime")),
+        // Box::new(CommandSegment::new("modules/30-load")),
+        // Box::new(CommandSegment::new("target/debug/memory")),
         Box::<disk::DiskSegment>::default(),
-        Box::new(CommandSegment::new("target/debug/docker"))
+        // Box::new(CommandSegment::new("target/debug/docker"))
     ];
 
     for segment in segments.iter_mut() {
-        segment.prepare()?
+        segment.prepare().with_context(|| format!("Failed to prepare segment: {:?}", segment))?;
     }
 
     for segment in segments.iter_mut() {
-        segment.render()?
+        segment.render().with_context(|| format!("Failed to render segment: {:?}", segment))?;
     }
 
     Ok(())

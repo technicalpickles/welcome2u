@@ -13,11 +13,12 @@ use ratatui::{
 };
 use std::io::stdout;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct DiskSegment {
     disks : Vec<Disk>
 }
 
+#[derive(Debug)]
 struct Disk {
     name: String,
     mount_point: String,

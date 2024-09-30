@@ -15,6 +15,7 @@ fn choose_fortune() -> Result<String, NoFortunesError> {
     Ok(fortune.to_string())
 }
 
+#[derive(Debug)]
 pub struct FortuneHeaderSegment {
     fortune: String
 }
