@@ -13,7 +13,7 @@ pub fn print_segment(label: &str, contents: &str) {
     println!("{}{}", format_label(label), contents);
 }
 
-pub trait MotdSegement: Debug {
+pub trait MotdSegment: Debug {
     fn prepare(&mut self) -> Result<()> {
         Ok(())
     }
@@ -33,7 +33,7 @@ impl Single {
     }
 }
 
-impl MotdSegement for Single {
+impl MotdSegment for Single {
     fn render(&self) -> Result<()>  {
         println!("{}", self.content);
         Ok(())
@@ -55,7 +55,7 @@ impl LabelWithContent {
     }
 }
 
-impl MotdSegement for LabelWithContent {
+impl MotdSegment for LabelWithContent {
     fn render(&self) -> Result<()> {
         print_segment(&self.label, &self.content);
         Ok(())

@@ -5,7 +5,7 @@ use anyhow::Result;
 use thiserror::Error;
 use anyhow::Context;
 
-use display::MotdSegement;
+use display::MotdSegment;
 
 #[derive(Debug)]
 struct CommandSegment {
@@ -36,7 +36,7 @@ enum CommandError {
     OutputParseError(#[from] std::string::FromUtf8Error),
 }
 
-impl MotdSegement for CommandSegment {
+impl MotdSegment for CommandSegment {
     fn prepare(&mut self) -> Result<()> {
         // TODO can we avoid cloning this?
         let mut command = Command::new(self.command.clone());
@@ -75,7 +75,7 @@ fn main() -> Result<()> {
     env::set_var("BASE_DIR", ".");
     env::set_var("CONFIG_PATH", "./config.sh");
 
-    let mut segments : Vec<Box<dyn MotdSegement>> = vec![
+    let mut segments : Vec<Box<dyn MotdSegment>> = vec![
         Box::<heading::HeadingSegment>::default(),
         Box::<quote::FortuneHeaderSegment>::default(),
         Box::new(CommandSegment::new("target/debug/user")),

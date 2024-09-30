@@ -1,6 +1,6 @@
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
-use display::MotdSegement;
+use display::MotdSegment;
 use anyhow::Result;
 use thiserror::Error;
 use std::fmt;
@@ -77,7 +77,7 @@ impl fmt::Debug for HeadingSegment {
     }
 }
 
-impl MotdSegement for HeadingSegment {
+impl MotdSegment for HeadingSegment {
     fn render(&self) -> Result<()> { 
         let font_choice = random_font();
         let figure = figlet(font_choice, &self.heading)?;

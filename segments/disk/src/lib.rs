@@ -5,7 +5,7 @@ use std::path::Path;
 use sysinfo::Disks;
 
 use anyhow::Result;
-use display::MotdSegement;
+use display::MotdSegment;
 
 use ratatui::{
     prelude::{CrosstermBackend, Terminal},
@@ -41,7 +41,7 @@ impl Disk {
     }
 }
 
-impl MotdSegement for DiskSegment {
+impl MotdSegment for DiskSegment {
     fn prepare(&mut self) -> Result<()> {
         let disks = Disks::new_with_refreshed_list();
 

@@ -3,7 +3,7 @@ use fortune::{Fortunes, NoFortunesError};
 use textwrap::indent;
 use anyhow::Result;
 
-use display::MotdSegement;
+use display::MotdSegment;
 
 fn choose_fortune() -> Result<String, NoFortunesError> {
     // TODO: support multiple fortune files: pickleisms, collected-quotes
@@ -28,7 +28,7 @@ impl Default for FortuneHeaderSegment {
     }
 }
 
-impl MotdSegement for FortuneHeaderSegment {
+impl MotdSegment for FortuneHeaderSegment {
     fn render(&self) -> Result<()> {
         let content = textwrap::fill(&self.fortune, 80);
         let content = indent(&content, "       ");
