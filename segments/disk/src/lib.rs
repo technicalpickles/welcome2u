@@ -1,16 +1,12 @@
 use ansi_term::Colour::Blue;
 use fmtsize::{Conventional, FmtSize};
-use ratatui::{prelude::*, widgets::*};
+use ratatui::{TerminalOptions,prelude::*, widgets::*};
 use std::path::Path;
 use sysinfo::Disks;
 
 use anyhow::Result;
 use display::MotdSegment;
 
-use ratatui::{
-    prelude::{CrosstermBackend, Terminal},
-    widgets::Paragraph,
-};
 use std::io::stdout;
 
 #[derive(Default, Debug)]

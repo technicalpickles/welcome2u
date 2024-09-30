@@ -78,7 +78,7 @@ fn main() -> Result<()> {
     let mut segments : Vec<Box<dyn MotdSegment>> = vec![
         Box::<heading::HeadingSegment>::default(),
         Box::<quote::FortuneHeaderSegment>::default(),
-        Box::new(CommandSegment::new("target/debug/user")),
+        Box::new(<user::UserSegment>::default()),
         Box::new(CommandSegment::new("target/debug/os")),
         // Box::new(CommandSegment::new("modules/20-uptime")),
         // Box::new(CommandSegment::new("modules/30-load")),

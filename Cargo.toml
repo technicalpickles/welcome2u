@@ -10,6 +10,7 @@ quote = { path = "segments/quote" }
 heading = { path = "segments/heading" }
 disk = { path = "segments/disk" }
 display = { path = "crates/display" }
+user = { path = "segments/user" }
 thiserror = "1.0.61"
 anyhow = "1.0.86"
 
