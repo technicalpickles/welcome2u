@@ -1,0 +1,10 @@
+[package]
+name = "ip"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+display = { path = "../../crates/display" }
+anyhow = "1.0.89"
+ratatui = "0.28.1"
+local-ip-address = "0.6.3"

@@ -1619,6 +1619,21 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
+version = "0.26.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c18a6156d1f27a9592ee18c1a846ca8dd5c258b7179fc193ae87c74ebb666f5"
+dependencies = [
+ "cfg-if",
+ "core-foundation-sys",
+ "libc",
+ "ntapi",
+ "once_cell",
+ "rayon",
+ "winapi",
+]
+
+[[package]]
+name = "sysinfo"
 version = "0.30.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "732ffa00f53e6b2af46208fba5718d9662a421049204e156328b66791ffa15ae"
@@ -1644,6 +1659,16 @@ dependencies = [
  "ntapi",
  "rayon",
  "windows 0.57.0",
+]
+
+[[package]]
+name = "temperatures"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "display",
+ "ratatui 0.28.1",
+ "sysinfo 0.26.9",
 ]
 
 [[package]]
@@ -2055,6 +2080,7 @@ dependencies = [
  "memory",
  "os",
  "quote 0.1.0",
+ "temperatures",
  "thiserror",
  "uptime",
  "user",

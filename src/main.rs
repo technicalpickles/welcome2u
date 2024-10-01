@@ -18,6 +18,7 @@ fn main() -> Result<()> {
         Box::new(<load::LoadSegment>::default()),
         Box::new(<memory::MemorySegment>::default()),
         Box::<disk::DiskSegment>::default(),
+        Box::<temperatures::TemperaturesSegment>::default(),
         // Box::new(<docker::DockerSegment>::default())
     ];
 
