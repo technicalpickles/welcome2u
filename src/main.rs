@@ -82,7 +82,7 @@ fn main() -> Result<()> {
         Box::new(CommandSegment::new("target/debug/os")),
         // Box::new(CommandSegment::new("modules/20-uptime")),
         // Box::new(CommandSegment::new("modules/30-load")),
-        Box::new(CommandSegment::new("target/debug/memory")),
+        Box::new(<memory::MemorySegment>::default()),
         Box::<disk::DiskSegment>::default(),
         // Box::new(CommandSegment::new("target/debug/docker"))
     ];

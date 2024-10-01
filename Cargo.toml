@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 quote = { path = "segments/quote" }
 heading = { path = "segments/heading" }
+memory = { path = "segments/memory" }
 disk = { path = "segments/disk" }
 display = { path = "crates/display" }
 user = { path = "segments/user" }
