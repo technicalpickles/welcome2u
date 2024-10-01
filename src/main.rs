@@ -14,7 +14,7 @@ fn main() -> Result<()> {
         Box::new(<user::UserSegment>::default()),
         Box::new(<os::OsSegment>::default()),
         Box::new(<uptime::UptimeSegment>::default()),
-        // Box::new(CommandSegment::new("modules/30-load")),
+        Box::new(<load::LoadSegment>::default()),
         Box::new(<memory::MemorySegment>::default()),
         Box::<disk::DiskSegment>::default(),
         // Box::new(<docker::DockerSegment>::default())

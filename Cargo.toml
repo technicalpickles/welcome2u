@@ -7,15 +7,16 @@ edition = "2021"
 
 [dependencies]
 command = { path = "segments/command" }
-docker = { path = "segments/docker" }
-quote = { path = "segments/quote" }
-heading = { path = "segments/heading" }
-memory = { path = "segments/memory" }
 disk = { path = "segments/disk" }
 display = { path = "crates/display" }
-user = { path = "segments/user" }
+docker = { path = "segments/docker" }
+heading = { path = "segments/heading" }
+load = { path = "segments/load" }
+memory = { path = "segments/memory" }
 os = { path = "segments/os" }
+quote = { path = "segments/quote" }
 uptime = { path = "segments/uptime" }
+user = { path = "segments/user" }
 thiserror = "1.0.61"
 anyhow = "1.0.86"
 
