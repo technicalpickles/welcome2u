@@ -9,9 +9,9 @@ MOTD_ENV=${MOTD_ENV:-debug}
 
 # Determine the correct binary based on MOTD_PROFILE
 if [ "$MOTD_PROFILE" = "release" ]; then
-    MOTD_BINARY="target/release/fancy-motd"
+    MOTD_BINARY="target/release/welcome2u"
 else
-    MOTD_BINARY="target/debug/fancy-motd"
+    MOTD_BINARY="target/debug/welcome2u"
     cargo build --quiet
 fi
 

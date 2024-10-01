@@ -471,24 +471,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "de853764b47027c2e862a995c34978ffa63c1501f2e15f987ba11bd4f9bba193"
 
 [[package]]
-name = "fancy-motd"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "command",
- "disk",
- "display",
- "docker",
- "heading",
- "memory",
- "os",
- "quote 0.1.0",
- "thiserror",
- "uptime",
- "user",
-]
-
-[[package]]
 name = "figlet-rs"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1982,6 +1964,24 @@ name = "wasm-bindgen-shared"
 version = "0.2.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af190c94f2773fdb3729c55b007a722abb5384da03bc0986df4c289bf5567e96"
+
+[[package]]
+name = "welcome2u"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "command",
+ "disk",
+ "display",
+ "docker",
+ "heading",
+ "memory",
+ "os",
+ "quote 0.1.0",
+ "thiserror",
+ "uptime",
+ "user",
+]
 
 [[package]]
 name = "winapi"
