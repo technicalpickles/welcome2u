@@ -13,7 +13,7 @@ fn main() -> Result<()> {
         Box::<quote::FortuneHeaderSegment>::default(),
         Box::new(<user::UserSegment>::default()),
         Box::new(<command::CommandSegment>::new("target/debug/os")),
-        // Box::new(CommandSegment::new("modules/20-uptime")),
+        Box::new(<uptime::UptimeSegment>::default()),
         // Box::new(CommandSegment::new("modules/30-load")),
         Box::new(<memory::MemorySegment>::default()),
         Box::<disk::DiskSegment>::default(),

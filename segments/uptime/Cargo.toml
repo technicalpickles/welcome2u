@@ -1,0 +1,11 @@
+[package]
+name = "uptime"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+display = { path = "../../crates/display" }
+anyhow = "1.0.89"
+ratatui = "0.28.1"
+ansi_term = "0.12.1"
+sysinfo = "0.30.12"
