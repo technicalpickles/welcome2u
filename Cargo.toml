@@ -11,6 +11,7 @@ disk = { path = "segments/disk" }
 display = { path = "crates/display" }
 docker = { path = "segments/docker" }
 heading = { path = "segments/heading" }
+ip = { path = "segments/ip" }
 load = { path = "segments/load" }
 memory = { path = "segments/memory" }
 os = { path = "segments/os" }

@@ -12,6 +12,7 @@ fn main() -> Result<()> {
         Box::<heading::HeadingSegment>::default(),
         Box::<quote::FortuneHeaderSegment>::default(),
         Box::new(<user::UserSegment>::default()),
+        Box::new(<ip::IpSegment>::default()),
         Box::new(<os::OsSegment>::default()),
         Box::new(<uptime::UptimeSegment>::default()),
         Box::new(<load::LoadSegment>::default()),
