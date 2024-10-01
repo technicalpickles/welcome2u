@@ -1,6 +1,5 @@
-use ansi_term::Colour::Blue;
 use fmtsize::{Conventional, FmtSize};
-use ratatui::{TerminalOptions,prelude::*, widgets::*};
+use ratatui::{TerminalOptions, prelude::*, widgets::*, style::{Color, Style, Modifier}};
 use std::path::Path;
 use sysinfo::Disks;
 
@@ -84,7 +83,8 @@ impl MotdSegment for DiskSegment {
             let [label_area, data_area] = layout.areas(frame.size());
 
             frame.render_widget(
-                Paragraph::new(Blue.bold().paint("Disk").to_string()),
+                Paragraph::new("Disk")
+                    .style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD)),
                 label_area,
             );
 

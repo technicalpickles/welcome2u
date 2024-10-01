@@ -1,17 +1,13 @@
-use ansi_term::Colour::Blue;
 use anyhow::Result;
+use ratatui::{
+    backend::CrosstermBackend,
+    layout::{Constraint, Direction, Layout},
+    style::{Color, Modifier, Style},
+    widgets::Paragraph,
+    Terminal, TerminalOptions, Viewport,
+};
 use std::fmt::Debug;
-
-pub fn format_label(text: &str) -> String {
-    let text = format!("{}:", text);
-    let label = format!("{:<width$}", text, width = 16);
-    // color last, or we width won't work
-    Blue.bold().paint(label).to_string()
-}
-
-pub fn print_segment(label: &str, contents: &str) {
-    println!("{}{}", format_label(label), contents);
-}
+use std::io::stdout;
 
 pub trait MotdSegment: Debug {
     fn prepare(&mut self) -> Result<()> {
@@ -22,7 +18,7 @@ pub trait MotdSegment: Debug {
 
 #[derive(Debug)]
 pub struct Single {
-    content: String
+    content: String,
 }
 
 impl Single {
@@ -34,8 +30,18 @@ impl Single {
 }
 
 impl MotdSegment for Single {
-    fn render(&self) -> Result<()>  {
-        println!("{}", self.content);
+    fn render(&self) -> Result<()> {
+        let backend = CrosstermBackend::new(stdout());
+        let options = TerminalOptions {
+            viewport: Viewport::Inline(1),
+        };
+        let mut terminal = Terminal::with_options(backend, options)?;
+
+        terminal.draw(|f| {
+            let paragraph = Paragraph::new(self.content.clone()).style(Style::default());
+            f.render_widget(paragraph, f.area());
+        })?;
+
         Ok(())
     }
 }
@@ -57,7 +63,29 @@ impl LabelWithContent {
 
 impl MotdSegment for LabelWithContent {
     fn render(&self) -> Result<()> {
-        print_segment(&self.label, &self.content);
+        let backend = CrosstermBackend::new(stdout());
+        let options = TerminalOptions {
+            viewport: Viewport::Inline(1),
+        };
+        let mut terminal = Terminal::with_options(backend, options)?;
+
+        terminal.draw(|f| {
+            let chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([Constraint::Length(16), Constraint::Min(0)].as_ref())
+                .split(f.area());
+
+            let label = Paragraph::new(format!("{}:", self.label)).style(
+                Style::default()
+                    .fg(Color::Blue)
+                    .add_modifier(Modifier::BOLD),
+            );
+            f.render_widget(label, chunks[0]);
+
+            let content = Paragraph::new(self.content.clone());
+            f.render_widget(content, chunks[1]);
+        })?;
+
         Ok(())
     }
 }

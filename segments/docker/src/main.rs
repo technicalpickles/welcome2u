@@ -1,8 +1,6 @@
 extern crate bollard;
 extern crate futures_util;
 
-use display::format_label;
-
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 
 use bollard::{
@@ -27,6 +25,10 @@ fn duration_since(str: &str) -> String {
     let ht = HumanTime::from(dt);
 
     ht.to_text_en(Accuracy::Rough, Tense::Present)
+}
+
+fn format_label(text: &str) -> String {
+    text.to_string()
 }
 
 async fn conc(arg: (Docker, &ContainerSummary)) {

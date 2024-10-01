@@ -13,6 +13,7 @@ memory = { path = "segments/memory" }
 disk = { path = "segments/disk" }
 display = { path = "crates/display" }
 user = { path = "segments/user" }
+os = { path = "segments/os" }
 uptime = { path = "segments/uptime" }
 thiserror = "1.0.61"
 anyhow = "1.0.86"
