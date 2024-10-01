@@ -1,0 +1,13 @@
+[package]
+name = "command"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ansi_term = "0.12.1"
+anyhow = "1.0.89"
+display = { version = "0.1.0", path = "../../crates/display" }
+fmtsize = "0.1.2"
+ratatui = "0.28.1"
+sysinfo = "0.31.4"
+thiserror = "1.0.64"
