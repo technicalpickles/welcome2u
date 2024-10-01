@@ -429,13 +429,16 @@ dependencies = [
 name = "docker"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bollard",
  "chrono",
  "chrono-humanize",
+ "crossterm 0.28.1",
  "display",
  "futures-util",
  "human-panic",
  "iso8601-timestamp",
+ "ratatui 0.28.1",
  "tokio",
 ]
 
@@ -475,6 +478,7 @@ dependencies = [
  "command",
  "disk",
  "display",
+ "docker",
  "heading",
  "memory",
  "os",

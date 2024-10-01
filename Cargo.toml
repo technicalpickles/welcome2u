@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 command = { path = "segments/command" }
+docker = { path = "segments/docker" }
 quote = { path = "segments/quote" }
 heading = { path = "segments/heading" }
 memory = { path = "segments/memory" }
