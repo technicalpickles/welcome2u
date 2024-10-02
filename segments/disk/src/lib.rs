@@ -97,12 +97,8 @@ impl MotdSegment for DiskSegment {
             frame.render_widget(
                 LineGauge::default()
                     .block(Block::default().title(disk.format()))
-                    .filled_style(
-                        Style::default()
-                            .fg(Color::Red)
-                            .bg(Color::Green)
-                            .add_modifier(Modifier::BOLD),
-                    )
+                    .filled_style(Style::default().fg(Color::Red).add_modifier(Modifier::BOLD))
+                    .unfilled_style(Style::default().fg(Color::Green))
                     .line_set(symbols::line::THICK)
                     .ratio(disk.percent_used),
                 data_area,
