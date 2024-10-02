@@ -1,13 +1,9 @@
 use anyhow::Result;
 use display::MotdSegment;
 use ratatui::{
-    TerminalOptions,
-    Viewport,
     prelude::*,
     widgets::*,
 };
-use std::io::stdout;
-use os_info;
 
 #[derive(Default, Debug)]
 pub struct OsSegment {

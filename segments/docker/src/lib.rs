@@ -6,13 +6,13 @@ use bollard::{
 };
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 use display::MotdSegment;
-use futures_util::stream::{self, StreamExt};
+use futures_util::stream::{StreamExt};
 use iso8601_timestamp::Timestamp;
 use ratatui::{
     prelude::*,
     widgets::*,
 };
-use std::{default::Default, io::stdout};
+use std::default::Default;
 
 #[derive(Debug, Default)]
 pub struct DockerSegment {

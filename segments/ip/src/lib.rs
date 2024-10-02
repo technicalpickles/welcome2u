@@ -1,8 +1,7 @@
 use anyhow::Result;
 use display::MotdSegment;
 use local_ip_address::local_ip;
-use ratatui::{prelude::*, widgets::*, TerminalOptions, Viewport};
-use std::io::stdout;
+use ratatui::{prelude::*, widgets::*};
 
 #[derive(Default, Debug)]
 pub struct IpSegment {

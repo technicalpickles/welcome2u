@@ -1,7 +1,6 @@
-use ratatui::{prelude::*, widgets::*, TerminalOptions, Viewport};
+use ratatui::{prelude::*, widgets::*};
 use anyhow::Result;
 use display::MotdSegment;
-use std::io::stdout;
 use sysinfo::System;
 
 #[derive(Default, Debug)]
@@ -49,7 +48,7 @@ impl LoadInfo {
             })
             .collect();
 
-        let mut result = vec![
+        let result = vec![
             colored_loads[0].clone(),
             Span::raw(", "),
             colored_loads[1].clone(),

@@ -1,12 +1,9 @@
 use anyhow::Result;
 use display::MotdSegment;
 use ratatui::{
-    TerminalOptions,
-    Viewport,
     prelude::*,
     widgets::*,
 };
-use std::io::stdout;
 use sysinfo::System;
 use fmtsize::{Conventional, FmtSize};
 use ansi_term::Colour::Blue;
