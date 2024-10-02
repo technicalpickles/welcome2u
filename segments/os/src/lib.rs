@@ -42,9 +42,6 @@ impl MotdSegment for OsSegment {
             frame.render_widget(Paragraph::new(info.os_string.clone()), data_area);
         }
 
-        // FIXME: remove println
-        println!();
-
         Ok(())
     }
 }

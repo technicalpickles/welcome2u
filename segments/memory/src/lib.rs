@@ -68,9 +68,6 @@ impl MotdSegment for MemorySegment {
             frame.render_widget(Paragraph::new(info.format()), data_area);
         }
 
-        // FIXME each segment shouldn't have to print its own newline
-        println!();
-
         Ok(())
     }
 }

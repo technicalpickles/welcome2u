@@ -79,9 +79,6 @@ impl MotdSegment for UptimeSegment {
             frame.render_widget(Paragraph::new(info.uptime.clone()), data_area);
         }
 
-        // FIXME
-        println!();
-
         Ok(())
     }
 }
