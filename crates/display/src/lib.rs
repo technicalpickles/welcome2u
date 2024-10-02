@@ -11,6 +11,7 @@ use std::fmt::Debug;
 pub trait MotdSegment: Debug {
     fn prepare(&mut self) -> Result<()>;
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()>;
+    fn height(&self) -> u16;
 }
 
 #[derive(Debug)]
@@ -34,6 +35,9 @@ impl MotdSegment for Single {
         let paragraph = Paragraph::new(self.content.clone()).style(Style::default());
         frame.render_widget(paragraph, area);
         Ok(())
+    }
+    fn height(&self) -> u16 {
+        self.content.lines().count() as u16
     }
 }
 
@@ -73,5 +77,8 @@ impl MotdSegment for LabelWithContent {
         let content = Paragraph::new(self.content.clone());
         frame.render_widget(content, chunks[1]);
         Ok(())
+    }
+    fn height(&self) -> u16 {
+        self.content.lines().count() as u16 + 1
     }
 }

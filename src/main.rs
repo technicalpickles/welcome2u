@@ -12,16 +12,16 @@ use display::MotdSegment;
 fn render_segments(segments: &mut [Box<dyn MotdSegment>]) -> Result<()> {
     let backend = CrosstermBackend::new(stdout());
     let options = TerminalOptions {
-        viewport: Viewport::Inline(segments.len() as u16 * 3), // Adjust the multiplier as needed
+        viewport: Viewport::Inline(segments.iter().map(|segment| segment.height()).sum()),
     };
     let mut terminal = Terminal::with_options(backend, options)?;
 
-    terminal.draw(|frame| {
-        let constraints = segments
-            .iter()
-            .map(|_| Constraint::Length(3))
-            .collect::<Vec<Constraint>>();
+    let constraints = segments
+        .iter()
+        .map(|segment| Constraint::Length(segment.height()))
+        .collect::<Vec<Constraint>>();
 
+    terminal.draw(|frame| {
         let layout = Layout::default()
             .direction(Direction::Vertical)
             .constraints(constraints)
@@ -48,7 +48,7 @@ fn main() -> Result<()> {
         Box::new(<uptime::UptimeSegment>::default()),
         Box::new(<load::LoadSegment>::default()),
         Box::new(<memory::MemorySegment>::default()),
-        // Box::<disk::DiskSegment>::default(),
+        Box::<disk::DiskSegment>::default(),
         // Box::<temperatures::TemperaturesSegment>::default(),
         // Box::new(<docker::DockerSegment>::default())
     ];

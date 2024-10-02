@@ -39,6 +39,10 @@ impl Disk {
 }
 
 impl MotdSegment for DiskSegment {
+    fn height(&self) -> u16 {
+        (self.disks.len() * 2) as u16
+    }
+
     fn prepare(&mut self) -> Result<()> {
         let disks = Disks::new_with_refreshed_list();
 

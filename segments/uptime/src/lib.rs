@@ -61,6 +61,10 @@ impl UptimeInfo {
 }
 
 impl MotdSegment for UptimeSegment {
+    fn height(&self) -> u16 {
+        1
+    }
+
     fn prepare(&mut self) -> Result<()> {
         self.info = Some(UptimeInfo::collect());
         Ok(())

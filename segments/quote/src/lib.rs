@@ -30,6 +30,10 @@ impl Default for FortuneHeaderSegment {
 }
 
 impl MotdSegment for FortuneHeaderSegment {
+    fn height(&self) -> u16 {
+        1
+    }
+
     fn prepare(&mut self) -> Result<()> {
         self.fortune =
             choose_fortune().map_err(|e| anyhow::anyhow!("Failed to choose fortune: {}", e))?;

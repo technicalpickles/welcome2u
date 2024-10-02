@@ -35,6 +35,10 @@ impl UserInfo {
 }
 
 impl MotdSegment for UserSegment {
+    fn height(&self) -> u16 {
+        1
+    }
+
     fn prepare(&mut self) -> Result<()> {
         self.info = Some(UserInfo::collect());
         Ok(())

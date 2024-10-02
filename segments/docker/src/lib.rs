@@ -77,6 +77,10 @@ impl DockerSegment {
 }
 
 impl MotdSegment for DockerSegment {
+    fn height(&self) -> u16 {
+        self.containers.len() as u16
+    }
+
     fn prepare(&mut self) -> Result<()> {
         tokio::runtime::Runtime::new()?.block_on(async {
             let docker = Docker::connect_with_socket(

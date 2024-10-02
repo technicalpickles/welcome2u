@@ -24,6 +24,10 @@ impl OsInfo {
 }
 
 impl MotdSegment for OsSegment {
+    fn height(&self) -> u16 {
+        1
+    }
+
     fn prepare(&mut self) -> Result<()> {
         self.info = Some(OsInfo::collect());
         Ok(())

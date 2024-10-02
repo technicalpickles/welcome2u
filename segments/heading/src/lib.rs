@@ -81,6 +81,11 @@ impl fmt::Debug for HeadingSegment {
 }
 
 impl MotdSegment for HeadingSegment {
+    fn height(&self) -> u16 {
+        // FIXME: need lines of the figure
+        1
+    }
+
     fn prepare(&mut self) -> Result<()> {
         Ok(())
     }

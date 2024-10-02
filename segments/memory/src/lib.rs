@@ -47,6 +47,10 @@ impl MemoryInfo {
 }
 
 impl MotdSegment for MemorySegment {
+    fn height(&self) -> u16 {
+        1
+    }
+
     fn prepare(&mut self) -> Result<()> {
         self.info = Some(MemoryInfo::collect());
         Ok(())

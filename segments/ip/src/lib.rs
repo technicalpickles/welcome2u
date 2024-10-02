@@ -25,6 +25,10 @@ impl IpInfo {
 }
 
 impl MotdSegment for IpSegment {
+    fn height(&self) -> u16 {
+        1
+    }
+
     fn prepare(&mut self) -> Result<()> {
         self.info = Some(IpInfo::collect()?);
         Ok(())

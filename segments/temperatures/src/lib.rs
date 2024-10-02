@@ -13,6 +13,10 @@ use display::MotdSegment;
 pub struct TemperaturesSegment;
 
 impl MotdSegment for TemperaturesSegment {
+    fn height(&self) -> u16 {
+        1
+    }
+
     fn prepare(&mut self) -> Result<()> {
         Ok(())
     }

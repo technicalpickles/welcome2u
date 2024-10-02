@@ -35,6 +35,10 @@ pub enum CommandError {
 }
 
 impl MotdSegment for CommandSegment {
+    fn height(&self) -> u16 {
+        self.output.lines().count() as u16
+    }
+
     fn prepare(&mut self) -> Result<()> {
         // TODO can we avoid cloning this?
         let mut command = Command::new(self.command.clone());
