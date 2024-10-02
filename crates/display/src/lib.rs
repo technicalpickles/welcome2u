@@ -1,9 +1,9 @@
 use anyhow::Result;
 use ratatui::{
     layout::{Constraint, Direction, Layout},
+    prelude::*,
     style::{Color, Modifier, Style},
     widgets::Paragraph,
-    Frame,
 };
 
 use std::fmt::Debug;

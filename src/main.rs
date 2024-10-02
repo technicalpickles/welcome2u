@@ -1,7 +1,7 @@
-use std::env;
-use anyhow::Result;
 use anyhow::Context;
+use anyhow::Result;
 use ratatui::{backend::CrosstermBackend, Terminal, TerminalOptions, Viewport};
+use std::env;
 use std::io::stdout;
 
 use display::MotdSegment;
@@ -26,8 +26,8 @@ fn main() -> Result<()> {
     env::set_var("BASE_DIR", ".");
     env::set_var("CONFIG_PATH", "./config.sh");
 
-    let mut segments : Vec<Box<dyn MotdSegment>> = vec![
-        Box::<heading::HeadingSegment>::default(),
+    let mut segments: Vec<Box<dyn MotdSegment>> = vec![
+        // Box::<heading::HeadingSegment>::default(),
         Box::<quote::FortuneHeaderSegment>::default(),
         Box::new(<user::UserSegment>::default()),
         Box::new(<ip::IpSegment>::default()),
@@ -41,7 +41,9 @@ fn main() -> Result<()> {
     ];
 
     for segment in segments.iter_mut() {
-        segment.prepare().with_context(|| format!("Failed to prepare segment: {:?}", segment))?;
+        segment
+            .prepare()
+            .with_context(|| format!("Failed to prepare segment: {:?}", segment))?;
     }
 
     render_segments(&mut segments)?;

@@ -293,22 +293,9 @@ dependencies = [
  "anyhow",
  "display",
  "fmtsize",
- "ratatui 0.28.1",
+ "ratatui",
  "sysinfo 0.31.4",
  "thiserror",
-]
-
-[[package]]
-name = "compact_str"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f86b9c4c00838774a6d902ef931eff7470720c51d90c2e32cfe15dc304737b3f"
-dependencies = [
- "castaway",
- "cfg-if",
- "itoa",
- "ryu",
- "static_assertions",
 ]
 
 [[package]]
@@ -417,7 +404,7 @@ dependencies = [
  "display",
  "fmtsize",
  "humanize-bytes",
- "ratatui 0.26.3",
+ "ratatui",
  "sysinfo 0.30.12",
  "thiserror",
 ]
@@ -428,7 +415,7 @@ version = "0.1.0"
 dependencies = [
  "ansi_term",
  "anyhow",
- "ratatui 0.28.1",
+ "ratatui",
 ]
 
 [[package]]
@@ -444,7 +431,7 @@ dependencies = [
  "futures-util",
  "human-panic",
  "iso8601-timestamp",
- "ratatui 0.28.1",
+ "ratatui",
  "tokio",
 ]
 
@@ -614,7 +601,7 @@ dependencies = [
  "fortune",
  "lolcat",
  "rand",
- "ratatui 0.28.1",
+ "ratatui",
  "thiserror",
 ]
 
@@ -853,7 +840,7 @@ dependencies = [
  "anyhow",
  "display",
  "local-ip-address",
- "ratatui 0.28.1",
+ "ratatui",
 ]
 
 [[package]]
@@ -931,7 +918,7 @@ dependencies = [
  "ansi_term",
  "anyhow",
  "display",
- "ratatui 0.28.1",
+ "ratatui",
  "sysinfo 0.30.12",
 ]
 
@@ -997,7 +984,7 @@ dependencies = [
  "anyhow",
  "display",
  "fmtsize",
- "ratatui 0.28.1",
+ "ratatui",
  "sysinfo 0.30.12",
 ]
 
@@ -1116,7 +1103,7 @@ dependencies = [
  "anyhow",
  "display",
  "os_info",
- "ratatui 0.28.1",
+ "ratatui",
 ]
 
 [[package]]
@@ -1226,7 +1213,7 @@ dependencies = [
  "anyhow",
  "display",
  "fortune",
- "ratatui 0.28.1",
+ "ratatui",
  "textwrap",
  "thiserror",
 ]
@@ -1272,33 +1259,13 @@ dependencies = [
 
 [[package]]
 name = "ratatui"
-version = "0.26.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f44c9e68fd46eda15c646fbb85e1040b657a58cdc8c98db1d97a55930d991eef"
-dependencies = [
- "bitflags",
- "cassowary",
- "compact_str 0.7.1",
- "crossterm 0.27.0",
- "itertools 0.12.1",
- "lru",
- "paste",
- "stability",
- "strum",
- "unicode-segmentation",
- "unicode-truncate",
- "unicode-width",
-]
-
-[[package]]
-name = "ratatui"
 version = "0.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fdef7f9be5c0122f890d58bdf4d964349ba6a6161f705907526d891efabba57d"
 dependencies = [
  "bitflags",
  "cassowary",
- "compact_str 0.8.0",
+ "compact_str",
  "crossterm 0.28.1",
  "instability",
  "itertools 0.13.0",
@@ -1560,16 +1527,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "stability"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ff9eaf853dec4c8802325d8b6d3dffa86cc707fd7a1a4cdbf416e13b061787a"
-dependencies = [
- "quote 1.0.36",
- "syn 2.0.66",
-]
-
-[[package]]
 name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1669,7 +1626,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "display",
- "ratatui 0.28.1",
+ "ratatui",
  "sysinfo 0.26.9",
 ]
 
@@ -1940,7 +1897,7 @@ dependencies = [
  "ansi_term",
  "anyhow",
  "display",
- "ratatui 0.28.1",
+ "ratatui",
  "sysinfo 0.30.12",
 ]
 
@@ -1963,7 +1920,7 @@ dependencies = [
  "anyhow",
  "display",
  "hostname",
- "ratatui 0.28.1",
+ "ratatui",
  "users",
 ]
 
@@ -2082,6 +2039,7 @@ dependencies = [
  "memory",
  "os",
  "quote 0.1.0",
+ "ratatui",
  "temperatures",
  "thiserror",
  "uptime",

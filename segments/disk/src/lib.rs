@@ -1,5 +1,9 @@
 use fmtsize::{Conventional, FmtSize};
-use ratatui::{Frame, prelude::*, widgets::*, style::{Color, Style, Modifier}};
+use ratatui::{
+    prelude::*,
+    style::{Color, Style},
+    widgets::*,
+};
 use std::path::Path;
 use sysinfo::Disks;
 
@@ -8,7 +12,7 @@ use display::MotdSegment;
 
 #[derive(Default, Debug)]
 pub struct DiskSegment {
-    disks : Vec<Disk>
+    disks: Vec<Disk>,
 }
 
 #[derive(Debug)]
@@ -18,7 +22,7 @@ struct Disk {
     free_space: u64,
     total_space: u64,
     used_space: u64,
-    percent_used: f64
+    percent_used: f64,
 }
 
 impl Disk {
@@ -40,42 +44,48 @@ impl MotdSegment for DiskSegment {
 
         let excluded_mount_points = [Path::new("/System/Volumes/Data")];
 
-        self.disks = disks.into_iter().filter_map(|disk| {
-            if excluded_mount_points.contains(&disk.mount_point()) {
-                return None;
-            }
+        self.disks = disks
+            .into_iter()
+            .filter_map(|disk| {
+                if excluded_mount_points.contains(&disk.mount_point()) {
+                    return None;
+                }
 
-            let name = disk.name().to_str().unwrap().to_string();
-            let mount_point = disk.mount_point().to_str().unwrap().to_string();
+                let name = disk.name().to_str().unwrap().to_string();
+                let mount_point = disk.mount_point().to_str().unwrap().to_string();
 
-            let free_space = disk.available_space();
-            let total_space = disk.total_space();
-            let used_space = total_space - free_space;
-            let percent_used = used_space as f64 / total_space as f64;
+                let free_space = disk.available_space();
+                let total_space = disk.total_space();
+                let used_space = total_space - free_space;
+                let percent_used = used_space as f64 / total_space as f64;
 
-            Some(Disk {
-                name,
-                mount_point,
-                free_space,
-                total_space,
-                used_space,
-                percent_used
+                Some(Disk {
+                    name,
+                    mount_point,
+                    free_space,
+                    total_space,
+                    used_space,
+                    percent_used,
+                })
             })
-        }).collect();
+            .collect();
 
         Ok(())
     }
 
-    fn render(&self, frame: &mut Frame) -> Result<()> {
+    fn render(&self, frame: &mut Frame<'_>) -> Result<()> {
         let layout = Layout::default()
             .direction(Direction::Horizontal)
             .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-        let [label_area, data_area] = layout.areas(frame.size());
+        let [label_area, data_area] = layout.areas(frame.area());
 
         frame.render_widget(
-            Paragraph::new("Disk")
-                .style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD)),
+            Paragraph::new("Disk").style(
+                Style::default()
+                    .fg(Color::Blue)
+                    .add_modifier(Modifier::BOLD),
+            ),
             label_area,
         );
 
@@ -83,7 +93,7 @@ impl MotdSegment for DiskSegment {
             frame.render_widget(
                 LineGauge::default()
                     .block(Block::default().title(disk.format()))
-                    .gauge_style(
+                    .filled_style(
                         Style::default()
                             .fg(Color::Red)
                             .bg(Color::Green)

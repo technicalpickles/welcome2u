@@ -1,12 +1,6 @@
 use anyhow::Result;
 use display::MotdSegment;
-use ratatui::{
-    TerminalOptions,
-    Viewport,
-    prelude::*,
-    widgets::*,
-};
-use std::io::stdout;
+use ratatui::{prelude::*, widgets::*};
 use sysinfo::System;
 
 #[derive(Default, Debug)]
@@ -35,10 +29,30 @@ impl UptimeInfo {
         let seconds = uptime_secs % 60;
 
         let mut uptime_parts = Vec::new();
-        if days > 0 { uptime_parts.push(format!("{} day{}", days, if days == 1 { "" } else { "s" })); }
-        if hours > 0 { uptime_parts.push(format!("{} hour{}", hours, if hours == 1 { "" } else { "s" })); }
-        if minutes > 0 { uptime_parts.push(format!("{} minute{}", minutes, if minutes == 1 { "" } else { "s" })); }
-        if seconds > 0 || uptime_parts.is_empty() { uptime_parts.push(format!("{} second{}", seconds, if seconds == 1 { "" } else { "s" })); }
+        if days > 0 {
+            uptime_parts.push(format!("{} day{}", days, if days == 1 { "" } else { "s" }));
+        }
+        if hours > 0 {
+            uptime_parts.push(format!(
+                "{} hour{}",
+                hours,
+                if hours == 1 { "" } else { "s" }
+            ));
+        }
+        if minutes > 0 {
+            uptime_parts.push(format!(
+                "{} minute{}",
+                minutes,
+                if minutes == 1 { "" } else { "s" }
+            ));
+        }
+        if seconds > 0 || uptime_parts.is_empty() {
+            uptime_parts.push(format!(
+                "{} second{}",
+                seconds,
+                if seconds == 1 { "" } else { "s" }
+            ));
+        }
 
         let uptime = uptime_parts.join(", ");
 
@@ -52,33 +66,20 @@ impl MotdSegment for UptimeSegment {
         Ok(())
     }
 
-    fn render(&self) -> Result<()> {
-        let backend = CrosstermBackend::new(stdout());
-        let options = TerminalOptions {
-            viewport: Viewport::Inline(1),
-        };
-        let mut terminal = Terminal::with_options(backend, options)?;
+    fn render(&self, frame: &mut Frame<'_>) -> Result<()> {
+        let layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-        terminal.draw(|frame| {
-            let layout = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
+        let [label_area, data_area] = layout.areas(frame.area());
 
-            let [label_area, data_area] = layout.areas(frame.area());
+        frame.render_widget(Paragraph::new("Uptime").fg(Color::Blue).bold(), label_area);
 
-            frame.render_widget(
-                Paragraph::new("Uptime").fg(Color::Blue).bold(),
-                label_area,
-            );
+        if let Some(info) = &self.info {
+            frame.render_widget(Paragraph::new(info.uptime.clone()), data_area);
+        }
 
-            if let Some(info) = &self.info {
-                frame.render_widget(
-                    Paragraph::new(info.uptime.clone()),
-                    data_area,
-                );
-            }
-        })?;
-
+        // FIXME
         println!();
 
         Ok(())

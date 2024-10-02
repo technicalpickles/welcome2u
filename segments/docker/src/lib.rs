@@ -6,12 +6,8 @@ use bollard::{
 };
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 use display::MotdSegment;
-use futures_util::stream::{StreamExt};
 use iso8601_timestamp::Timestamp;
-use ratatui::{
-    prelude::*,
-    widgets::*,
-};
+use ratatui::{prelude::*, widgets::*};
 use std::default::Default;
 
 #[derive(Debug, Default)]
@@ -35,7 +31,10 @@ impl DockerSegment {
         ht.to_text_en(Accuracy::Rough, Tense::Present)
     }
 
-    async fn fetch_container_info(docker: &Docker, container: &ContainerSummary) -> Result<ContainerInfo> {
+    async fn fetch_container_info(
+        docker: &Docker,
+        container: &ContainerSummary,
+    ) -> Result<ContainerInfo> {
         let info = docker
             .inspect_container(
                 container.id.as_ref().unwrap(),
@@ -60,7 +59,11 @@ impl DockerSegment {
             Some(ContainerStateStatusEnum::RESTARTING) => "Restarting".to_string(),
             Some(ContainerStateStatusEnum::REMOVING) => "Removing".to_string(),
             Some(ContainerStateStatusEnum::EXITED) => {
-                format!("Exited ({}) {} ago", exit_code, Self::duration_since(finished_at))
+                format!(
+                    "Exited ({}) {} ago",
+                    exit_code,
+                    Self::duration_since(finished_at)
+                )
             }
             Some(ContainerStateStatusEnum::DEAD) => "Dead".to_string(),
             None => String::new(),
@@ -89,9 +92,9 @@ impl MotdSegment for DockerSegment {
 
             let containers = docker.list_containers(Some(options)).await?;
 
-            let futures = containers.iter().map(|container| {
-                Self::fetch_container_info(&docker, container)
-            });
+            let futures = containers
+                .iter()
+                .map(|container| Self::fetch_container_info(&docker, container));
 
             self.containers = futures_util::future::join_all(futures)
                 .await
@@ -108,22 +111,22 @@ impl MotdSegment for DockerSegment {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .margin(1)
-            .constraints([
-                Constraint::Length(1),
-                Constraint::Min(0),
-            ])
+            .constraints([Constraint::Length(1), Constraint::Min(0)])
             .split(area);
 
         frame.render_widget(
-            Paragraph::new("Docker").style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD)),
+            Paragraph::new("Docker").style(
+                Style::default()
+                    .fg(Color::Blue)
+                    .add_modifier(Modifier::BOLD),
+            ),
             chunks[0],
         );
 
-        let items: Vec<ListItem> = self.containers
+        let items: Vec<ListItem> = self
+            .containers
             .iter()
-            .map(|container| {
-                ListItem::new(format!("{:<40} {}", container.name, container.status))
-            })
+            .map(|container| ListItem::new(format!("{:<40} {}", container.name, container.status)))
             .collect();
 
         let list = List::new(items);
