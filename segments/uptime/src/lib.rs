@@ -80,7 +80,15 @@ impl MotdSegment for UptimeSegment {
         frame.render_widget(Paragraph::new("Uptime").fg(Color::Blue).bold(), label_area);
 
         if let Some(info) = &self.info {
-            frame.render_widget(Paragraph::new(info.uptime.clone()), data_area);
+            let uptime_color = if info.uptime.contains("day") || info.uptime.contains("days") {
+                Color::Yellow
+            } else {
+                Color::Reset
+            };
+            frame.render_widget(
+                Paragraph::new(info.uptime.clone()).fg(uptime_color),
+                data_area,
+            );
         }
 
         Ok(())
