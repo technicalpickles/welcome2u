@@ -1,0 +1,10 @@
+[package]
+name = "updates"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+display = { path = "../../crates/display" }
+anyhow = "1.0.89"
+ratatui = "0.28.1"
+tokio = { version = "1.38.0", features = ["full"] }

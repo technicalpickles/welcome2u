@@ -48,6 +48,7 @@ fn main() -> Result<()> {
         Box::new(<uptime::UptimeSegment>::default()),
         Box::new(<load::LoadSegment>::default()),
         Box::new(<memory::MemorySegment>::default()),
+        Box::new(<updates::UpdatesSegment>::default()),
         Box::<disk::DiskSegment>::default(),
         // Box::<temperatures::TemperaturesSegment>::default(),
         // Box::new(<docker::DockerSegment>::default())
