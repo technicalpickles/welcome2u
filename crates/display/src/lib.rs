@@ -1,19 +1,16 @@
 use anyhow::Result;
 use ratatui::{
-    backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
     widgets::Paragraph,
-    Terminal, TerminalOptions, Viewport,
+    Frame,
 };
+
 use std::fmt::Debug;
-use std::io::stdout;
 
 pub trait MotdSegment: Debug {
-    fn prepare(&mut self) -> Result<()> {
-        Ok(())
-    }
-    fn render(&self) -> Result<()>;
+    fn prepare(&mut self) -> Result<()>;
+    fn render(&self, frame: &mut Frame) -> Result<()>;
 }
 
 #[derive(Debug)]
@@ -30,18 +27,12 @@ impl Single {
 }
 
 impl MotdSegment for Single {
-    fn render(&self) -> Result<()> {
-        let backend = CrosstermBackend::new(stdout());
-        let options = TerminalOptions {
-            viewport: Viewport::Inline(1),
-        };
-        let mut terminal = Terminal::with_options(backend, options)?;
-
-        terminal.draw(|f| {
-            let paragraph = Paragraph::new(self.content.clone()).style(Style::default());
-            f.render_widget(paragraph, f.area());
-        })?;
-
+    fn prepare(&mut self) -> Result<()> {
+        Ok(())
+    }
+    fn render(&self, frame: &mut Frame) -> Result<()> {
+        let paragraph = Paragraph::new(self.content.clone()).style(Style::default());
+        frame.render_widget(paragraph, frame.area());
         Ok(())
     }
 }
@@ -62,30 +53,25 @@ impl LabelWithContent {
 }
 
 impl MotdSegment for LabelWithContent {
-    fn render(&self) -> Result<()> {
-        let backend = CrosstermBackend::new(stdout());
-        let options = TerminalOptions {
-            viewport: Viewport::Inline(1),
-        };
-        let mut terminal = Terminal::with_options(backend, options)?;
+    fn prepare(&mut self) -> Result<()> {
+        Ok(())
+    }
 
-        terminal.draw(|f| {
-            let chunks = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([Constraint::Length(16), Constraint::Min(0)].as_ref())
-                .split(f.area());
+    fn render(&self, frame: &mut Frame) -> Result<()> {
+        let chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Length(16), Constraint::Min(0)].as_ref())
+            .split(frame.area());
 
-            let label = Paragraph::new(format!("{}:", self.label)).style(
-                Style::default()
-                    .fg(Color::Blue)
-                    .add_modifier(Modifier::BOLD),
-            );
-            f.render_widget(label, chunks[0]);
+        let label = Paragraph::new(format!("{}:", self.label)).style(
+            Style::default()
+                .fg(Color::Blue)
+                .add_modifier(Modifier::BOLD),
+        );
+        frame.render_widget(label, chunks[0]);
 
-            let content = Paragraph::new(self.content.clone());
-            f.render_widget(content, chunks[1]);
-        })?;
-
+        let content = Paragraph::new(self.content.clone());
+        frame.render_widget(content, chunks[1]);
         Ok(())
     }
 }

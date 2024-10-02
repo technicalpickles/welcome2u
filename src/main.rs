@@ -1,8 +1,26 @@
 use std::env;
 use anyhow::Result;
 use anyhow::Context;
+use ratatui::{backend::CrosstermBackend, Terminal, TerminalOptions, Viewport};
+use std::io::stdout;
 
 use display::MotdSegment;
+
+fn render_segments(segments: &mut [Box<dyn MotdSegment>]) -> Result<()> {
+    let backend = CrosstermBackend::new(stdout());
+    let options = TerminalOptions {
+        viewport: Viewport::Inline(segments.len() as u16 * 3), // Adjust the multiplier as needed
+    };
+    let mut terminal = Terminal::with_options(backend, options)?;
+
+    terminal.draw(|frame| {
+        for segment in segments.iter() {
+            segment.render(frame).unwrap(); // Handle errors appropriately
+        }
+    })?;
+
+    Ok(())
+}
 
 fn main() -> Result<()> {
     env::set_var("BASE_DIR", ".");
@@ -26,9 +44,7 @@ fn main() -> Result<()> {
         segment.prepare().with_context(|| format!("Failed to prepare segment: {:?}", segment))?;
     }
 
-    for segment in segments.iter_mut() {
-        segment.render().with_context(|| format!("Failed to render segment: {:?}", segment))?;
-    }
+    render_segments(&mut segments)?;
 
     Ok(())
 }

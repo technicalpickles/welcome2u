@@ -1,12 +1,7 @@
 use anyhow::Result;
 use display::MotdSegment;
 use local_ip_address::local_ip;
-use ratatui::{
-    TerminalOptions,
-    Viewport,
-    prelude::*,
-    widgets::*,
-};
+use ratatui::{prelude::*, widgets::*, TerminalOptions, Viewport};
 use std::io::stdout;
 
 #[derive(Default, Debug)]
@@ -36,34 +31,21 @@ impl MotdSegment for IpSegment {
         Ok(())
     }
 
-    fn render(&self) -> Result<()> {
-        let backend = CrosstermBackend::new(stdout());
-        let options = TerminalOptions {
-            viewport: Viewport::Inline(1),
-        };
-        let mut terminal = Terminal::with_options(backend, options)?;
+    fn render(&self, frame: &mut Frame) -> Result<()> {
+        let layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-        terminal.draw(|frame| {
-            let layout = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
+        let [label_area, data_area] = layout.areas(frame.area());
 
-            let [label_area, data_area] = layout.areas(frame.area());
+        frame.render_widget(
+            Paragraph::new("IP address").fg(Color::Blue).bold(),
+            label_area,
+        );
 
-            frame.render_widget(
-                Paragraph::new("IP address").fg(Color::Blue).bold(),
-                label_area,
-            );
-
-            if let Some(info) = &self.info {
-                frame.render_widget(
-                    Paragraph::new(info.ip_address.clone()),
-                    data_area,
-                );
-            }
-        })?;
-
-        println!();
+        if let Some(info) = &self.info {
+            frame.render_widget(Paragraph::new(info.ip_address.clone()), data_area);
+        }
 
         Ok(())
     }

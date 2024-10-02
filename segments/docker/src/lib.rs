@@ -103,37 +103,33 @@ impl MotdSegment for DockerSegment {
         })
     }
 
-    fn render(&self) -> Result<()> {
-        let backend = CrosstermBackend::new(stdout());
-        let mut terminal = Terminal::new(backend)?;
+    fn render(&self, frame: &mut Frame) -> Result<()> {
+        let area = frame.area();
+        let chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .margin(1)
+            .constraints([
+                Constraint::Length(1),
+                Constraint::Min(0),
+            ])
+            .split(area);
 
-        terminal.draw(|frame| {
-            let area = frame.size();
-            let chunks = Layout::default()
-                .direction(Direction::Vertical)
-                .margin(1)
-                .constraints([
-                    Constraint::Length(1),
-                    Constraint::Min(0),
-                ])
-                .split(area);
+        frame.render_widget(
+            Paragraph::new("Docker").style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD)),
+            chunks[0],
+        );
 
-            frame.render_widget(
-                Paragraph::new("Docker").style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD)),
-                chunks[0],
-            );
+        let items: Vec<ListItem> = self.containers
+            .iter()
+            .map(|container| {
+                ListItem::new(format!("{:<40} {}", container.name, container.status))
+            })
+            .collect();
 
-            let items: Vec<ListItem> = self.containers
-                .iter()
-                .map(|container| {
-                    ListItem::new(format!("{:<40} {}", container.name, container.status))
-                })
-                .collect();
+        let list = List::new(items);
+        frame.render_widget(list, chunks[1]);
 
-            let list = List::new(items);
-            frame.render_widget(list, chunks[1]);
-        })?;
-
+        // FIXME: figure out how to avoid printn
         println!();
 
         Ok(())

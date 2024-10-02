@@ -60,32 +60,24 @@ impl MotdSegment for MemorySegment {
         Ok(())
     }
 
-    fn render(&self) -> Result<()> {
-        let backend = CrosstermBackend::new(stdout());
-        let options = TerminalOptions {
-            viewport: Viewport::Inline(1),
-        };
-        let mut terminal = Terminal::with_options(backend, options)?;
-
-        terminal.draw(|frame| {
-            let layout = Layout::default()
-                .direction(Direction::Horizontal)
+    fn render(&self, frame: &mut Frame<'_>) -> Result<()> {
+        let layout = Layout::default()
+            .direction(Direction::Horizontal)
                 .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-            let [label_area, data_area] = layout.areas(frame.area());
+        let [label_area, data_area] = layout.areas(frame.area());
 
+        frame.render_widget(
+            Paragraph::new(Blue.bold().paint("RAM").to_string()),
+            label_area,
+        );
+
+        if let Some(info) = &self.info {
             frame.render_widget(
-                Paragraph::new(Blue.bold().paint("RAM").to_string()),
-                label_area,
+                Paragraph::new(info.format()),
+                data_area,
             );
-
-            if let Some(info) = &self.info {
-                frame.render_widget(
-                    Paragraph::new(info.format()),
-                    data_area,
-                );
-            }
-        })?;
+        }
 
         // FIXME each segment shouldn't have to print its own newline
         println!();

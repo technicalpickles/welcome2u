@@ -36,33 +36,26 @@ impl MotdSegment for OsSegment {
         Ok(())
     }
 
-    fn render(&self) -> Result<()> {
-        let backend = CrosstermBackend::new(stdout());
-        let options = TerminalOptions {
-            viewport: Viewport::Inline(1),
-        };
-        let mut terminal = Terminal::with_options(backend, options)?;
+    fn render(&self, frame: &mut Frame<'_>) -> Result<()> {
+        let layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-        terminal.draw(|frame| {
-            let layout = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
+        let [label_area, data_area] = layout.areas(frame.area());
 
-            let [label_area, data_area] = layout.areas(frame.area());
+        frame.render_widget(
+            Paragraph::new("OS").fg(Color::Blue).bold(),
+            label_area,
+        );
 
+        if let Some(info) = &self.info {
             frame.render_widget(
-                Paragraph::new("OS").fg(Color::Blue).bold(),
-                label_area,
+                Paragraph::new(info.os_string.clone()),
+                data_area,
             );
+        }
 
-            if let Some(info) = &self.info {
-                frame.render_widget(
-                    Paragraph::new(info.os_string.clone()),
-                    data_area,
-                );
-            }
-        })?;
-
+        // FIXME: remove println
         println!();
 
         Ok(())

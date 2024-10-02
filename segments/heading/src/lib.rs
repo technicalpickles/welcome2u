@@ -3,6 +3,7 @@ use rand::{seq::SliceRandom, thread_rng};
 use display::MotdSegment;
 use anyhow::Result;
 use thiserror::Error;
+use ratatui::Frame;
 use std::fmt;
 
 use fortune::{Fortunes, NoFortunesError};
@@ -78,7 +79,11 @@ impl fmt::Debug for HeadingSegment {
 }
 
 impl MotdSegment for HeadingSegment {
-    fn render(&self) -> Result<()> { 
+    fn prepare(&mut self) -> Result<()> {
+        Ok(())
+    }
+
+    fn render(&self, frame: &mut Frame) -> Result<()> { 
         let font_choice = random_font();
         let figure = figlet(font_choice, &self.heading)?;
 
@@ -88,6 +93,7 @@ impl MotdSegment for HeadingSegment {
         let spread = 5.0;
         let inverse = false;
 
+        // FIXME: figure out how to print-rainbow to a string instead
         figure.lines().for_each(|line| {
             lolcat::print_rainbow(line, freq, seed, spread, inverse);
             println!();

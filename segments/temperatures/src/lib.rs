@@ -1,5 +1,3 @@
-use std::io::stdout;
-
 use anyhow::Result;
 use ratatui::{
     Terminal, TerminalOptions,
@@ -7,17 +5,20 @@ use ratatui::{
     style::{Color, Style},
     text::{Span, Line},
     widgets::Paragraph,
-    Viewport,
 };
 use sysinfo::{ComponentExt, System, SystemExt};
 
 use display::MotdSegment;
 
-#[derive(Default, Debug)]
-pub struct TemperaturesSegment;
+#[derive(Debug)]
+pub struct Temperatures;
 
-impl MotdSegment for TemperaturesSegment {
-    fn render(&self) -> Result<()> {
+impl MotdSegment for Temperatures {
+    fn prepare(&mut self) -> Result<()> {
+        Ok(())
+    }
+
+    fn render(&self, frame: &mut Frame<'_>) -> Result<()> {
         let mut sys = System::new_all();
         sys.refresh_components();
 

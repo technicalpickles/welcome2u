@@ -1,3 +1,5 @@
+use ratatui::Frame;
+use display::Single;
 use std::process::{Command, Stdio, ExitStatus};
 use anyhow::Result;
 use thiserror::Error;
@@ -60,8 +62,7 @@ impl MotdSegment for CommandSegment {
         Ok(())
     }
 
-    fn render(&self) -> Result<()> {
-        print!("{}", self.output);
-        Ok(())
+    fn render(&self, frame: &mut Frame) -> Result<()> {
+        Single::new(&self.output).render(frame)
     }
 }

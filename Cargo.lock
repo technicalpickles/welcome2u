@@ -614,6 +614,7 @@ dependencies = [
  "fortune",
  "lolcat",
  "rand",
+ "ratatui 0.28.1",
  "thiserror",
 ]
 
@@ -1225,6 +1226,7 @@ dependencies = [
  "anyhow",
  "display",
  "fortune",
+ "ratatui 0.28.1",
  "textwrap",
  "thiserror",
 ]

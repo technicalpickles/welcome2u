@@ -1,12 +1,10 @@
 use fmtsize::{Conventional, FmtSize};
-use ratatui::{TerminalOptions, prelude::*, widgets::*, style::{Color, Style, Modifier}};
+use ratatui::{Frame, prelude::*, widgets::*, style::{Color, Style, Modifier}};
 use std::path::Path;
 use sysinfo::Disks;
 
 use anyhow::Result;
 use display::MotdSegment;
-
-use std::io::stdout;
 
 #[derive(Default, Debug)]
 pub struct DiskSegment {
@@ -68,42 +66,34 @@ impl MotdSegment for DiskSegment {
         Ok(())
     }
 
-    fn render(&self) -> Result<()> {
-        let backend = CrosstermBackend::new(stdout());
-        let options = TerminalOptions {
-            viewport: Viewport::Inline(3),
-        };
-        let mut terminal = Terminal::with_options(backend, options)?;
+    fn render(&self, frame: &mut Frame) -> Result<()> {
+        let layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-        terminal.draw(|frame| {
-            let layout = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
+        let [label_area, data_area] = layout.areas(frame.size());
 
-            let [label_area, data_area] = layout.areas(frame.size());
+        frame.render_widget(
+            Paragraph::new("Disk")
+                .style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD)),
+            label_area,
+        );
 
+        for disk in self.disks.iter() {
             frame.render_widget(
-                Paragraph::new("Disk")
-                    .style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD)),
-                label_area,
+                LineGauge::default()
+                    .block(Block::default().title(disk.format()))
+                    .gauge_style(
+                        Style::default()
+                            .fg(Color::Red)
+                            .bg(Color::Green)
+                            .add_modifier(Modifier::BOLD),
+                    )
+                    .line_set(symbols::line::THICK)
+                    .ratio(disk.percent_used),
+                data_area,
             );
-
-            for disk in self.disks.iter() {
-                frame.render_widget(
-                    LineGauge::default()
-                        .block(Block::default().title(disk.format()))
-                        .gauge_style(
-                            Style::default()
-                                .fg(Color::Red)
-                                .bg(Color::Green)
-                                .add_modifier(Modifier::BOLD),
-                        )
-                        .line_set(symbols::line::THICK)
-                        .ratio(disk.percent_used),
-                    data_area,
-                );
-            }
-        })?;
+        }
 
         Ok(())
     }

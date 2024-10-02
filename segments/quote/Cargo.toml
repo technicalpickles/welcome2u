@@ -12,3 +12,4 @@ display = { path = "../../crates/display" }
 textwrap = "0.16.1"
 thiserror = "1.0.61"
 anyhow = "1.0.86"
+ratatui = "0.28.1"

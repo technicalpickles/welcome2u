@@ -1,9 +1,10 @@
 use ansi_term::Style;
-use fortune::{Fortunes, NoFortunesError};
-use textwrap::indent;
 use anyhow::Result;
-
 use display::MotdSegment;
+use display::Single;
+use fortune::{Fortunes, NoFortunesError};
+use ratatui::Frame;
+use textwrap::indent;
 
 fn choose_fortune() -> Result<String, NoFortunesError> {
     // TODO: support multiple fortune files: pickleisms, collected-quotes
@@ -17,25 +18,30 @@ fn choose_fortune() -> Result<String, NoFortunesError> {
 
 #[derive(Debug)]
 pub struct FortuneHeaderSegment {
-    fortune: String
+    fortune: String,
 }
 
 impl Default for FortuneHeaderSegment {
     fn default() -> Self {
         Self {
-            fortune: choose_fortune().unwrap()
+            fortune: choose_fortune().unwrap(),
         }
     }
 }
 
 impl MotdSegment for FortuneHeaderSegment {
-    fn render(&self) -> Result<()> {
+    fn prepare(&mut self) -> Result<()> {
+        self.fortune =
+            choose_fortune().map_err(|e| anyhow::anyhow!("Failed to choose fortune: {}", e))?;
+        Ok(())
+    }
+
+    fn render(&self, frame: &mut Frame) -> Result<()> {
         let content = textwrap::fill(&self.fortune, 80);
         let content = indent(&content, "       ");
         let content = Style::default().dimmed().paint(content);
 
-        println!("{}", content);
-        println!();
+        Single::new(&content).render(frame)?;
         Ok(())
     }
 }
