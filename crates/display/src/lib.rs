@@ -10,7 +10,7 @@ use std::fmt::Debug;
 
 pub trait MotdSegment: Debug {
     fn prepare(&mut self) -> Result<()>;
-    fn render(&self, frame: &mut Frame) -> Result<()>;
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()>;
 }
 
 #[derive(Debug)]
@@ -30,9 +30,9 @@ impl MotdSegment for Single {
     fn prepare(&mut self) -> Result<()> {
         Ok(())
     }
-    fn render(&self, frame: &mut Frame) -> Result<()> {
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let paragraph = Paragraph::new(self.content.clone()).style(Style::default());
-        frame.render_widget(paragraph, frame.area());
+        frame.render_widget(paragraph, area);
         Ok(())
     }
 }
@@ -57,11 +57,11 @@ impl MotdSegment for LabelWithContent {
         Ok(())
     }
 
-    fn render(&self, frame: &mut Frame) -> Result<()> {
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([Constraint::Length(16), Constraint::Min(0)].as_ref())
-            .split(frame.area());
+            .split(area);
 
         let label = Paragraph::new(format!("{}:", self.label)).style(
             Style::default()

@@ -106,8 +106,7 @@ impl MotdSegment for DockerSegment {
         })
     }
 
-    fn render(&self, frame: &mut Frame) -> Result<()> {
-        let area = frame.area();
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .margin(1)
@@ -131,9 +130,6 @@ impl MotdSegment for DockerSegment {
 
         let list = List::new(items);
         frame.render_widget(list, chunks[1]);
-
-        // FIXME: figure out how to avoid printn
-        println!();
 
         Ok(())
     }

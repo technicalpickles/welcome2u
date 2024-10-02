@@ -66,12 +66,12 @@ impl MotdSegment for UptimeSegment {
         Ok(())
     }
 
-    fn render(&self, frame: &mut Frame<'_>) -> Result<()> {
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let layout = Layout::default()
             .direction(Direction::Horizontal)
             .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-        let [label_area, data_area] = layout.areas(frame.area());
+        let [label_area, data_area] = layout.areas(area);
 
         frame.render_widget(Paragraph::new("Uptime").fg(Color::Blue).bold(), label_area);
 

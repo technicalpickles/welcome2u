@@ -1,5 +1,8 @@
 use anyhow::Context;
 use anyhow::Result;
+use ratatui::layout::Constraint;
+use ratatui::layout::Direction;
+use ratatui::layout::Layout;
 use ratatui::{backend::CrosstermBackend, Terminal, TerminalOptions, Viewport};
 use std::env;
 use std::io::stdout;
@@ -14,8 +17,18 @@ fn render_segments(segments: &mut [Box<dyn MotdSegment>]) -> Result<()> {
     let mut terminal = Terminal::with_options(backend, options)?;
 
     terminal.draw(|frame| {
-        for segment in segments.iter() {
-            segment.render(frame).unwrap(); // Handle errors appropriately
+        let constraints = segments
+            .iter()
+            .map(|_| Constraint::Length(3))
+            .collect::<Vec<Constraint>>();
+
+        let layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(constraints)
+            .split(frame.area());
+
+        for (segment, area) in segments.iter().zip(layout.iter()) {
+            segment.render(frame, *area).unwrap(); // Handle errors appropriately
         }
     })?;
 
@@ -35,8 +48,8 @@ fn main() -> Result<()> {
         Box::new(<uptime::UptimeSegment>::default()),
         Box::new(<load::LoadSegment>::default()),
         Box::new(<memory::MemorySegment>::default()),
-        Box::<disk::DiskSegment>::default(),
-        Box::<temperatures::TemperaturesSegment>::default(),
+        // Box::<disk::DiskSegment>::default(),
+        // Box::<temperatures::TemperaturesSegment>::default(),
         // Box::new(<docker::DockerSegment>::default())
     ];
 

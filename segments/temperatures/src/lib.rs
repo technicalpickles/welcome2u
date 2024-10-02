@@ -17,7 +17,7 @@ impl MotdSegment for TemperaturesSegment {
         Ok(())
     }
 
-    fn render(&self, frame: &mut Frame<'_>) -> Result<()> {
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let mut sys = System::new_all();
         sys.refresh_components();
 
@@ -66,7 +66,7 @@ impl MotdSegment for TemperaturesSegment {
             .direction(Direction::Horizontal)
             .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-        let [label_area, data_area] = layout.areas(frame.area());
+        let [label_area, data_area] = layout.areas(area);
 
         frame.render_widget(
             Paragraph::new("Temperatures").style(

@@ -1,12 +1,9 @@
+use ansi_term::Colour::Blue;
 use anyhow::Result;
 use display::MotdSegment;
-use ratatui::{
-    prelude::*,
-    widgets::*,
-};
-use sysinfo::System;
 use fmtsize::{Conventional, FmtSize};
-use ansi_term::Colour::Blue;
+use ratatui::{prelude::*, widgets::*};
+use sysinfo::System;
 
 #[derive(Default, Debug)]
 pub struct MemorySegment {
@@ -44,9 +41,7 @@ impl MemoryInfo {
     fn format(&self) -> String {
         format!(
             "RAM - {} used, {} available / {}",
-            self.used_memory,
-            self.available_memory,
-            self.total_memory
+            self.used_memory, self.available_memory, self.total_memory
         )
     }
 }
@@ -57,12 +52,12 @@ impl MotdSegment for MemorySegment {
         Ok(())
     }
 
-    fn render(&self, frame: &mut Frame<'_>) -> Result<()> {
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let layout = Layout::default()
             .direction(Direction::Horizontal)
-                .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
+            .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-        let [label_area, data_area] = layout.areas(frame.area());
+        let [label_area, data_area] = layout.areas(area);
 
         frame.render_widget(
             Paragraph::new(Blue.bold().paint("RAM").to_string()),
@@ -70,10 +65,7 @@ impl MotdSegment for MemorySegment {
         );
 
         if let Some(info) = &self.info {
-            frame.render_widget(
-                Paragraph::new(info.format()),
-                data_area,
-            );
+            frame.render_widget(Paragraph::new(info.format()), data_area);
         }
 
         // FIXME each segment shouldn't have to print its own newline

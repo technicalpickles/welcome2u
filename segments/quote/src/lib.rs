@@ -3,7 +3,7 @@ use anyhow::Result;
 use display::MotdSegment;
 use display::Single;
 use fortune::{Fortunes, NoFortunesError};
-use ratatui::Frame;
+use ratatui::prelude::*;
 use textwrap::indent;
 
 fn choose_fortune() -> Result<String, NoFortunesError> {
@@ -36,12 +36,12 @@ impl MotdSegment for FortuneHeaderSegment {
         Ok(())
     }
 
-    fn render(&self, frame: &mut Frame) -> Result<()> {
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let content = textwrap::fill(&self.fortune, 80);
         let content = indent(&content, "       ");
         let content = Style::default().dimmed().paint(content);
 
-        Single::new(&content).render(frame)?;
+        Single::new(&content).render(frame, area)?;
         Ok(())
     }
 }

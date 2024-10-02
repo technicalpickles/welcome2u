@@ -1,9 +1,6 @@
 use anyhow::Result;
 use display::MotdSegment;
-use ratatui::{
-    prelude::*,
-    widgets::*,
-};
+use ratatui::{prelude::*, widgets::*};
 
 #[derive(Default, Debug)]
 pub struct OsSegment {
@@ -32,23 +29,17 @@ impl MotdSegment for OsSegment {
         Ok(())
     }
 
-    fn render(&self, frame: &mut Frame<'_>) -> Result<()> {
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let layout = Layout::default()
             .direction(Direction::Horizontal)
             .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
-        let [label_area, data_area] = layout.areas(frame.area());
+        let [label_area, data_area] = layout.areas(area);
 
-        frame.render_widget(
-            Paragraph::new("OS").fg(Color::Blue).bold(),
-            label_area,
-        );
+        frame.render_widget(Paragraph::new("OS").fg(Color::Blue).bold(), label_area);
 
         if let Some(info) = &self.info {
-            frame.render_widget(
-                Paragraph::new(info.os_string.clone()),
-                data_area,
-            );
+            frame.render_widget(Paragraph::new(info.os_string.clone()), data_area);
         }
 
         // FIXME: remove println

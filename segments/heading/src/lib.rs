@@ -1,10 +1,11 @@
+use anyhow::Result;
+use display::MotdSegment;
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
-use display::MotdSegment;
-use anyhow::Result;
-use thiserror::Error;
+use ratatui::layout::Rect;
 use ratatui::Frame;
 use std::fmt;
+use thiserror::Error;
 
 use fortune::{Fortunes, NoFortunesError};
 
@@ -21,20 +22,21 @@ pub enum FigletError {
     #[error("Could not load font from {path}: {message}")]
     FontLoadError { path: String, message: String },
     #[error("Could not convert text to figlet: {message}")]
-    ConversionError { message: String }
+    ConversionError { message: String },
 }
 
 fn figlet(font: String, message: &str) -> Result<String> {
     let font_directory = "/opt/homebrew/opt/figlet";
     let font_path = format!("{}/share/figlet/fonts/{}.flf", font_directory, font);
 
-    let font = FIGfont::from_file(font_path.as_str())
-        .map_err(|error| FigletError::FontLoadError {
+    let font =
+        FIGfont::from_file(font_path.as_str()).map_err(|error| FigletError::FontLoadError {
             path: font_path.clone(),
             message: error.to_string(),
         })?;
 
-    let figure = font.convert(message)
+    let figure = font
+        .convert(message)
         .ok_or_else(|| FigletError::ConversionError {
             message: "Failed to convert text to figlet".to_string(),
         })?;
@@ -59,13 +61,13 @@ fn random_font() -> String {
 }
 
 pub struct HeadingSegment {
-    pub heading: String
+    pub heading: String,
 }
 
 impl Default for HeadingSegment {
     fn default() -> Self {
         Self {
-            heading: choose_fortune().unwrap()
+            heading: choose_fortune().unwrap(),
         }
     }
 }
@@ -83,7 +85,7 @@ impl MotdSegment for HeadingSegment {
         Ok(())
     }
 
-    fn render(&self, frame: &mut Frame) -> Result<()> { 
+    fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let font_choice = random_font();
         let figure = figlet(font_choice, &self.heading)?;
 
