@@ -1,40 +1,41 @@
 use anyhow::Result;
-use segment::Segment;
 use ratatui::{prelude::*, widgets::*};
-use sysinfo::System;
+use segment::{Info, InfoBuilder, Segment};
+use sysinfo::{LoadAvg, System};
 
 #[derive(Default, Debug)]
 pub struct LoadSegment {
     info: Option<LoadInfo>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct LoadInfo {
-    loads: [f64; 3],
+    loads: LoadAvg,
     cores: usize,
 }
 
-impl LoadInfo {
-    fn new(loads: [f64; 3], cores: usize) -> Self {
-        Self { loads, cores }
-    }
+impl Info for LoadInfo {}
 
-    fn collect() -> Self {
+#[derive(Debug, Default)]
+struct LoadInfoBuilder {}
+
+impl InfoBuilder<LoadInfo> for LoadInfoBuilder {
+    fn build(&self) -> Result<LoadInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();
 
         let loads = System::load_average();
         let cores = sys.physical_core_count().unwrap_or(1);
-
-        Self::new([loads.one, loads.five, loads.fifteen], cores)
+        Ok(LoadInfo { loads, cores })
     }
+}
 
-    fn format(&self) -> Vec<Span> {
-        let warning_threshold = self.cores as f64 * 0.9;
-        let error_threshold = self.cores as f64 * 1.5;
+impl LoadSegment {
+    fn format_loads(&self, info: &LoadInfo) -> Vec<Span> {
+        let warning_threshold = info.cores as f64 * 0.9;
+        let error_threshold = info.cores as f64 * 1.5;
 
-        let colored_loads: Vec<Span> = self
-            .loads
+        let colored_loads: Vec<Span> = [info.loads.one, info.loads.five, info.loads.fifteen]
             .iter()
             .map(|&load| {
                 let content = format!("{:.2}", load);
@@ -48,16 +49,14 @@ impl LoadInfo {
             })
             .collect();
 
-        let result = vec![
+        vec![
             colored_loads[0].clone(),
             Span::raw(", "),
             colored_loads[1].clone(),
             Span::raw(", "),
             colored_loads[2].clone(),
-            Span::raw(format!(" (across {} cores)", self.cores)),
-        ];
-
-        result
+            Span::raw(format!(" (across {} cores)", info.cores)),
+        ]
     }
 }
 
@@ -67,7 +66,7 @@ impl Segment for LoadSegment {
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(LoadInfo::collect());
+        self.info = Some(LoadInfoBuilder::default().build()?);
         Ok(())
     }
 
@@ -88,7 +87,8 @@ impl Segment for LoadSegment {
         );
 
         if let Some(info) = &self.info {
-            frame.render_widget(Paragraph::new(Line::from(info.format())), data_area);
+            let formatted_loads = self.format_loads(info);
+            frame.render_widget(Paragraph::new(Line::from(formatted_loads)), data_area);
         }
 
         Ok(())
