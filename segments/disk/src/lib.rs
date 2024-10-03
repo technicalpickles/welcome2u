@@ -7,7 +7,7 @@ use ratatui::{
 use sysinfo::Disks;
 
 use anyhow::Result;
-use segment::Segment;
+use segment::{Info, InfoBuilder, Segment};
 
 #[derive(Debug)]
 struct Disk {
@@ -37,27 +37,26 @@ pub struct DiskSegmentInfo {
     disks: Vec<Disk>,
 }
 
+impl Info for DiskSegmentInfo {}
+
 #[derive(Debug, Default)]
 pub struct DiskSegment {
     info: DiskSegmentInfo,
 }
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct DiskInfoBuilder {
     excluded_mount_points: Vec<String>,
 }
 
 impl DiskInfoBuilder {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     pub fn exclude_mount_point(mut self, mount_point: String) -> Self {
         self.excluded_mount_points.push(mount_point);
         self
     }
-
-    pub fn build(self) -> Result<DiskSegmentInfo> {
+}
+impl InfoBuilder<DiskSegmentInfo> for DiskInfoBuilder {
+    fn build(&self) -> Result<DiskSegmentInfo> {
         let disks = Disks::new_with_refreshed_list();
 
         let disks = disks
@@ -99,7 +98,7 @@ impl Segment for DiskSegment {
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = DiskInfoBuilder::new().build()?;
+        self.info = DiskInfoBuilder::default().build()?;
         Ok(())
     }
 
@@ -132,13 +131,5 @@ impl Segment for DiskSegment {
         }
 
         Ok(())
-    }
-}
-
-impl DiskSegment {
-    pub fn new() -> Self {
-        Self {
-            info: DiskSegmentInfo::default(),
-        }
     }
 }

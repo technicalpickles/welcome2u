@@ -14,6 +14,12 @@ pub trait Segment: Debug {
     fn height(&self) -> u16;
 }
 
+pub trait Info: Debug {}
+
+pub trait InfoBuilder<T: Info>: Debug {
+    fn build(&self) -> Result<T>;
+}
+
 #[derive(Debug)]
 pub struct Text {
     content: String,
