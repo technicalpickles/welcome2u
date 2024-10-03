@@ -1,6 +1,6 @@
 use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
-use segment::Segment;
+use segment::*;
 use sysinfo::System;
 
 #[derive(Default, Debug)]
@@ -13,12 +13,13 @@ struct UptimeInfo {
     uptime: String,
 }
 
-impl UptimeInfo {
-    fn new(uptime: String) -> Self {
-        Self { uptime }
-    }
+impl Info for UptimeInfo {}
 
-    fn collect() -> Self {
+#[derive(Debug, Default)]
+struct UptimeInfoBuilder {}
+
+impl InfoBuilder<UptimeInfo> for UptimeInfoBuilder {
+    fn build(&self) -> Result<UptimeInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();
 
@@ -55,18 +56,16 @@ impl UptimeInfo {
         }
 
         let uptime = uptime_parts.join(", ");
-
-        Self::new(uptime)
+        Ok(UptimeInfo { uptime })
     }
 }
-
 impl Segment for UptimeSegment {
     fn height(&self) -> u16 {
         1
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(UptimeInfo::collect());
+        self.info = Some(UptimeInfoBuilder::default().build()?);
         Ok(())
     }
 
