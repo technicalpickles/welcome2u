@@ -14,3 +14,5 @@ display = { path = "../../crates/display" }
 anyhow = "1.0.86"
 thiserror = "1.0.61"
 ratatui = "0.28.1"
+regex = "1.11.0"
+lolcrab = "0.4.0"

@@ -2,8 +2,7 @@ use anyhow::Result;
 use display::MotdSegment;
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
-use ratatui::layout::Rect;
-use ratatui::Frame;
+use ratatui::{layout::Rect, Frame};
 use std::fmt;
 use thiserror::Error;
 
@@ -62,12 +61,16 @@ fn random_font() -> String {
 
 pub struct HeadingSegment {
     pub heading: String,
+    pub figure: String,
+    pub font_choice: String,
 }
 
 impl Default for HeadingSegment {
     fn default() -> Self {
         Self {
             heading: choose_fortune().unwrap(),
+            font_choice: String::new(),
+            figure: String::new(),
         }
     }
 }
@@ -76,6 +79,7 @@ impl fmt::Debug for HeadingSegment {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("HeadingSegment")
             .field("heading", &self.heading)
+            .field("font_choice", &self.font_choice)
             .finish()
     }
 }
@@ -83,29 +87,19 @@ impl fmt::Debug for HeadingSegment {
 impl MotdSegment for HeadingSegment {
     fn height(&self) -> u16 {
         // FIXME: need lines of the figure
-        1
+        self.figure.lines().count() as u16
     }
 
     fn prepare(&mut self) -> Result<()> {
+        self.font_choice = random_font();
+        self.figure = figlet(self.font_choice.clone(), &self.heading)?;
+
         Ok(())
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let font_choice = random_font();
-        let figure = figlet(font_choice, &self.heading)?;
-
-        let seed = rand::random::<f64>() * 1_000_000.0;
-        let freq = 0.1;
-        // default is 1.0 ... increase the number to have it spread out a lil less, ie not changing as much
-        let spread = 5.0;
-        let inverse = false;
-
-        // FIXME: figure out how to print-rainbow to a string instead
-        figure.lines().for_each(|line| {
-            lolcat::print_rainbow(line, freq, seed, spread, inverse);
-            println!();
-        });
-
+        // FIXME: doesn't seem to correctly render, ie only getting part of the figlet
+        frame.render_widget(self.figure.clone(), area);
         Ok(())
     }
 }

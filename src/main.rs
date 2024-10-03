@@ -40,6 +40,7 @@ fn main() -> Result<()> {
     env::set_var("CONFIG_PATH", "./config.sh");
 
     let mut segments: Vec<Box<dyn MotdSegment>> = vec![
+        // TODO: re-enable once rendering correctly
         // Box::<heading::HeadingSegment>::default(),
         Box::<quote::FortuneHeaderSegment>::default(),
         Box::new(<user::UserSegment>::default()),
@@ -50,6 +51,7 @@ fn main() -> Result<()> {
         Box::new(<memory::MemorySegment>::default()),
         Box::new(<updates::UpdatesSegment>::default()),
         Box::<disk::DiskSegment>::default(),
+        // TODO: re-enable these after testing
         // Box::<temperatures::TemperaturesSegment>::default(),
         // Box::new(<docker::DockerSegment>::default())
     ];
