@@ -7,9 +7,9 @@ use ratatui::{backend::CrosstermBackend, Terminal, TerminalOptions, Viewport};
 use std::env;
 use std::io::stdout;
 
-use display::MotdSegment;
+use segment::Segment;
 
-fn render_segments(segments: &mut [Box<dyn MotdSegment>]) -> Result<()> {
+fn render_segments(segments: &mut [Box<dyn Segment>]) -> Result<()> {
     let backend = CrosstermBackend::new(stdout());
     let options = TerminalOptions {
         viewport: Viewport::Inline(segments.iter().map(|segment| segment.height()).sum()),
@@ -39,7 +39,7 @@ fn main() -> Result<()> {
     env::set_var("BASE_DIR", ".");
     env::set_var("CONFIG_PATH", "./config.sh");
 
-    let mut segments: Vec<Box<dyn MotdSegment>> = vec![
+    let mut segments: Vec<Box<dyn Segment>> = vec![
         // TODO: re-enable once rendering correctly
         // Box::<heading::HeadingSegment>::default(),
         Box::<quote::FortuneHeaderSegment>::default(),

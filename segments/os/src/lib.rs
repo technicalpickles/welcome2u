@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::MotdSegment;
+use segment::Segment;
 use ratatui::{prelude::*, widgets::*};
 
 #[derive(Default, Debug)]
@@ -23,7 +23,7 @@ impl OsInfo {
     }
 }
 
-impl MotdSegment for OsSegment {
+impl Segment for OsSegment {
     fn height(&self) -> u16 {
         1
     }

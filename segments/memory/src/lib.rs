@@ -1,6 +1,6 @@
 use ansi_term::Colour::Blue;
 use anyhow::Result;
-use display::MotdSegment;
+use segment::Segment;
 use fmtsize::{Conventional, FmtSize};
 use ratatui::{prelude::*, widgets::*};
 use sysinfo::System;
@@ -46,7 +46,7 @@ impl MemoryInfo {
     }
 }
 
-impl MotdSegment for MemorySegment {
+impl Segment for MemorySegment {
     fn height(&self) -> u16 {
         1
     }

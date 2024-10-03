@@ -7,12 +7,12 @@ use ratatui::{
 };
 use sysinfo::{ComponentExt, System, SystemExt};
 
-use display::MotdSegment;
+use segment::Segment;
 
 #[derive(Debug, Default)]
 pub struct TemperaturesSegment;
 
-impl MotdSegment for TemperaturesSegment {
+impl Segment for TemperaturesSegment {
     fn height(&self) -> u16 {
         1
     }

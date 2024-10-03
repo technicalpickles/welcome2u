@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::MotdSegment;
+use segment::Segment;
 use ratatui::{prelude::*, widgets::*};
 use std::process::Command;
 
@@ -37,7 +37,7 @@ impl UpdatesInfo {
     }
 }
 
-impl MotdSegment for UpdatesSegment {
+impl Segment for UpdatesSegment {
     fn height(&self) -> u16 {
         1
     }

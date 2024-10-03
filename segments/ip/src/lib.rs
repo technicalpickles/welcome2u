@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::MotdSegment;
+use segment::Segment;
 use local_ip_address::local_ip;
 use ratatui::{prelude::*, widgets::*};
 
@@ -24,7 +24,7 @@ impl IpInfo {
     }
 }
 
-impl MotdSegment for IpSegment {
+impl Segment for IpSegment {
     fn height(&self) -> u16 {
         1
     }

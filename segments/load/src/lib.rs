@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::MotdSegment;
+use segment::Segment;
 use ratatui::{prelude::*, widgets::*};
 use sysinfo::System;
 
@@ -61,7 +61,7 @@ impl LoadInfo {
     }
 }
 
-impl MotdSegment for LoadSegment {
+impl Segment for LoadSegment {
     fn height(&self) -> u16 {
         1
     }

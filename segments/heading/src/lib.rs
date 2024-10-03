@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::MotdSegment;
+use segment::Segment;
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
 use ratatui::{layout::Rect, Frame};
@@ -84,7 +84,7 @@ impl fmt::Debug for HeadingSegment {
     }
 }
 
-impl MotdSegment for HeadingSegment {
+impl Segment for HeadingSegment {
     fn height(&self) -> u16 {
         // FIXME: need lines of the figure
         self.figure.lines().count() as u16
