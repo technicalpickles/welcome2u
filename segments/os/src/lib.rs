@@ -1,6 +1,6 @@
 use anyhow::Result;
-use segment::Segment;
 use ratatui::{prelude::*, widgets::*};
+use segment::{Info, InfoBuilder, Segment};
 
 #[derive(Default, Debug)]
 pub struct OsSegment {
@@ -12,14 +12,17 @@ struct OsInfo {
     os_string: String,
 }
 
-impl OsInfo {
-    fn new(os_string: String) -> Self {
-        Self { os_string }
-    }
+impl Info for OsInfo {}
 
-    fn collect() -> Self {
+#[derive(Debug, Default)]
+struct OsInfoBuilder {}
+
+impl InfoBuilder<OsInfo> for OsInfoBuilder {
+    fn build(&self) -> Result<OsInfo> {
         let info = os_info::get();
-        Self::new(info.to_string())
+        Ok(OsInfo {
+            os_string: info.to_string(),
+        })
     }
 }
 
@@ -29,7 +32,7 @@ impl Segment for OsSegment {
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(OsInfo::collect());
+        self.info = Some(OsInfoBuilder::default().build()?);
         Ok(())
     }
 
