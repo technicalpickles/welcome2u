@@ -4,16 +4,10 @@ use ratatui::{
     style::{Color, Style},
     widgets::*,
 };
-use std::path::Path;
 use sysinfo::Disks;
 
 use anyhow::Result;
-use display::MotdSegment;
-
-#[derive(Default, Debug)]
-pub struct DiskSegment {
-    disks: Vec<Disk>,
-}
+use segment::Segment;
 
 #[derive(Debug)]
 struct Disk {
@@ -38,20 +32,41 @@ impl Disk {
     }
 }
 
-impl MotdSegment for DiskSegment {
-    fn height(&self) -> u16 {
-        (self.disks.len() * 2) as u16
+#[derive(Default, Debug)]
+pub struct DiskSegmentInfo {
+    disks: Vec<Disk>,
+}
+
+#[derive(Debug, Default)]
+pub struct DiskSegment {
+    info: DiskSegmentInfo,
+}
+
+#[derive(Default)]
+pub struct DiskInfoBuilder {
+    excluded_mount_points: Vec<String>,
+}
+
+impl DiskInfoBuilder {
+    pub fn new() -> Self {
+        Self::default()
     }
 
-    fn prepare(&mut self) -> Result<()> {
+    pub fn exclude_mount_point(mut self, mount_point: String) -> Self {
+        self.excluded_mount_points.push(mount_point);
+        self
+    }
+
+    pub fn build(self) -> Result<DiskSegmentInfo> {
         let disks = Disks::new_with_refreshed_list();
 
-        let excluded_mount_points = [Path::new("/System/Volumes/Data")];
-
-        self.disks = disks
+        let disks = disks
             .into_iter()
             .filter_map(|disk| {
-                if excluded_mount_points.contains(&disk.mount_point()) {
+                if self
+                    .excluded_mount_points
+                    .contains(&disk.mount_point().to_str().unwrap().to_string())
+                {
                     return None;
                 }
 
@@ -74,6 +89,17 @@ impl MotdSegment for DiskSegment {
             })
             .collect();
 
+        Ok(DiskSegmentInfo { disks })
+    }
+}
+
+impl Segment for DiskSegment {
+    fn height(&self) -> u16 {
+        (self.info.disks.len() * 2) as u16
+    }
+
+    fn prepare(&mut self) -> Result<()> {
+        self.info = DiskInfoBuilder::new().build()?;
         Ok(())
     }
 
@@ -93,7 +119,7 @@ impl MotdSegment for DiskSegment {
             label_area,
         );
 
-        for disk in self.disks.iter() {
+        for disk in self.info.disks.iter() {
             frame.render_widget(
                 LineGauge::default()
                     .block(Block::default().title(disk.format()))
@@ -106,5 +132,13 @@ impl MotdSegment for DiskSegment {
         }
 
         Ok(())
+    }
+}
+
+impl DiskSegment {
+    pub fn new() -> Self {
+        Self {
+            info: DiskSegmentInfo::default(),
+        }
     }
 }
