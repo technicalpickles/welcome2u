@@ -1,22 +1,63 @@
 use anyhow::Result;
 use ratatui::layout::Rect;
 use ratatui::Frame;
+use segment::Info;
+use segment::InfoBuilder;
 use segment::Segment;
 use segment::Text;
 use std::process::{Command, ExitStatus, Stdio};
 use thiserror::Error;
 
+#[derive(Debug, Default)]
+struct CommandInfo {
+    output: String,
+}
+
+impl Info for CommandInfo {}
+
+#[derive(Debug, Default)]
+struct CommandInfoBuilder {
+    command: String,
+}
+
+impl CommandInfoBuilder {
+    pub fn command(mut self, command: String) -> Self {
+        self.command = command;
+        self
+    }
+}
+
+impl InfoBuilder<CommandInfo> for CommandInfoBuilder {
+    fn build(&self) -> Result<CommandInfo> {
+        let output = Command::new(&self.command)
+            .stdout(Stdio::piped())
+            .output()?;
+
+        if !output.status.success() {
+            return Err(CommandError::CommandFailed {
+                command_ran: self.command.clone(),
+                status: output.status,
+            }
+            .into());
+        }
+
+        let output_str = String::from_utf8(output.stdout)?;
+
+        Ok(CommandInfo { output: output_str })
+    }
+}
+
 #[derive(Debug)]
 pub struct CommandSegment {
     command: String,
-    output: String,
+    info: CommandInfo,
 }
 
 impl CommandSegment {
     pub fn new(command: &str) -> Self {
         Self {
             command: command.to_string(),
-            output: "".to_string(),
+            info: CommandInfo::default(),
         }
     }
 }
@@ -36,37 +77,16 @@ pub enum CommandError {
 
 impl Segment for CommandSegment {
     fn height(&self) -> u16 {
-        self.output.lines().count() as u16
+        self.info.output.lines().count() as u16
     }
 
     fn prepare(&mut self) -> Result<()> {
-        // TODO can we avoid cloning this?
-        let mut command = Command::new(self.command.clone());
-
-        let child = match command.stdout(Stdio::piped()).spawn() {
-            Ok(child) => child,
-            Err(error) => return Err(CommandError::SpawnFailed(error).into()),
-        };
-
-        let output = child.wait_with_output()?;
-
-        if !output.status.success() {
-            let error = CommandError::CommandFailed {
-                // TODO can we avoid a clone?
-                command_ran: self.command.clone(),
-                status: output.status,
-            };
-            return Err(error.into());
-        }
-        match String::from_utf8(output.stdout) {
-            Ok(string) => self.output = string,
-            Err(error) => return Err(CommandError::OutputParseError(error).into()),
-        }
+        self.info = CommandInfoBuilder::default().build()?;
 
         Ok(())
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        Text::new(&self.output).render(frame, area)
+        Text::new(&self.info.output).render(frame, area)
     }
 }
