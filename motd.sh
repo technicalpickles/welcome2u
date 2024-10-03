@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
+# TODO: remove this once there aren't any shell scripts using it
 BASE_DIR=$(dirname "$(readlink -f "$0")")
-cd $BASE_DIR
-# Set MOTD_ENV to 'debug' by default, but allow it to be overridden
-MOTD_ENV=${MOTD_ENV:-debug}
 
-# Determine the correct binary based on MOTD_PROFILE
-if [ "$MOTD_PROFILE" = "release" ]; then
-    MOTD_BINARY="target/release/welcome2u"
-else
-    MOTD_BINARY="target/debug/welcome2u"
+MOTD_PROFILE=${MOTD_PROFILE:-}
+if [ -z "$MOTD_PROFILE" ]; then
+    if [ "$PWD" = "$BASE_DIR" ]; then
+        # If running in BASE_DIR, set to debug
+        MOTD_PROFILE="debug"
+    else
+        # Otherwise, set to release
+        MOTD_PROFILE="release"
+    fi
+fi
+export MOTD_PROFILE
+
+cd $BASE_DIR
+MOTD_BINARY="target/$MOTD_PROFILE/welcome2u"
+if [ "$MOTD_PROFILE" = "debug" ]; then
     cargo build --quiet
 fi
 
-$MOTD_BINARY
+"$MOTD_BINARY"
