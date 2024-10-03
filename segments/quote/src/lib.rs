@@ -17,31 +17,35 @@ fn choose_fortune() -> Result<String, NoFortunesError> {
 }
 
 #[derive(Debug)]
-pub struct FortuneHeaderSegment {
-    fortune: String,
+pub struct QuoteSegmentInfo {
+    quote: String,
 }
 
-impl Default for FortuneHeaderSegment {
+impl Default for QuoteSegmentInfo {
     fn default() -> Self {
         Self {
-            fortune: choose_fortune().unwrap(),
+            quote: choose_fortune().unwrap(),
         }
     }
 }
 
-impl Segment for FortuneHeaderSegment {
+#[derive(Debug, Default)]
+pub struct QuoteSegment {
+    info: QuoteSegmentInfo,
+}
+
+impl Segment for QuoteSegment {
     fn height(&self) -> u16 {
         1
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.fortune =
-            choose_fortune().map_err(|e| anyhow::anyhow!("Failed to choose fortune: {}", e))?;
+        self.info = QuoteSegmentInfo::default();
         Ok(())
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let content = textwrap::fill(&self.fortune, 80);
+        let content = textwrap::fill(&self.info.quote, 80);
         let content = indent(&content, "       ");
         let content = Style::default().dimmed().paint(content);
 

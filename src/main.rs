@@ -42,7 +42,7 @@ fn main() -> Result<()> {
     let mut segments: Vec<Box<dyn Segment>> = vec![
         // TODO: re-enable once rendering correctly
         // Box::<heading::HeadingSegment>::default(),
-        Box::<quote::FortuneHeaderSegment>::default(),
+        Box::<quote::QuoteSegment>::default(),
         Box::new(<user::UserSegment>::default()),
         Box::new(<ip::IpSegment>::default()),
         Box::new(<os::OsSegment>::default()),
