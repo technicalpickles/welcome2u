@@ -1,6 +1,6 @@
 use ansi_term::Colour::Blue;
 use anyhow::Result;
-use display::Segment;
+use segment::Segment;
 use fmtsize::{Conventional, FmtSize};
 use ratatui::{prelude::*, widgets::*};
 use sysinfo::System;

@@ -1,7 +1,7 @@
 use ansi_term::Style;
 use anyhow::Result;
-use display::Segment;
-use display::Single;
+use segment::Segment;
+use segment::Single;
 use fortune::{Fortunes, NoFortunesError};
 use ratatui::prelude::*;
 use textwrap::indent;

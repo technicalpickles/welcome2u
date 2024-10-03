@@ -9,7 +9,7 @@ edition = "2021"
 figlet-rs = "0.1.5"
 rand = "0.8.5"
 fortune = { path = "../../crates/fortune" }
-display = { path = "../../crates/display" }
+segment = { path = "../../crates/segment" }
 anyhow = "1.0.86"
 thiserror = "1.0.61"
 ratatui = "0.28.1"

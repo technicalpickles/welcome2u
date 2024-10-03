@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::Segment;
+use segment::Segment;
 use local_ip_address::local_ip;
 use ratatui::{prelude::*, widgets::*};
 

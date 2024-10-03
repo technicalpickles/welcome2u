@@ -7,7 +7,7 @@ use ratatui::{backend::CrosstermBackend, Terminal, TerminalOptions, Viewport};
 use std::env;
 use std::io::stdout;
 
-use display::Segment;
+use segment::Segment;
 
 fn render_segments(segments: &mut [Box<dyn Segment>]) -> Result<()> {
     let backend = CrosstermBackend::new(stdout());

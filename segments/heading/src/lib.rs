@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::Segment;
+use segment::Segment;
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
 use ratatui::{layout::Rect, Frame};

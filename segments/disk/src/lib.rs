@@ -8,7 +8,7 @@ use std::path::Path;
 use sysinfo::Disks;
 
 use anyhow::Result;
-use display::Segment;
+use segment::Segment;
 
 #[derive(Default, Debug)]
 pub struct DiskSegment {

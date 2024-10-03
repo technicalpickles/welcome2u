@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 os_info = "3.8.2"
-display = { path = "../../crates/display" }
+segment = { path = "../../crates/segment" }
 anyhow = "1.0.89"
 ratatui = "0.28.1"

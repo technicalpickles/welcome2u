@@ -7,7 +7,7 @@ use ratatui::{
 };
 use sysinfo::{ComponentExt, System, SystemExt};
 
-use display::Segment;
+use segment::Segment;
 
 #[derive(Debug, Default)]
 pub struct TemperaturesSegment;

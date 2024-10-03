@@ -1,6 +1,6 @@
 use anyhow::Result;
-use display::Segment;
 use ratatui::{prelude::*, widgets::*};
+use segment::Segment;
 use sysinfo::System;
 
 #[derive(Default, Debug)]

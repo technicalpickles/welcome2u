@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::Segment;
+use segment::Segment;
 use ratatui::{prelude::*, widgets::*};
 use sysinfo::System;
 

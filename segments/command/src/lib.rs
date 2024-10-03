@@ -1,8 +1,8 @@
 use anyhow::Result;
-use display::Segment;
-use display::Single;
 use ratatui::layout::Rect;
 use ratatui::Frame;
+use segment::Segment;
+use segment::Single;
 use std::process::{Command, ExitStatus, Stdio};
 use thiserror::Error;
 

@@ -5,7 +5,7 @@ use bollard::{
     Docker, API_DEFAULT_VERSION,
 };
 use chrono_humanize::{Accuracy, HumanTime, Tense};
-use display::Segment;
+use segment::Segment;
 use iso8601_timestamp::Timestamp;
 use ratatui::{prelude::*, widgets::*};
 use std::default::Default;

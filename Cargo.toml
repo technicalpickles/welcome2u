@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 command = { path = "segments/command" }
 disk = { path = "segments/disk" }
-display = { path = "crates/display" }
+segment = { path = "crates/segment" }
 docker = { path = "segments/docker" }
 heading = { path = "segments/heading" }
 ip = { path = "segments/ip" }
