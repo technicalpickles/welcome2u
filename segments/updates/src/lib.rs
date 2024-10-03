@@ -1,6 +1,6 @@
 use anyhow::Result;
-use segment::Segment;
 use ratatui::{prelude::*, widgets::*};
+use segment::*;
 use std::process::Command;
 
 #[derive(Default, Debug)]
@@ -13,12 +13,13 @@ struct UpdatesInfo {
     updates_available: String,
 }
 
-impl UpdatesInfo {
-    fn new(updates_available: String) -> Self {
-        Self { updates_available }
-    }
+impl Info for UpdatesInfo {}
 
-    fn collect() -> Result<Self> {
+#[derive(Debug, Default)]
+struct UpdatesInfoBuilder {}
+
+impl InfoBuilder<UpdatesInfo> for UpdatesInfoBuilder {
+    fn build(&self) -> Result<UpdatesInfo> {
         let output = Command::new("softwareupdate").arg("--list").output()?;
 
         let stdout = String::from_utf8(output.stdout)?;
@@ -33,7 +34,7 @@ impl UpdatesInfo {
             )
         };
 
-        Ok(Self::new(updates_available))
+        Ok(UpdatesInfo { updates_available })
     }
 }
 
@@ -43,7 +44,7 @@ impl Segment for UpdatesSegment {
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(UpdatesInfo::collect()?);
+        self.info = Some(UpdatesInfoBuilder::default().build()?);
         Ok(())
     }
 
