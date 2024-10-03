@@ -1,8 +1,8 @@
 use ansi_term::Colour::Blue;
 use anyhow::Result;
-use segment::Segment;
 use fmtsize::{Conventional, FmtSize};
 use ratatui::{prelude::*, widgets::*};
+use segment::{Info, Segment};
 use sysinfo::System;
 
 #[derive(Default, Debug)]
@@ -17,16 +17,13 @@ struct MemoryInfo {
     total_memory: String,
 }
 
-impl MemoryInfo {
-    fn new(used_memory: String, available_memory: String, total_memory: String) -> Self {
-        Self {
-            used_memory,
-            available_memory,
-            total_memory,
-        }
-    }
+impl Info for MemoryInfo {}
 
-    fn collect() -> Self {
+#[derive(Debug, Default)]
+struct MemoryInfoBuilder {}
+
+impl MemoryInfoBuilder {
+    fn build(&self) -> Result<MemoryInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();
 
@@ -35,14 +32,11 @@ impl MemoryInfo {
         let available_memory = sys.available_memory().fmt_size(Conventional).to_string();
         let total_memory = sys.total_memory().fmt_size(Conventional).to_string();
 
-        Self::new(used_memory, available_memory, total_memory)
-    }
-
-    fn format(&self) -> String {
-        format!(
-            "RAM - {} used, {} available / {}",
-            self.used_memory, self.available_memory, self.total_memory
-        )
+        Ok(MemoryInfo {
+            used_memory,
+            available_memory,
+            total_memory,
+        })
     }
 }
 
@@ -52,11 +46,12 @@ impl Segment for MemorySegment {
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(MemoryInfo::collect());
+        self.info = Some(MemoryInfoBuilder::default().build()?);
         Ok(())
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
+        // TODO: find way to re-use label and layout stuff
         let layout = Layout::default()
             .direction(Direction::Horizontal)
             .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
@@ -69,7 +64,13 @@ impl Segment for MemorySegment {
         );
 
         if let Some(info) = &self.info {
-            frame.render_widget(Paragraph::new(info.format()), data_area);
+            frame.render_widget(
+                Paragraph::new(format!(
+                    "{} used, {} available / {}",
+                    info.used_memory, info.available_memory, info.total_memory
+                )),
+                data_area,
+            );
         }
 
         Ok(())
