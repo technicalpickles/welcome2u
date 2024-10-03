@@ -81,7 +81,9 @@ impl Segment for CommandSegment {
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = CommandInfoBuilder::default().build()?;
+        self.info = CommandInfoBuilder::default()
+            .command(self.command.clone())
+            .build()?;
 
         Ok(())
     }

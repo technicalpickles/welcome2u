@@ -1,7 +1,7 @@
 use anyhow::Result;
-use segment::Segment;
 use local_ip_address::local_ip;
 use ratatui::{prelude::*, widgets::*};
+use segment::{Info, InfoBuilder, Segment};
 
 #[derive(Default, Debug)]
 pub struct IpSegment {
@@ -13,14 +13,16 @@ struct IpInfo {
     ip_address: String,
 }
 
-impl IpInfo {
-    fn new(ip_address: String) -> Self {
-        Self { ip_address }
-    }
+impl Info for IpInfo {}
 
-    fn collect() -> Result<Self> {
+#[derive(Debug, Default)]
+struct IpInfoBuilder {}
+
+impl InfoBuilder<IpInfo> for IpInfoBuilder {
+    fn build(&self) -> Result<IpInfo> {
         let ip = local_ip()?;
-        Ok(Self::new(ip.to_string()))
+        let ip_address = ip.to_string();
+        Ok(IpInfo { ip_address })
     }
 }
 
@@ -30,7 +32,7 @@ impl Segment for IpSegment {
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(IpInfo::collect()?);
+        self.info = Some(IpInfoBuilder::default().build()?);
         Ok(())
     }
 
