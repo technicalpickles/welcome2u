@@ -1,9 +1,9 @@
 use ansi_term::Style;
 use anyhow::Result;
-use segment::Segment;
-use segment::Single;
 use fortune::{Fortunes, NoFortunesError};
 use ratatui::prelude::*;
+use segment::Segment;
+use segment::Text;
 use textwrap::indent;
 
 fn choose_fortune() -> Result<String, NoFortunesError> {
@@ -45,7 +45,7 @@ impl Segment for FortuneHeaderSegment {
         let content = indent(&content, "       ");
         let content = Style::default().dimmed().paint(content);
 
-        Single::new(&content).render(frame, area)?;
+        Text::new(&content).render(frame, area)?;
         Ok(())
     }
 }

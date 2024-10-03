@@ -2,7 +2,7 @@ use anyhow::Result;
 use ratatui::layout::Rect;
 use ratatui::Frame;
 use segment::Segment;
-use segment::Single;
+use segment::Text;
 use std::process::{Command, ExitStatus, Stdio};
 use thiserror::Error;
 
@@ -67,6 +67,6 @@ impl Segment for CommandSegment {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        Single::new(&self.output).render(frame, area)
+        Text::new(&self.output).render(frame, area)
     }
 }
