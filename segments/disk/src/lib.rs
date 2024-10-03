@@ -8,7 +8,7 @@ use std::path::Path;
 use sysinfo::Disks;
 
 use anyhow::Result;
-use display::MotdSegment;
+use display::Segment;
 
 #[derive(Default, Debug)]
 pub struct DiskSegment {
@@ -38,7 +38,7 @@ impl Disk {
     }
 }
 
-impl MotdSegment for DiskSegment {
+impl Segment for DiskSegment {
     fn height(&self) -> u16 {
         (self.disks.len() * 2) as u16
     }

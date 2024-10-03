@@ -5,7 +5,7 @@ use bollard::{
     Docker, API_DEFAULT_VERSION,
 };
 use chrono_humanize::{Accuracy, HumanTime, Tense};
-use display::MotdSegment;
+use display::Segment;
 use iso8601_timestamp::Timestamp;
 use ratatui::{prelude::*, widgets::*};
 use std::default::Default;
@@ -76,7 +76,7 @@ impl DockerSegment {
     }
 }
 
-impl MotdSegment for DockerSegment {
+impl Segment for DockerSegment {
     fn height(&self) -> u16 {
         self.containers.len() as u16
     }

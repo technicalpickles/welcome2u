@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::MotdSegment;
+use display::Segment;
 use ratatui::{prelude::*, widgets::*};
 use users::{get_current_uid, get_user_by_uid};
 
@@ -34,7 +34,7 @@ impl UserInfo {
     }
 }
 
-impl MotdSegment for UserSegment {
+impl Segment for UserSegment {
     fn height(&self) -> u16 {
         1
     }

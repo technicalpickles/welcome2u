@@ -8,7 +8,7 @@ use ratatui::{
 
 use std::fmt::Debug;
 
-pub trait MotdSegment: Debug {
+pub trait Segment: Debug {
     fn prepare(&mut self) -> Result<()>;
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()>;
     fn height(&self) -> u16;
@@ -27,7 +27,7 @@ impl Single {
     }
 }
 
-impl MotdSegment for Single {
+impl Segment for Single {
     fn prepare(&mut self) -> Result<()> {
         Ok(())
     }
@@ -56,7 +56,7 @@ impl LabelWithContent {
     }
 }
 
-impl MotdSegment for LabelWithContent {
+impl Segment for LabelWithContent {
     fn prepare(&mut self) -> Result<()> {
         Ok(())
     }

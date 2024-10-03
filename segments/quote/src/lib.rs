@@ -1,6 +1,6 @@
 use ansi_term::Style;
 use anyhow::Result;
-use display::MotdSegment;
+use display::Segment;
 use display::Single;
 use fortune::{Fortunes, NoFortunesError};
 use ratatui::prelude::*;
@@ -29,7 +29,7 @@ impl Default for FortuneHeaderSegment {
     }
 }
 
-impl MotdSegment for FortuneHeaderSegment {
+impl Segment for FortuneHeaderSegment {
     fn height(&self) -> u16 {
         1
     }

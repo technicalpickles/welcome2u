@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::MotdSegment;
+use display::Segment;
 use display::Single;
 use ratatui::layout::Rect;
 use ratatui::Frame;
@@ -34,7 +34,7 @@ pub enum CommandError {
     OutputParseError(#[from] std::string::FromUtf8Error),
 }
 
-impl MotdSegment for CommandSegment {
+impl Segment for CommandSegment {
     fn height(&self) -> u16 {
         self.output.lines().count() as u16
     }

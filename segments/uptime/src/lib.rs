@@ -1,5 +1,5 @@
 use anyhow::Result;
-use display::MotdSegment;
+use display::Segment;
 use ratatui::{prelude::*, widgets::*};
 use sysinfo::System;
 
@@ -60,7 +60,7 @@ impl UptimeInfo {
     }
 }
 
-impl MotdSegment for UptimeSegment {
+impl Segment for UptimeSegment {
     fn height(&self) -> u16 {
         1
     }
