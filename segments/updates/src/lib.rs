@@ -4,7 +4,7 @@ use segment::*;
 use std::process::Command;
 
 #[derive(Default, Debug)]
-pub struct UpdatesSegment {
+pub struct UpdatesSegmentRenderer {
     info: Option<UpdatesInfo>,
 }
 
@@ -38,7 +38,7 @@ impl InfoBuilder<UpdatesInfo> for UpdatesInfoBuilder {
     }
 }
 
-impl Segment for UpdatesSegment {
+impl SegmentRenderer for UpdatesSegmentRenderer {
     fn height(&self) -> u16 {
         1
     }

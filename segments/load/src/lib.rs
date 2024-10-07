@@ -1,10 +1,10 @@
 use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
-use segment::{Info, InfoBuilder, Segment};
+use segment::{Info, InfoBuilder, SegmentRenderer};
 use sysinfo::{LoadAvg, System};
 
 #[derive(Default, Debug)]
-pub struct LoadSegment {
+pub struct LoadSegmentRenderer {
     info: Option<LoadInfo>,
 }
 
@@ -30,7 +30,7 @@ impl InfoBuilder<LoadInfo> for LoadInfoBuilder {
     }
 }
 
-impl LoadSegment {
+impl LoadSegmentRenderer {
     fn format_loads(&self, info: &LoadInfo) -> Vec<Span> {
         let warning_threshold = info.cores as f64 * 0.9;
         let error_threshold = info.cores as f64 * 1.5;
@@ -60,7 +60,7 @@ impl LoadSegment {
     }
 }
 
-impl Segment for LoadSegment {
+impl SegmentRenderer for LoadSegmentRenderer {
     fn height(&self) -> u16 {
         1
     }

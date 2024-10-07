@@ -7,9 +7,9 @@ use ratatui::{backend::CrosstermBackend, Terminal, TerminalOptions, Viewport};
 use std::env;
 use std::io::stdout;
 
-use segment::Segment;
+use segment::SegmentRenderer;
 
-fn render_segments(segments: &mut [Box<dyn Segment>]) -> Result<()> {
+fn render_segments(segments: &mut [Box<dyn SegmentRenderer>]) -> Result<()> {
     let backend = CrosstermBackend::new(stdout());
     let options = TerminalOptions {
         viewport: Viewport::Inline(segments.iter().map(|segment| segment.height()).sum()),
@@ -39,18 +39,18 @@ fn main() -> Result<()> {
     env::set_var("BASE_DIR", ".");
     env::set_var("CONFIG_PATH", "./config.sh");
 
-    let mut segments: Vec<Box<dyn Segment>> = vec![
+    let mut segments: Vec<Box<dyn SegmentRenderer>> = vec![
         // TODO: re-enable once rendering correctly
         // Box::<heading::HeadingSegment>::default(),
-        Box::<quote::QuoteSegment>::default(),
-        Box::new(<user::UserSegment>::default()),
-        Box::new(<ip::IpSegment>::default()),
-        Box::new(<os::OsSegment>::default()),
-        Box::new(<uptime::UptimeSegment>::default()),
-        Box::new(<load::LoadSegment>::default()),
+        Box::<quote::QuoteSegmentRenderer>::default(),
+        Box::new(<user::UserSegmentRenderer>::default()),
+        Box::new(<ip::IpSegmentRenderer>::default()),
+        Box::new(<os::OsSegmentRenderer>::default()),
+        Box::new(<uptime::UptimeSegmentRenderer>::default()),
+        Box::new(<load::LoadSegmentRenderer>::default()),
         Box::new(<memory::MemorySegment>::default()),
-        Box::new(<updates::UpdatesSegment>::default()),
-        Box::<disk::DiskSegment>::default(),
+        Box::new(<updates::UpdatesSegmentRenderer>::default()),
+        Box::<disk::DiskSegmentRenderer>::default(),
         // TODO: re-enable these after testing
         // Box::<temperatures::TemperaturesSegment>::default(),
         // Box::new(<docker::DockerSegment>::default())

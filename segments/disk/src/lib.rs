@@ -7,7 +7,7 @@ use ratatui::{
 use sysinfo::Disks;
 
 use anyhow::Result;
-use segment::{Info, InfoBuilder, Segment};
+use segment::{Info, InfoBuilder, SegmentRenderer};
 
 #[derive(Debug)]
 struct Disk {
@@ -40,7 +40,7 @@ pub struct DiskSegmentInfo {
 impl Info for DiskSegmentInfo {}
 
 #[derive(Debug, Default)]
-pub struct DiskSegment {
+pub struct DiskSegmentRenderer {
     info: DiskSegmentInfo,
 }
 
@@ -92,7 +92,7 @@ impl InfoBuilder<DiskSegmentInfo> for DiskInfoBuilder {
     }
 }
 
-impl Segment for DiskSegment {
+impl SegmentRenderer for DiskSegmentRenderer {
     fn height(&self) -> u16 {
         (self.info.disks.len() * 2) as u16
     }

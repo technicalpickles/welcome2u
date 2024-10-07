@@ -5,13 +5,13 @@ use bollard::{
     Docker, API_DEFAULT_VERSION,
 };
 use chrono_humanize::{Accuracy, HumanTime, Tense};
-use segment::Segment;
 use iso8601_timestamp::Timestamp;
 use ratatui::{prelude::*, widgets::*};
+use segment::SegmentRenderer;
 use std::default::Default;
 
 #[derive(Debug, Default)]
-pub struct DockerSegment {
+pub struct DockerSegmentRenderer {
     containers: Vec<ContainerInfo>,
 }
 
@@ -21,7 +21,7 @@ struct ContainerInfo {
     status: String,
 }
 
-impl DockerSegment {
+impl DockerSegmentRenderer {
     fn duration_since(str: &str) -> String {
         let now = Timestamp::now_utc();
         let timestamp = Timestamp::parse(str).unwrap();
@@ -76,7 +76,7 @@ impl DockerSegment {
     }
 }
 
-impl Segment for DockerSegment {
+impl SegmentRenderer for DockerSegmentRenderer {
     fn height(&self) -> u16 {
         self.containers.len() as u16
     }

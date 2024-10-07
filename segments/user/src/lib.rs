@@ -4,7 +4,7 @@ use segment::*;
 use users::{get_current_uid, get_user_by_uid};
 
 #[derive(Default, Debug)]
-pub struct UserSegment {
+pub struct UserSegmentRenderer {
     info: Option<UserInfo>,
 }
 
@@ -40,7 +40,7 @@ impl InfoBuilder<UserInfo> for UserInfoBuilder {
     }
 }
 
-impl Segment for UserSegment {
+impl SegmentRenderer for UserSegmentRenderer {
     fn height(&self) -> u16 {
         1
     }

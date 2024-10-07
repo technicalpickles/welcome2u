@@ -1,8 +1,8 @@
 use anyhow::Result;
-use segment::Segment;
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
 use ratatui::{layout::Rect, Frame};
+use segment::SegmentRenderer;
 use std::fmt;
 use thiserror::Error;
 
@@ -59,13 +59,13 @@ fn random_font() -> String {
     font_choice.unwrap().to_string()
 }
 
-pub struct HeadingSegment {
+pub struct HeadingSegmentRenderer {
     pub heading: String,
     pub figure: String,
     pub font_choice: String,
 }
 
-impl Default for HeadingSegment {
+impl Default for HeadingSegmentRenderer {
     fn default() -> Self {
         Self {
             heading: choose_fortune().unwrap(),
@@ -75,7 +75,7 @@ impl Default for HeadingSegment {
     }
 }
 
-impl fmt::Debug for HeadingSegment {
+impl fmt::Debug for HeadingSegmentRenderer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("HeadingSegment")
             .field("heading", &self.heading)
@@ -84,7 +84,7 @@ impl fmt::Debug for HeadingSegment {
     }
 }
 
-impl Segment for HeadingSegment {
+impl SegmentRenderer for HeadingSegmentRenderer {
     fn height(&self) -> u16 {
         // FIXME: need lines of the figure
         self.figure.lines().count() as u16

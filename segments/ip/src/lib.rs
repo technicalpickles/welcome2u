@@ -1,10 +1,10 @@
 use anyhow::Result;
 use local_ip_address::local_ip;
 use ratatui::{prelude::*, widgets::*};
-use segment::{Info, InfoBuilder, Segment};
+use segment::{Info, InfoBuilder, SegmentRenderer};
 
 #[derive(Default, Debug)]
-pub struct IpSegment {
+pub struct IpSegmentRenderer {
     info: Option<IpInfo>,
 }
 
@@ -26,7 +26,7 @@ impl InfoBuilder<IpInfo> for IpInfoBuilder {
     }
 }
 
-impl Segment for IpSegment {
+impl SegmentRenderer for IpSegmentRenderer {
     fn height(&self) -> u16 {
         1
     }

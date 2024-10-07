@@ -1,9 +1,9 @@
 use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
-use segment::{Info, InfoBuilder, Segment};
+use segment::{Info, InfoBuilder, SegmentRenderer};
 
 #[derive(Default, Debug)]
-pub struct OsSegment {
+pub struct OsSegmentRenderer {
     info: Option<OsInfo>,
 }
 
@@ -26,7 +26,7 @@ impl InfoBuilder<OsInfo> for OsInfoBuilder {
     }
 }
 
-impl Segment for OsSegment {
+impl SegmentRenderer for OsSegmentRenderer {
     fn height(&self) -> u16 {
         1
     }

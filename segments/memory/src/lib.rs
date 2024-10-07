@@ -2,7 +2,7 @@ use ansi_term::Colour::Blue;
 use anyhow::Result;
 use fmtsize::{Conventional, FmtSize};
 use ratatui::{prelude::*, widgets::*};
-use segment::{Info, Segment};
+use segment::{Info, SegmentRenderer};
 use sysinfo::System;
 
 #[derive(Default, Debug)]
@@ -40,7 +40,7 @@ impl MemoryInfoBuilder {
     }
 }
 
-impl Segment for MemorySegment {
+impl SegmentRenderer for MemorySegment {
     fn height(&self) -> u16 {
         1
     }

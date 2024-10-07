@@ -3,7 +3,7 @@ use ratatui::layout::Rect;
 use ratatui::Frame;
 use segment::Info;
 use segment::InfoBuilder;
-use segment::Segment;
+use segment::SegmentRenderer;
 use segment::Text;
 use std::process::{Command, ExitStatus, Stdio};
 use thiserror::Error;
@@ -48,12 +48,12 @@ impl InfoBuilder<CommandInfo> for CommandInfoBuilder {
 }
 
 #[derive(Debug)]
-pub struct CommandSegment {
+pub struct CommandSegmentRenderer {
     command: String,
     info: CommandInfo,
 }
 
-impl CommandSegment {
+impl CommandSegmentRenderer {
     pub fn new(command: &str) -> Self {
         Self {
             command: command.to_string(),
@@ -75,7 +75,7 @@ pub enum CommandError {
     OutputParseError(#[from] std::string::FromUtf8Error),
 }
 
-impl Segment for CommandSegment {
+impl SegmentRenderer for CommandSegmentRenderer {
     fn height(&self) -> u16 {
         self.info.output.lines().count() as u16
     }

@@ -4,7 +4,7 @@ use segment::*;
 use sysinfo::System;
 
 #[derive(Default, Debug)]
-pub struct UptimeSegment {
+pub struct UptimeSegmentRenderer {
     info: Option<UptimeInfo>,
 }
 
@@ -59,7 +59,7 @@ impl InfoBuilder<UptimeInfo> for UptimeInfoBuilder {
         Ok(UptimeInfo { uptime })
     }
 }
-impl Segment for UptimeSegment {
+impl SegmentRenderer for UptimeSegmentRenderer {
     fn height(&self) -> u16 {
         1
     }

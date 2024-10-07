@@ -2,7 +2,7 @@ use ansi_term::Style;
 use anyhow::Result;
 use fortune::{Fortunes, NoFortunesError};
 use ratatui::prelude::*;
-use segment::Segment;
+use segment::SegmentRenderer;
 use segment::Text;
 use textwrap::indent;
 
@@ -30,11 +30,11 @@ impl Default for QuoteSegmentInfo {
 }
 
 #[derive(Debug, Default)]
-pub struct QuoteSegment {
+pub struct QuoteSegmentRenderer {
     info: QuoteSegmentInfo,
 }
 
-impl Segment for QuoteSegment {
+impl SegmentRenderer for QuoteSegmentRenderer {
     fn height(&self) -> u16 {
         1
     }
