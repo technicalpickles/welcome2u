@@ -1,6 +1,6 @@
 use anyhow::Result;
-use segment::Segment;
 use ratatui::{prelude::*, widgets::*};
+use segment::*;
 use users::{get_current_uid, get_user_by_uid};
 
 #[derive(Default, Debug)]
@@ -15,22 +15,28 @@ struct UserInfo {
 }
 
 impl UserInfo {
-    fn new(username: String, hostname: String) -> Self {
-        Self { username, hostname }
+    fn user_with_hostname(&self) -> String {
+        format!("{}@{}", self.username, self.hostname)
     }
+}
 
-    fn collect() -> Self {
+impl Info for UserInfo {}
+
+#[derive(Debug, Default)]
+struct UserInfoBuilder {}
+
+impl InfoBuilder<UserInfo> for UserInfoBuilder {
+    fn build(&self) -> Result<UserInfo> {
         let user = get_user_by_uid(get_current_uid()).unwrap();
         let username = user.name().to_str().unwrap();
 
         let hostname = hostname::get().unwrap();
         let hostname_str = hostname.to_str().unwrap();
 
-        Self::new(username.to_string(), hostname_str.to_string())
-    }
-
-    fn format(&self) -> String {
-        format!("{}@{}", self.username, self.hostname)
+        Ok(UserInfo {
+            username: username.to_string(),
+            hostname: hostname_str.to_string(),
+        })
     }
 }
 
@@ -40,7 +46,7 @@ impl Segment for UserSegment {
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(UserInfo::collect());
+        self.info = Some(UserInfoBuilder::default().build()?);
         Ok(())
     }
 
@@ -61,7 +67,7 @@ impl Segment for UserSegment {
         );
 
         if let Some(info) = &self.info {
-            frame.render_widget(Paragraph::new(info.format()), data_area);
+            frame.render_widget(Paragraph::new(info.user_with_hostname()), data_area);
         }
 
         Ok(())
