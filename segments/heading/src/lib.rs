@@ -38,7 +38,10 @@ fn figlet(font: String, message: &str) -> Result<String> {
         .ok_or_else(|| FigletError::ConversionError {
             message: "Failed to convert text to figlet".to_string(),
         })?;
-    Ok(figure.to_string())
+
+    // Remove empty lines from the beginning and end of the figure
+    let trimmed_figure = figure.to_string().trim_matches('\n').to_string();
+    Ok(trimmed_figure)
 }
 
 fn random_font() -> String {
