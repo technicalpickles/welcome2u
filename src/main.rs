@@ -41,11 +41,15 @@ fn main() -> Result<()> {
     };
     let mut terminal = Terminal::with_options(backend, options)?;
 
+    let ip_info = ip::IpInfoBuilder::default().build()?;
+    let ip_renderer = ip::IpSegmentRenderer::new(ip_info);
+
     // let constraints = segments
     //     .iter()
     //     .map(|segment| Constraint::Length(segment.height()))
     //     .collect::<Vec<Constraint>>();
     terminal.draw(|frame| {
+        ip_renderer.render(frame, frame.area()).unwrap();
         // let layout = Layout::default()
         //     .direction(Direction::Vertical)
         //     // .constraints(constraints)

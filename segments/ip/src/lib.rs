@@ -4,14 +4,14 @@ use ratatui::{prelude::*, widgets::*};
 use segment::*;
 
 #[derive(Debug)]
-struct IpInfo {
+pub struct IpInfo {
     ip_address: String,
 }
 
 impl Info for IpInfo {}
 
 #[derive(Debug, Default)]
-struct IpInfoBuilder {}
+pub struct IpInfoBuilder {}
 
 impl InfoBuilder<IpInfo> for IpInfoBuilder {
     fn build(&self) -> Result<IpInfo> {
