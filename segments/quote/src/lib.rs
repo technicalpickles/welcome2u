@@ -1,7 +1,7 @@
-use ansi_term::Style;
 use anyhow::Result;
 use fortune::{Fortunes, NoFortunesError};
 use ratatui::prelude::*;
+use ratatui::widgets::*;
 use segment::*;
 use textwrap::indent;
 
@@ -41,7 +41,7 @@ impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
     }
 
     fn height(&self) -> u16 {
-        1
+        self.info.quote.lines().count() as u16
     }
 
     fn prepare(&mut self) -> Result<()> {
@@ -50,11 +50,17 @@ impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let content = textwrap::fill(&self.info.quote, 80);
-        let content = indent(&content, "       ");
-        let content = Style::default().dimmed().paint(content);
+        let styled_lines: Vec<Line> = self
+            .info
+            .quote
+            .lines()
+            .map(|line| Line::from(Span::styled(line, Style::default().dim())))
+            .collect();
 
-        segment::Text::new(&content).render(frame, area)?;
+        let styled_content = Paragraph::new(styled_lines).wrap(Wrap { trim: true });
+
+        frame.render_widget(styled_content, area);
+
         Ok(())
     }
 }
