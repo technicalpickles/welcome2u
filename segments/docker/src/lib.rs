@@ -164,13 +164,3 @@ pub struct DockerSegment {
     info_builder: DockerSegmentInfoBuilder,
     renderer: DockerSegmentRenderer,
 }
-
-impl Segment<DockerSegmentInfo, DockerSegmentInfoBuilder, DockerSegmentRenderer> for DockerSegment {
-    fn info_builder(&self) -> &DockerSegmentInfoBuilder {
-        &self.info_builder
-    }
-
-    fn renderer(&self) -> &DockerSegmentRenderer {
-        &self.renderer
-    }
-}

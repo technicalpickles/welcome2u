@@ -21,11 +21,41 @@ pub struct Text {
     content: String,
 }
 
+impl Info for Text {}
+
 impl Text {
     pub fn new(content: &str) -> Self {
         Self {
             content: content.to_string(),
         }
+    }
+}
+
+#[derive(Debug)]
+struct TextInfoBuilder {
+    content: String,
+}
+
+impl Default for TextInfoBuilder {
+    fn default() -> Self {
+        Self {
+            content: "".to_string(),
+        }
+    }
+}
+
+impl TextInfoBuilder {
+    pub fn content(mut self, content: String) -> Self {
+        self.content = content;
+        self
+    }
+}
+
+impl InfoBuilder<TextInfo> for TextInfoBuilder {
+    fn build(&self) -> Result<TextInfo> {
+        Ok(TextInfo {
+            content: self.content.clone(),
+        })
     }
 }
 

@@ -61,13 +61,3 @@ pub struct IpSegment {
     info_builder: IpInfoBuilder,
     renderer: IpSegmentRenderer,
 }
-
-impl Segment<IpInfo, IpInfoBuilder, IpSegmentRenderer> for IpSegment {
-    fn info_builder(&self) -> &IpInfoBuilder {
-        &self.info_builder
-    }
-
-    fn renderer(&self) -> &IpSegmentRenderer {
-        &self.renderer
-    }
-}
