@@ -44,6 +44,7 @@ fn main() -> Result<()> {
 
     let ip_renderer = ip::IpSegmentRenderer::new(ip_info);
     let ip_constraint = Constraint::Length(ip_renderer.height());
+    println!("heading_renderer.height(): {}", heading_renderer.height());
     let options = TerminalOptions {
         viewport: Viewport::Inline(heading_renderer.height() + ip_renderer.height()),
     };
@@ -57,10 +58,6 @@ fn main() -> Result<()> {
 
         heading_renderer.render(frame, layout[0]).unwrap();
         ip_renderer.render(frame, layout[1]).unwrap();
-
-        // for (segment, area) in segments.iter().zip(layout.iter()) {
-        //     segment.render(frame, *area).unwrap(); // Handle errors appropriately
-        // }
     })?;
 
     Ok(())

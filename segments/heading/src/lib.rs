@@ -1,7 +1,7 @@
 use anyhow::Result;
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
-use ratatui::{layout::Rect, Frame};
+use ratatui::{prelude::*, widgets::*, Frame};
 use segment::*;
 use thiserror::Error;
 
@@ -102,8 +102,17 @@ impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        // FIXME: doesn't seem to correctly render, ie only getting part of the figlet
-        frame.render_widget(self.info.figure.clone(), area);
+        let lines: Vec<Line> = self
+            .info
+            .figure
+            .lines()
+            .map(|line| Line::from(line.trim_end()))
+            .collect();
+
+        let paragraph = Paragraph::new(lines);
+
+        frame.render_widget(paragraph, area);
+
         Ok(())
     }
 }
