@@ -36,24 +36,27 @@ use segment::*;
 fn main() -> Result<()> {
     let backend = CrosstermBackend::new(stdout());
 
-    let options = TerminalOptions {
-        viewport: Viewport::Inline(1),
-    };
-    let mut terminal = Terminal::with_options(backend, options)?;
-
     let ip_info = ip::IpInfoBuilder::default().build()?;
-    let ip_renderer = ip::IpSegmentRenderer::new(ip_info);
+    let heading_info = heading::HeadingSegmentInfoBuilder::default().build()?;
 
-    // let constraints = segments
-    //     .iter()
-    //     .map(|segment| Constraint::Length(segment.height()))
-    //     .collect::<Vec<Constraint>>();
+    let heading_renderer = heading::HeadingSegmentRenderer::new(heading_info);
+    let heading_constraint = Constraint::Length(heading_renderer.height());
+
+    let ip_renderer = ip::IpSegmentRenderer::new(ip_info);
+    let ip_constraint = Constraint::Length(ip_renderer.height());
+    let options = TerminalOptions {
+        viewport: Viewport::Inline(heading_renderer.height() + ip_renderer.height()),
+    };
+    let constraints = vec![heading_constraint, ip_constraint];
+    let mut terminal = Terminal::with_options(backend, options)?;
     terminal.draw(|frame| {
-        ip_renderer.render(frame, frame.area()).unwrap();
-        // let layout = Layout::default()
-        //     .direction(Direction::Vertical)
-        //     // .constraints(constraints)
-        //     .split(frame.area());
+        let layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(constraints)
+            .split(frame.area());
+
+        heading_renderer.render(frame, layout[0]).unwrap();
+        ip_renderer.render(frame, layout[1]).unwrap();
 
         // for (segment, area) in segments.iter().zip(layout.iter()) {
         //     segment.render(frame, *area).unwrap(); // Handle errors appropriately
