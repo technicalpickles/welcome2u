@@ -5,10 +5,10 @@ use std::process::Command;
 
 #[derive(Default, Debug)]
 pub struct UpdatesSegmentRenderer {
-    info: Option<UpdatesInfo>,
+    info: UpdatesInfo,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct UpdatesInfo {
     updates_available: String,
 }
@@ -38,13 +38,16 @@ impl InfoBuilder<UpdatesInfo> for UpdatesInfoBuilder {
     }
 }
 
-impl SegmentRenderer for UpdatesSegmentRenderer {
+impl SegmentRenderer<UpdatesInfo> for UpdatesSegmentRenderer {
+    fn new(info: UpdatesInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         1
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(UpdatesInfoBuilder::default().build()?);
         Ok(())
     }
 
@@ -64,9 +67,10 @@ impl SegmentRenderer for UpdatesSegmentRenderer {
             label_area,
         );
 
-        if let Some(info) = &self.info {
-            frame.render_widget(Paragraph::new(info.updates_available.clone()), data_area);
-        }
+        frame.render_widget(
+            Paragraph::new(self.info.updates_available.clone()),
+            data_area,
+        );
 
         Ok(())
     }

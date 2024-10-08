@@ -7,12 +7,23 @@ use ratatui::{
 };
 use sysinfo::{ComponentExt, System, SystemExt};
 
-use segment::SegmentRenderer;
+use segment::*;
 
 #[derive(Debug, Default)]
-pub struct TemperaturesSegmentRenderer;
+pub struct TemperaturesSegmentRenderer {
+    info: TemperaturesInfo,
+}
 
-impl SegmentRenderer for TemperaturesSegmentRenderer {
+#[derive(Debug, Default)]
+pub struct TemperaturesInfo;
+
+impl Info for TemperaturesInfo {}
+
+impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
+    fn new(info: TemperaturesInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         1
     }

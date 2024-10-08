@@ -2,11 +2,6 @@ use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
 use segment::{Info, InfoBuilder, SegmentRenderer};
 
-#[derive(Default, Debug)]
-pub struct OsSegmentRenderer {
-    info: Option<OsInfo>,
-}
-
 #[derive(Debug)]
 struct OsInfo {
     os_string: String,
@@ -15,7 +10,7 @@ struct OsInfo {
 impl Info for OsInfo {}
 
 #[derive(Debug, Default)]
-struct OsInfoBuilder {}
+pub struct OsInfoBuilder {}
 
 impl InfoBuilder<OsInfo> for OsInfoBuilder {
     fn build(&self) -> Result<OsInfo> {
@@ -26,13 +21,21 @@ impl InfoBuilder<OsInfo> for OsInfoBuilder {
     }
 }
 
-impl SegmentRenderer for OsSegmentRenderer {
+#[derive(Debug)]
+pub struct OsSegmentRenderer {
+    info: OsInfo,
+}
+
+impl SegmentRenderer<OsInfo> for OsSegmentRenderer {
+    fn new(info: OsInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         1
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(OsInfoBuilder::default().build()?);
         Ok(())
     }
 
@@ -45,9 +48,7 @@ impl SegmentRenderer for OsSegmentRenderer {
 
         frame.render_widget(Paragraph::new("OS").fg(Color::Blue).bold(), label_area);
 
-        if let Some(info) = &self.info {
-            frame.render_widget(Paragraph::new(info.os_string.clone()), data_area);
-        }
+        frame.render_widget(Paragraph::new(self.info.os_string.clone()), data_area);
 
         Ok(())
     }

@@ -2,8 +2,7 @@ use anyhow::Result;
 use figlet_rs::FIGfont;
 use rand::{seq::SliceRandom, thread_rng};
 use ratatui::{layout::Rect, Frame};
-use segment::SegmentRenderer;
-use std::fmt;
+use segment::*;
 use thiserror::Error;
 
 use fortune::{Fortunes, NoFortunesError};
@@ -59,47 +58,52 @@ fn random_font() -> String {
     font_choice.unwrap().to_string()
 }
 
-pub struct HeadingSegmentRenderer {
+#[derive(Debug)]
+pub struct HeadingSegmentInfo {
     pub heading: String,
     pub figure: String,
     pub font_choice: String,
 }
 
-impl Default for HeadingSegmentRenderer {
-    fn default() -> Self {
-        Self {
-            heading: choose_fortune().unwrap(),
-            font_choice: String::new(),
-            figure: String::new(),
-        }
+impl Info for HeadingSegmentInfo {}
+
+#[derive(Debug, Default)]
+pub struct HeadingSegmentInfoBuilder {}
+
+impl InfoBuilder<HeadingSegmentInfo> for HeadingSegmentInfoBuilder {
+    fn build(&self) -> Result<HeadingSegmentInfo> {
+        let heading = choose_fortune()?;
+        let figure = figlet(random_font(), &heading)?;
+        Ok(HeadingSegmentInfo {
+            heading,
+            figure,
+            font_choice: random_font(),
+        })
     }
 }
 
-impl fmt::Debug for HeadingSegmentRenderer {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("HeadingSegment")
-            .field("heading", &self.heading)
-            .field("font_choice", &self.font_choice)
-            .finish()
-    }
+#[derive(Debug)]
+pub struct HeadingSegmentRenderer {
+    pub info: HeadingSegmentInfo,
 }
 
-impl SegmentRenderer for HeadingSegmentRenderer {
+impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
+    fn new(info: HeadingSegmentInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         // FIXME: need lines of the figure
-        self.figure.lines().count() as u16
+        self.info.figure.lines().count() as u16
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.font_choice = random_font();
-        self.figure = figlet(self.font_choice.clone(), &self.heading)?;
-
         Ok(())
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         // FIXME: doesn't seem to correctly render, ie only getting part of the figlet
-        frame.render_widget(self.figure.clone(), area);
+        frame.render_widget(self.info.figure.clone(), area);
         Ok(())
     }
 }

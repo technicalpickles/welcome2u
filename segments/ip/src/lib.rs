@@ -1,12 +1,7 @@
 use anyhow::Result;
 use local_ip_address::local_ip;
 use ratatui::{prelude::*, widgets::*};
-use segment::{Info, InfoBuilder, SegmentRenderer};
-
-#[derive(Default, Debug)]
-pub struct IpSegmentRenderer {
-    info: Option<IpInfo>,
-}
+use segment::*;
 
 #[derive(Debug)]
 struct IpInfo {
@@ -26,13 +21,21 @@ impl InfoBuilder<IpInfo> for IpInfoBuilder {
     }
 }
 
-impl SegmentRenderer for IpSegmentRenderer {
+#[derive(Debug)]
+pub struct IpSegmentRenderer {
+    info: IpInfo,
+}
+
+impl SegmentRenderer<IpInfo> for IpSegmentRenderer {
+    fn new(info: IpInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         1
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(IpInfoBuilder::default().build()?);
         Ok(())
     }
 
@@ -48,10 +51,23 @@ impl SegmentRenderer for IpSegmentRenderer {
             label_area,
         );
 
-        if let Some(info) = &self.info {
-            frame.render_widget(Paragraph::new(info.ip_address.clone()), data_area);
-        }
+        frame.render_widget(Paragraph::new(self.info.ip_address.clone()), data_area);
 
         Ok(())
+    }
+}
+
+pub struct IpSegment {
+    info_builder: IpInfoBuilder,
+    renderer: IpSegmentRenderer,
+}
+
+impl Segment<IpInfo, IpInfoBuilder, IpSegmentRenderer> for IpSegment {
+    fn info_builder(&self) -> &IpInfoBuilder {
+        &self.info_builder
+    }
+
+    fn renderer(&self) -> &IpSegmentRenderer {
+        &self.renderer
     }
 }

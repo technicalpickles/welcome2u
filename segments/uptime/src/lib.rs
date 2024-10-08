@@ -3,9 +3,9 @@ use ratatui::{prelude::*, widgets::*};
 use segment::*;
 use sysinfo::System;
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct UptimeSegmentRenderer {
-    info: Option<UptimeInfo>,
+    info: UptimeInfo,
 }
 
 #[derive(Debug)]
@@ -59,13 +59,17 @@ impl InfoBuilder<UptimeInfo> for UptimeInfoBuilder {
         Ok(UptimeInfo { uptime })
     }
 }
-impl SegmentRenderer for UptimeSegmentRenderer {
+impl SegmentRenderer<UptimeInfo> for UptimeSegmentRenderer {
+    fn new(info: UptimeInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         1
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(UptimeInfoBuilder::default().build()?);
+        self.info = UptimeInfoBuilder::default().build()?;
         Ok(())
     }
 
@@ -78,17 +82,16 @@ impl SegmentRenderer for UptimeSegmentRenderer {
 
         frame.render_widget(Paragraph::new("Uptime").fg(Color::Blue).bold(), label_area);
 
-        if let Some(info) = &self.info {
-            let uptime_color = if info.uptime.contains("day") || info.uptime.contains("days") {
-                Color::Yellow
-            } else {
-                Color::Reset
-            };
-            frame.render_widget(
-                Paragraph::new(info.uptime.clone()).fg(uptime_color),
-                data_area,
-            );
-        }
+        let uptime_color = if self.info.uptime.contains("day") || self.info.uptime.contains("days")
+        {
+            Color::Yellow
+        } else {
+            Color::Reset
+        };
+        frame.render_widget(
+            Paragraph::new(self.info.uptime.clone()).fg(uptime_color),
+            data_area,
+        );
 
         Ok(())
     }

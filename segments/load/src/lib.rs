@@ -5,7 +5,7 @@ use sysinfo::{LoadAvg, System};
 
 #[derive(Default, Debug)]
 pub struct LoadSegmentRenderer {
-    info: Option<LoadInfo>,
+    info: LoadInfo,
 }
 
 #[derive(Debug, Default)]
@@ -60,13 +60,16 @@ impl LoadSegmentRenderer {
     }
 }
 
-impl SegmentRenderer for LoadSegmentRenderer {
+impl SegmentRenderer<LoadInfo> for LoadSegmentRenderer {
+    fn new(info: LoadInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         1
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(LoadInfoBuilder::default().build()?);
         Ok(())
     }
 
@@ -86,10 +89,8 @@ impl SegmentRenderer for LoadSegmentRenderer {
             label_area,
         );
 
-        if let Some(info) = &self.info {
-            let formatted_loads = self.format_loads(info);
-            frame.render_widget(Paragraph::new(Line::from(formatted_loads)), data_area);
-        }
+        let formatted_loads = self.format_loads(&self.info);
+        frame.render_widget(Paragraph::new(Line::from(formatted_loads)), data_area);
 
         Ok(())
     }

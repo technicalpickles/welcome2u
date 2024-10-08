@@ -7,12 +7,19 @@ use bollard::{
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 use iso8601_timestamp::Timestamp;
 use ratatui::{prelude::*, widgets::*};
-use segment::SegmentRenderer;
+use segment::*;
 use std::default::Default;
 
 #[derive(Debug, Default)]
-pub struct DockerSegmentRenderer {
+pub struct DockerSegmentInfo {
     containers: Vec<ContainerInfo>,
+}
+
+impl Info for DockerSegmentInfo {}
+
+#[derive(Debug)]
+pub struct DockerSegmentRenderer {
+    info: DockerSegmentInfo,
 }
 
 #[derive(Debug)]
@@ -21,7 +28,10 @@ struct ContainerInfo {
     status: String,
 }
 
-impl DockerSegmentRenderer {
+#[derive(Debug)]
+struct DockerSegmentInfoBuilder;
+
+impl DockerSegmentInfoBuilder {
     fn duration_since(str: &str) -> String {
         let now = Timestamp::now_utc();
         let timestamp = Timestamp::parse(str).unwrap();
@@ -76,12 +86,8 @@ impl DockerSegmentRenderer {
     }
 }
 
-impl SegmentRenderer for DockerSegmentRenderer {
-    fn height(&self) -> u16 {
-        self.containers.len() as u16
-    }
-
-    fn prepare(&mut self) -> Result<()> {
+impl InfoBuilder<DockerSegmentInfo> for DockerSegmentInfoBuilder {
+    fn build(&self) -> Result<DockerSegmentInfo> {
         tokio::runtime::Runtime::new()?.block_on(async {
             let docker = Docker::connect_with_socket(
                 "unix:///Users/josh.nichols/.colima/gusto/docker.sock",
@@ -100,14 +106,28 @@ impl SegmentRenderer for DockerSegmentRenderer {
                 .iter()
                 .map(|container| Self::fetch_container_info(&docker, container));
 
-            self.containers = futures_util::future::join_all(futures)
+            let containers = futures_util::future::join_all(futures)
                 .await
                 .into_iter()
                 .filter_map(Result::ok)
                 .collect();
 
-            Ok(())
+            Ok(DockerSegmentInfo { containers })
         })
+    }
+}
+
+impl SegmentRenderer<DockerSegmentInfo> for DockerSegmentRenderer {
+    fn new(info: DockerSegmentInfo) -> Self {
+        Self { info }
+    }
+
+    fn height(&self) -> u16 {
+        self.info.containers.len() as u16
+    }
+
+    fn prepare(&mut self) -> Result<()> {
+        Ok(())
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
@@ -127,6 +147,7 @@ impl SegmentRenderer for DockerSegmentRenderer {
         );
 
         let items: Vec<ListItem> = self
+            .info
             .containers
             .iter()
             .map(|container| ListItem::new(format!("{:<40} {}", container.name, container.status)))
@@ -136,5 +157,20 @@ impl SegmentRenderer for DockerSegmentRenderer {
         frame.render_widget(list, chunks[1]);
 
         Ok(())
+    }
+}
+
+pub struct DockerSegment {
+    info_builder: DockerSegmentInfoBuilder,
+    renderer: DockerSegmentRenderer,
+}
+
+impl Segment<DockerSegmentInfo, DockerSegmentInfoBuilder, DockerSegmentRenderer> for DockerSegment {
+    fn info_builder(&self) -> &DockerSegmentInfoBuilder {
+        &self.info_builder
+    }
+
+    fn renderer(&self) -> &DockerSegmentRenderer {
+        &self.renderer
     }
 }

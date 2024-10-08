@@ -2,7 +2,9 @@ use anyhow::Result;
 use ratatui::{prelude::*, style::Style, widgets::Paragraph};
 use std::fmt::Debug;
 
-pub trait SegmentRenderer: Debug {
+pub trait SegmentRenderer<T: Info>: Debug {
+    fn new(info: T) -> Self;
+
     fn prepare(&mut self) -> Result<()>;
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()>;
     fn height(&self) -> u16;
@@ -27,7 +29,20 @@ impl Text {
     }
 }
 
-impl SegmentRenderer for Text {
+#[derive(Debug)]
+pub struct TextInfo {
+    content: String,
+}
+
+impl Info for TextInfo {}
+
+impl SegmentRenderer<TextInfo> for Text {
+    fn new(info: TextInfo) -> Self {
+        Self {
+            content: info.content,
+        }
+    }
+
     fn prepare(&mut self) -> Result<()> {
         Ok(())
     }
@@ -39,4 +54,9 @@ impl SegmentRenderer for Text {
     fn height(&self) -> u16 {
         self.content.lines().count() as u16
     }
+}
+
+pub trait Segment<T: Info, U: InfoBuilder<T>, V: SegmentRenderer<T>> {
+    fn info_builder(&self) -> &U;
+    fn renderer(&self) -> &V;
 }

@@ -11,6 +11,7 @@ use thiserror::Error;
 #[derive(Debug, Default)]
 struct CommandInfo {
     output: String,
+    command: String,
 }
 
 impl Info for CommandInfo {}
@@ -43,23 +44,16 @@ impl InfoBuilder<CommandInfo> for CommandInfoBuilder {
 
         let output_str = String::from_utf8(output.stdout)?;
 
-        Ok(CommandInfo { output: output_str })
+        Ok(CommandInfo {
+            command: self.command.clone(),
+            output: output_str,
+        })
     }
 }
 
 #[derive(Debug)]
 pub struct CommandSegmentRenderer {
-    command: String,
     info: CommandInfo,
-}
-
-impl CommandSegmentRenderer {
-    pub fn new(command: &str) -> Self {
-        Self {
-            command: command.to_string(),
-            info: CommandInfo::default(),
-        }
-    }
 }
 
 #[derive(Error, Debug)]
@@ -75,14 +69,18 @@ pub enum CommandError {
     OutputParseError(#[from] std::string::FromUtf8Error),
 }
 
-impl SegmentRenderer for CommandSegmentRenderer {
+impl SegmentRenderer<CommandInfo> for CommandSegmentRenderer {
+    fn new(info: CommandInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         self.info.output.lines().count() as u16
     }
 
     fn prepare(&mut self) -> Result<()> {
         self.info = CommandInfoBuilder::default()
-            .command(self.command.clone())
+            .command(self.info.command.clone())
             .build()?;
 
         Ok(())

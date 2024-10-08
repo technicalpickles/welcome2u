@@ -5,9 +5,9 @@ use ratatui::{prelude::*, widgets::*};
 use segment::{Info, SegmentRenderer};
 use sysinfo::System;
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct MemorySegment {
-    info: Option<MemoryInfo>,
+    info: MemoryInfo,
 }
 
 #[derive(Debug)]
@@ -40,13 +40,17 @@ impl MemoryInfoBuilder {
     }
 }
 
-impl SegmentRenderer for MemorySegment {
+impl SegmentRenderer<MemoryInfo> for MemorySegment {
+    fn new(info: MemoryInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         1
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(MemoryInfoBuilder::default().build()?);
+        self.info = MemoryInfoBuilder::default().build()?;
         Ok(())
     }
 
@@ -63,15 +67,13 @@ impl SegmentRenderer for MemorySegment {
             label_area,
         );
 
-        if let Some(info) = &self.info {
-            frame.render_widget(
-                Paragraph::new(format!(
-                    "{} used, {} available / {}",
-                    info.used_memory, info.available_memory, info.total_memory
-                )),
-                data_area,
-            );
-        }
+        frame.render_widget(
+            Paragraph::new(format!(
+                "{} used, {} available / {}",
+                self.info.used_memory, self.info.available_memory, self.info.total_memory
+            )),
+            data_area,
+        );
 
         Ok(())
     }

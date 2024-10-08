@@ -2,8 +2,7 @@ use ansi_term::Style;
 use anyhow::Result;
 use fortune::{Fortunes, NoFortunesError};
 use ratatui::prelude::*;
-use segment::SegmentRenderer;
-use segment::Text;
+use segment::*;
 use textwrap::indent;
 
 fn choose_fortune() -> Result<String, NoFortunesError> {
@@ -21,6 +20,8 @@ pub struct QuoteSegmentInfo {
     quote: String,
 }
 
+impl Info for QuoteSegmentInfo {}
+
 impl Default for QuoteSegmentInfo {
     fn default() -> Self {
         Self {
@@ -34,7 +35,11 @@ pub struct QuoteSegmentRenderer {
     info: QuoteSegmentInfo,
 }
 
-impl SegmentRenderer for QuoteSegmentRenderer {
+impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
+    fn new(info: QuoteSegmentInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         1
     }
@@ -49,7 +54,7 @@ impl SegmentRenderer for QuoteSegmentRenderer {
         let content = indent(&content, "       ");
         let content = Style::default().dimmed().paint(content);
 
-        Text::new(&content).render(frame, area)?;
+        segment::Text::new(&content).render(frame, area)?;
         Ok(())
     }
 }

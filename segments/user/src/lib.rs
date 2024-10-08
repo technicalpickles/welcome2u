@@ -3,9 +3,9 @@ use ratatui::{prelude::*, widgets::*};
 use segment::*;
 use users::{get_current_uid, get_user_by_uid};
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct UserSegmentRenderer {
-    info: Option<UserInfo>,
+    info: UserInfo,
 }
 
 #[derive(Debug)]
@@ -40,13 +40,17 @@ impl InfoBuilder<UserInfo> for UserInfoBuilder {
     }
 }
 
-impl SegmentRenderer for UserSegmentRenderer {
+impl SegmentRenderer<UserInfo> for UserSegmentRenderer {
+    fn new(info: UserInfo) -> Self {
+        Self { info }
+    }
+
     fn height(&self) -> u16 {
         1
     }
 
     fn prepare(&mut self) -> Result<()> {
-        self.info = Some(UserInfoBuilder::default().build()?);
+        self.info = UserInfoBuilder::default().build()?;
         Ok(())
     }
 
@@ -66,9 +70,7 @@ impl SegmentRenderer for UserSegmentRenderer {
             label_area,
         );
 
-        if let Some(info) = &self.info {
-            frame.render_widget(Paragraph::new(info.user_with_hostname()), data_area);
-        }
+        frame.render_widget(Paragraph::new(self.info.user_with_hostname()), data_area);
 
         Ok(())
     }
