@@ -3,7 +3,6 @@ use fortune::{Fortunes, NoFortunesError};
 use ratatui::prelude::*;
 use ratatui::widgets::*;
 use segment::*;
-use textwrap::indent;
 
 fn choose_fortune() -> Result<String, NoFortunesError> {
     // TODO: support multiple fortune files: pickleisms, collected-quotes
@@ -57,9 +56,15 @@ impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
             .map(|line| Line::from(Span::styled(line, Style::default().dim())))
             .collect();
 
-        let styled_content = Paragraph::new(styled_lines).wrap(Wrap { trim: true });
+        let block = Block::default()
+            .borders(Borders::NONE)
+            .padding(Padding::horizontal(4));
 
-        frame.render_widget(styled_content, area);
+        let paragraph = Paragraph::new(styled_lines)
+            .wrap(Wrap { trim: true })
+            .block(block);
+
+        frame.render_widget(paragraph, area);
 
         Ok(())
     }
