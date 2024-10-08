@@ -53,7 +53,7 @@ impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
             .info
             .quote
             .lines()
-            .map(|line| Line::from(Span::styled(line, Style::default().dim())))
+            .map(|line| Line::from(line))
             .collect();
 
         let block = Block::default()
@@ -62,6 +62,7 @@ impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
 
         let paragraph = Paragraph::new(styled_lines)
             .wrap(Wrap { trim: true })
+            .style(Style::default().dim())
             .block(block);
 
         frame.render_widget(paragraph, area);
