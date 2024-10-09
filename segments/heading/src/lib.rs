@@ -5,7 +5,9 @@ use ratatui::{prelude::*, widgets::*, Frame};
 use segment::*;
 use thiserror::Error;
 
+use ansi_to_tui::IntoText;
 use fortune::{Fortunes, NoFortunesError};
+use lolcrab::Lolcrab;
 
 fn choose_fortune() -> Result<String, NoFortunesError> {
     let fortune_path = String::from("/opt/homebrew/opt/fortune/share/games/fortunes/intro");
@@ -97,14 +99,14 @@ impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let lines: Vec<Line> = self
-            .info
-            .figure
-            .lines()
-            .map(|line| Line::from(line.trim_end()))
-            .collect();
+        // Use lolcrab to colorize the figure
+        let mut colorized = Vec::new();
+        Lolcrab::new(None, None).colorize_str(&self.info.figure, &mut colorized)?;
 
-        let paragraph = Paragraph::new(lines);
+        // Convert the colorized string to Text using ansi-to-tui
+        let text: Text = colorized.into_text()?;
+
+        let paragraph = Paragraph::new(text);
 
         frame.render_widget(paragraph, area);
 
