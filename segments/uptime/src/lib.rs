@@ -59,17 +59,14 @@ impl InfoBuilder<UptimeInfo> for UptimeInfoBuilder {
         Ok(UptimeInfo { uptime })
     }
 }
+
 impl SegmentRenderer<UptimeInfo> for UptimeSegmentRenderer {
     fn height(&self) -> u16 {
         1
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let layout = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
-
-        let [label_area, data_area] = layout.areas(area);
+        let [label_area, data_area] = create_label_data_layout(area);
 
         frame.render_widget(Paragraph::new("Uptime").fg(Color::Blue).bold(), label_area);
 

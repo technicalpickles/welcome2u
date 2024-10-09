@@ -12,3 +12,12 @@ pub trait Info: Debug {}
 pub trait InfoBuilder<T: Info>: Debug {
     fn build(&self) -> impl std::future::Future<Output = Result<T>> + Send;
 }
+
+// Add this function to the file
+pub fn create_label_data_layout(area: Rect) -> [Rect; 2] {
+    let layout = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
+
+    layout.areas(area)
+}

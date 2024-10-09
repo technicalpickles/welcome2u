@@ -1,6 +1,6 @@
 use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
-use segment::{Info, InfoBuilder, SegmentRenderer};
+use segment::*;
 
 #[derive(Debug)]
 pub struct OsInfo {
@@ -32,11 +32,7 @@ impl SegmentRenderer<OsInfo> for OsSegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let layout = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
-
-        let [label_area, data_area] = layout.areas(area);
+        let [label_area, data_area] = create_label_data_layout(area);
 
         frame.render_widget(Paragraph::new("OS").fg(Color::Blue).bold(), label_area);
 

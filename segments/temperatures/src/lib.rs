@@ -69,11 +69,7 @@ impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
 
         let temps_paragraph = Paragraph::new(vec![temps_line]);
 
-        let layout = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
-
-        let [label_area, data_area] = layout.areas(area);
+        let [label_area, data_area] = create_label_data_layout(area);
 
         frame.render_widget(
             Paragraph::new("Temperatures").style(

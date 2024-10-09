@@ -121,6 +121,7 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
+        // TODO: figure out how to use create_label_data_layout here
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .margin(1)
