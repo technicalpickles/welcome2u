@@ -1,10 +1,7 @@
 use anyhow::Result;
-use ratatui::layout::Rect;
-use ratatui::Frame;
-use segment::Info;
-use segment::InfoBuilder;
-use segment::SegmentRenderer;
-use segment::Text;
+use ratatui::prelude::*;
+use ratatui::widgets::*;
+use segment::*;
 use std::process::{Command, ExitStatus, Stdio};
 use thiserror::Error;
 
@@ -87,6 +84,7 @@ impl SegmentRenderer<CommandInfo> for CommandSegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        Text::new(&self.info.output).render(frame, area)
+        frame.render_widget(Paragraph::new(Text::from(self.info.output.clone())), area);
+        Ok(())
     }
 }
