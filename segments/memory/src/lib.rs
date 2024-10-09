@@ -2,16 +2,16 @@ use ansi_term::Colour::Blue;
 use anyhow::Result;
 use fmtsize::{Conventional, FmtSize};
 use ratatui::{prelude::*, widgets::*};
-use segment::{Info, SegmentRenderer};
+use segment::*;
 use sysinfo::System;
 
 #[derive(Debug)]
-pub struct MemorySegment {
+pub struct MemorySegmentRenderer {
     info: MemoryInfo,
 }
 
 #[derive(Debug)]
-struct MemoryInfo {
+pub struct MemoryInfo {
     used_memory: String,
     available_memory: String,
     total_memory: String,
@@ -20,9 +20,9 @@ struct MemoryInfo {
 impl Info for MemoryInfo {}
 
 #[derive(Debug, Default)]
-struct MemoryInfoBuilder {}
+pub struct MemoryInfoBuilder {}
 
-impl MemoryInfoBuilder {
+impl InfoBuilder<MemoryInfo> for MemoryInfoBuilder {
     fn build(&self) -> Result<MemoryInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();
@@ -40,7 +40,7 @@ impl MemoryInfoBuilder {
     }
 }
 
-impl SegmentRenderer<MemoryInfo> for MemorySegment {
+impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
     fn height(&self) -> u16 {
         1
     }
@@ -70,7 +70,7 @@ impl SegmentRenderer<MemoryInfo> for MemorySegment {
     }
 }
 
-impl From<Box<MemoryInfo>> for MemorySegment {
+impl From<Box<MemoryInfo>> for MemorySegmentRenderer {
     fn from(info: Box<MemoryInfo>) -> Self {
         Self { info: *info }
     }

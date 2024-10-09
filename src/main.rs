@@ -1,5 +1,4 @@
 use anyhow::Result;
-use futures::future::join_all;
 use ratatui::layout::*;
 use ratatui::{backend::CrosstermBackend, *};
 use std::io::stdout;
@@ -17,15 +16,21 @@ async fn main() -> Result<()> {
         tokio::spawn(async { heading::HeadingSegmentInfoBuilder::default().build() });
     let quote_info_future =
         tokio::spawn(async { Ok::<_, std::io::Error>(quote::QuoteSegmentInfo::default()) });
+    let memory_info_future = tokio::spawn(async { memory::MemoryInfoBuilder::default().build() });
 
     // Wait for all futures to complete
-    let (ip_info, heading_info, quote_info) =
-        tokio::try_join!(ip_info_future, heading_info_future, quote_info_future)?;
+    let (ip_info, heading_info, quote_info, memory_info) = tokio::try_join!(
+        ip_info_future,
+        heading_info_future,
+        quote_info_future,
+        memory_info_future
+    )?;
 
     // Unwrap results
     let ip_info = ip_info?;
     let heading_info = heading_info?;
     let quote_info = quote_info?;
+    let memory_info = memory_info?;
 
     // -----
 
@@ -38,7 +43,15 @@ async fn main() -> Result<()> {
     let quote_renderer = quote::QuoteSegmentRenderer::from(Box::new(quote_info));
     let quote_constraint = Constraint::Length(quote_renderer.height());
 
-    let constraints = vec![heading_constraint, quote_constraint, ip_constraint];
+    let memory_renderer = memory::MemorySegmentRenderer::from(Box::new(memory_info));
+    let memory_constraint = Constraint::Length(memory_renderer.height());
+
+    let constraints = vec![
+        heading_constraint,
+        quote_constraint,
+        ip_constraint,
+        memory_constraint,
+    ];
 
     let options = TerminalOptions {
         viewport: Viewport::Inline(
@@ -62,6 +75,7 @@ async fn main() -> Result<()> {
         heading_renderer.render(frame, layout[0]).unwrap();
         quote_renderer.render(frame, layout[1]).unwrap();
         ip_renderer.render(frame, layout[2]).unwrap();
+        memory_renderer.render(frame, layout[3]).unwrap();
     })?;
 
     Ok(())
