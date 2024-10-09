@@ -9,7 +9,7 @@ pub struct LoadSegmentRenderer {
 }
 
 #[derive(Debug, Default)]
-struct LoadInfo {
+pub struct LoadInfo {
     loads: LoadAvg,
     cores: usize,
 }
@@ -17,7 +17,7 @@ struct LoadInfo {
 impl Info for LoadInfo {}
 
 #[derive(Debug, Default)]
-struct LoadInfoBuilder {}
+pub struct LoadInfoBuilder {}
 
 impl InfoBuilder<LoadInfo> for LoadInfoBuilder {
     fn build(&self) -> Result<LoadInfo> {
