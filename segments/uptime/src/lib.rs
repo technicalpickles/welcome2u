@@ -9,14 +9,14 @@ pub struct UptimeSegmentRenderer {
 }
 
 #[derive(Debug)]
-struct UptimeInfo {
+pub struct UptimeInfo {
     uptime: String,
 }
 
 impl Info for UptimeInfo {}
 
 #[derive(Debug, Default)]
-struct UptimeInfoBuilder {}
+pub struct UptimeInfoBuilder {}
 
 impl InfoBuilder<UptimeInfo> for UptimeInfoBuilder {
     fn build(&self) -> Result<UptimeInfo> {
