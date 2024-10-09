@@ -20,6 +20,11 @@ async fn main() -> Result<()> {
     let os_info_future = tokio::spawn(async { os::OsInfoBuilder::default().build() });
     let uptime_info_future = tokio::spawn(async { uptime::UptimeInfoBuilder::default().build() });
     let load_info_future = tokio::spawn(async { load::LoadInfoBuilder::default().build() });
+    let disk_info_future = tokio::spawn(async {
+        disk::DiskInfoBuilder::default()
+            .exclude_mount_point("/System/Volumes/Data".to_string())
+            .build()
+    });
     let memory_info_future = tokio::spawn(async { memory::MemoryInfoBuilder::default().build() });
 
     // Wait for all futures to complete
@@ -31,6 +36,7 @@ async fn main() -> Result<()> {
         os_info,
         uptime_info,
         load_info,
+        disk_info,
         memory_info,
     ) = tokio::try_join!(
         heading_info_future,
@@ -40,6 +46,7 @@ async fn main() -> Result<()> {
         os_info_future,
         uptime_info_future,
         load_info_future,
+        disk_info_future,
         memory_info_future
     )?;
 
@@ -51,6 +58,7 @@ async fn main() -> Result<()> {
     let os_info = os_info?;
     let uptime_info = uptime_info?;
     let load_info = load_info?;
+    let disk_info = disk_info?;
     let memory_info = memory_info?;
 
     // -----
@@ -76,6 +84,9 @@ async fn main() -> Result<()> {
     let load_renderer = load::LoadSegmentRenderer::from(Box::new(load_info));
     let load_constraint = Constraint::Length(load_renderer.height());
 
+    let disk_renderer = disk::DiskSegmentRenderer::from(Box::new(disk_info));
+    let disk_constraint = Constraint::Length(disk_renderer.height());
+
     let memory_renderer = memory::MemorySegmentRenderer::from(Box::new(memory_info));
     let memory_constraint = Constraint::Length(memory_renderer.height());
 
@@ -87,6 +98,7 @@ async fn main() -> Result<()> {
         os_constraint,
         uptime_constraint,
         load_constraint,
+        disk_constraint,
         memory_constraint,
     ];
 
@@ -116,7 +128,8 @@ async fn main() -> Result<()> {
         os_renderer.render(frame, layout[4]).unwrap();
         uptime_renderer.render(frame, layout[5]).unwrap();
         load_renderer.render(frame, layout[6]).unwrap();
-        memory_renderer.render(frame, layout[7]).unwrap();
+        disk_renderer.render(frame, layout[7]).unwrap();
+        memory_renderer.render(frame, layout[8]).unwrap();
     })?;
 
     Ok(())

@@ -94,15 +94,18 @@ pub struct HeadingSegmentRenderer {
 
 impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
     fn height(&self) -> u16 {
-        // FIXME: need lines of the figure
-        self.info.figure.lines().count() as u16
+        // Add 1 line padding above and 2 below
+        self.info.figure.lines().count() as u16 + 3
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let mut colorized_figure = Vec::new();
         Lolcrab::new(None, None).colorize_str(&self.info.figure, &mut colorized_figure)?;
 
-        let paragraph = Paragraph::new(colorized_figure.into_text()?);
+        let paragraph = Paragraph::new(colorized_figure.into_text()?)
+            .alignment(Alignment::Center)
+            .block(Block::default().padding(Padding::new(0, 0, 1, 2)));
+
         frame.render_widget(paragraph, area);
 
         Ok(())
