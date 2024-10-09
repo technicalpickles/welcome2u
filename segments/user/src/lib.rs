@@ -9,7 +9,7 @@ pub struct UserSegmentRenderer {
 }
 
 #[derive(Debug)]
-struct UserInfo {
+pub struct UserInfo {
     username: String,
     hostname: String,
 }
@@ -23,7 +23,7 @@ impl UserInfo {
 impl Info for UserInfo {}
 
 #[derive(Debug, Default)]
-struct UserInfoBuilder {}
+pub struct UserInfoBuilder {}
 
 impl InfoBuilder<UserInfo> for UserInfoBuilder {
     fn build(&self) -> Result<UserInfo> {

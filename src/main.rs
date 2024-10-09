@@ -15,15 +15,17 @@ async fn main() -> Result<()> {
         tokio::spawn(async { heading::HeadingSegmentInfoBuilder::default().build() });
     let quote_info_future =
         tokio::spawn(async { Ok::<_, std::io::Error>(quote::QuoteSegmentInfo::default()) });
+    let user_info_future = tokio::spawn(async { user::UserInfoBuilder::default().build() });
     let ip_info_future = tokio::spawn(async { ip::IpInfoBuilder::default().build() });
     let uptime_info_future = tokio::spawn(async { uptime::UptimeInfoBuilder::default().build() });
     let load_info_future = tokio::spawn(async { load::LoadInfoBuilder::default().build() });
     let memory_info_future = tokio::spawn(async { memory::MemoryInfoBuilder::default().build() });
 
     // Wait for all futures to complete
-    let (heading_info, quote_info, ip_info, uptime_info, load_info, memory_info) = tokio::try_join!(
+    let (heading_info, quote_info, user_info, ip_info, uptime_info, load_info, memory_info) = tokio::try_join!(
         heading_info_future,
         quote_info_future,
+        user_info_future,
         ip_info_future,
         uptime_info_future,
         load_info_future,
@@ -33,6 +35,7 @@ async fn main() -> Result<()> {
     // Unwrap results
     let heading_info = heading_info?;
     let quote_info = quote_info?;
+    let user_info = user_info?;
     let ip_info = ip_info?;
     let uptime_info = uptime_info?;
     let load_info = load_info?;
@@ -45,6 +48,9 @@ async fn main() -> Result<()> {
 
     let quote_renderer = quote::QuoteSegmentRenderer::from(Box::new(quote_info));
     let quote_constraint = Constraint::Length(quote_renderer.height());
+
+    let user_renderer = user::UserSegmentRenderer::from(Box::new(user_info));
+    let user_constraint = Constraint::Length(user_renderer.height());
 
     let ip_renderer = ip::IpSegmentRenderer::from(Box::new(ip_info));
     let ip_constraint = Constraint::Length(ip_renderer.height());
@@ -61,6 +67,7 @@ async fn main() -> Result<()> {
     let constraints = vec![
         heading_constraint,
         quote_constraint,
+        user_constraint,
         ip_constraint,
         uptime_constraint,
         load_constraint,
@@ -88,10 +95,11 @@ async fn main() -> Result<()> {
 
         heading_renderer.render(frame, layout[0]).unwrap();
         quote_renderer.render(frame, layout[1]).unwrap();
-        ip_renderer.render(frame, layout[2]).unwrap();
-        uptime_renderer.render(frame, layout[3]).unwrap();
-        load_renderer.render(frame, layout[4]).unwrap();
-        memory_renderer.render(frame, layout[5]).unwrap();
+        user_renderer.render(frame, layout[2]).unwrap();
+        ip_renderer.render(frame, layout[3]).unwrap();
+        uptime_renderer.render(frame, layout[4]).unwrap();
+        load_renderer.render(frame, layout[5]).unwrap();
+        memory_renderer.render(frame, layout[6]).unwrap();
     })?;
 
     Ok(())
