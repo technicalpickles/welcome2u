@@ -20,10 +20,6 @@ pub struct TemperaturesInfo;
 impl Info for TemperaturesInfo {}
 
 impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
-    fn new(info: TemperaturesInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         1
     }
@@ -91,5 +87,11 @@ impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
         frame.render_widget(temps_paragraph, data_area);
 
         Ok(())
+    }
+}
+
+impl From<Box<TemperaturesInfo>> for TemperaturesSegmentRenderer {
+    fn from(info: Box<TemperaturesInfo>) -> Self {
+        Self { info: *info }
     }
 }

@@ -41,10 +41,6 @@ impl InfoBuilder<UserInfo> for UserInfoBuilder {
 }
 
 impl SegmentRenderer<UserInfo> for UserSegmentRenderer {
-    fn new(info: UserInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         1
     }
@@ -68,5 +64,11 @@ impl SegmentRenderer<UserInfo> for UserSegmentRenderer {
         frame.render_widget(Paragraph::new(self.info.user_with_hostname()), data_area);
 
         Ok(())
+    }
+}
+
+impl From<Box<UserInfo>> for UserSegmentRenderer {
+    fn from(info: Box<UserInfo>) -> Self {
+        Self { info: *info }
     }
 }

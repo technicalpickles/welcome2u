@@ -118,10 +118,6 @@ impl InfoBuilder<DockerSegmentInfo> for DockerSegmentInfoBuilder {
 }
 
 impl SegmentRenderer<DockerSegmentInfo> for DockerSegmentRenderer {
-    fn new(info: DockerSegmentInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         self.info.containers.len() as u16
     }
@@ -153,5 +149,11 @@ impl SegmentRenderer<DockerSegmentInfo> for DockerSegmentRenderer {
         frame.render_widget(list, chunks[1]);
 
         Ok(())
+    }
+}
+
+impl From<Box<DockerSegmentInfo>> for DockerSegmentRenderer {
+    fn from(info: Box<DockerSegmentInfo>) -> Self {
+        Self { info: *info }
     }
 }

@@ -60,10 +60,6 @@ impl InfoBuilder<UptimeInfo> for UptimeInfoBuilder {
     }
 }
 impl SegmentRenderer<UptimeInfo> for UptimeSegmentRenderer {
-    fn new(info: UptimeInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         1
     }
@@ -89,5 +85,11 @@ impl SegmentRenderer<UptimeInfo> for UptimeSegmentRenderer {
         );
 
         Ok(())
+    }
+}
+
+impl From<Box<UptimeInfo>> for UptimeSegmentRenderer {
+    fn from(info: Box<UptimeInfo>) -> Self {
+        Self { info: *info }
     }
 }

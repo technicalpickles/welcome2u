@@ -93,10 +93,6 @@ impl InfoBuilder<DiskSegmentInfo> for DiskInfoBuilder {
 }
 
 impl SegmentRenderer<DiskSegmentInfo> for DiskSegmentRenderer {
-    fn new(info: DiskSegmentInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         (self.info.disks.len() * 2) as u16
     }
@@ -130,5 +126,11 @@ impl SegmentRenderer<DiskSegmentInfo> for DiskSegmentRenderer {
         }
 
         Ok(())
+    }
+}
+
+impl From<Box<DiskSegmentInfo>> for DiskSegmentRenderer {
+    fn from(info: Box<DiskSegmentInfo>) -> Self {
+        Self { info: *info }
     }
 }

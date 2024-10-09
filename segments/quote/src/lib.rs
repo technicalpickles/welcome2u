@@ -35,10 +35,6 @@ pub struct QuoteSegmentRenderer {
 }
 
 impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
-    fn new(info: QuoteSegmentInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         self.info.quote.lines().count() as u16
     }
@@ -63,5 +59,11 @@ impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
         frame.render_widget(paragraph, area);
 
         Ok(())
+    }
+}
+
+impl From<Box<QuoteSegmentInfo>> for QuoteSegmentRenderer {
+    fn from(info: Box<QuoteSegmentInfo>) -> Self {
+        Self { info: *info }
     }
 }

@@ -27,10 +27,6 @@ pub struct IpSegmentRenderer {
 }
 
 impl SegmentRenderer<IpInfo> for IpSegmentRenderer {
-    fn new(info: IpInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         1
     }
@@ -53,7 +49,8 @@ impl SegmentRenderer<IpInfo> for IpSegmentRenderer {
     }
 }
 
-pub struct IpSegment {
-    info_builder: IpInfoBuilder,
-    renderer: IpSegmentRenderer,
+impl From<Box<IpInfo>> for IpSegmentRenderer {
+    fn from(info: Box<IpInfo>) -> Self {
+        Self { info: *info }
+    }
 }

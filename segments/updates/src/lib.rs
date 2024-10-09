@@ -39,10 +39,6 @@ impl InfoBuilder<UpdatesInfo> for UpdatesInfoBuilder {
 }
 
 impl SegmentRenderer<UpdatesInfo> for UpdatesSegmentRenderer {
-    fn new(info: UpdatesInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         1
     }
@@ -69,5 +65,11 @@ impl SegmentRenderer<UpdatesInfo> for UpdatesSegmentRenderer {
         );
 
         Ok(())
+    }
+}
+
+impl From<Box<UpdatesInfo>> for UpdatesSegmentRenderer {
+    fn from(info: Box<UpdatesInfo>) -> Self {
+        Self { info: *info }
     }
 }

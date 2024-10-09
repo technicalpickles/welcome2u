@@ -61,10 +61,6 @@ impl LoadSegmentRenderer {
 }
 
 impl SegmentRenderer<LoadInfo> for LoadSegmentRenderer {
-    fn new(info: LoadInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         1
     }
@@ -89,5 +85,11 @@ impl SegmentRenderer<LoadInfo> for LoadSegmentRenderer {
         frame.render_widget(Paragraph::new(Line::from(formatted_loads)), data_area);
 
         Ok(())
+    }
+}
+
+impl From<Box<LoadInfo>> for LoadSegmentRenderer {
+    fn from(info: Box<LoadInfo>) -> Self {
+        Self { info: *info }
     }
 }

@@ -27,10 +27,6 @@ pub struct OsSegmentRenderer {
 }
 
 impl SegmentRenderer<OsInfo> for OsSegmentRenderer {
-    fn new(info: OsInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         1
     }
@@ -47,5 +43,11 @@ impl SegmentRenderer<OsInfo> for OsSegmentRenderer {
         frame.render_widget(Paragraph::new(self.info.os_string.clone()), data_area);
 
         Ok(())
+    }
+}
+
+impl From<Box<OsInfo>> for OsSegmentRenderer {
+    fn from(info: Box<OsInfo>) -> Self {
+        Self { info: *info }
     }
 }

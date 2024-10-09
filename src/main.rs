@@ -14,13 +14,13 @@ fn main() -> Result<()> {
 
     // -----
 
-    let heading_renderer = heading::HeadingSegmentRenderer::new(heading_info);
+    let heading_renderer = heading::HeadingSegmentRenderer::from(Box::new(heading_info));
     let heading_constraint = Constraint::Length(heading_renderer.height());
 
-    let ip_renderer = ip::IpSegmentRenderer::new(ip_info);
+    let ip_renderer = ip::IpSegmentRenderer::from(Box::new(ip_info));
     let ip_constraint = Constraint::Length(ip_renderer.height());
 
-    let quote_renderer = quote::QuoteSegmentRenderer::new(quote_info);
+    let quote_renderer = quote::QuoteSegmentRenderer::from(Box::new(quote_info));
     let quote_constraint = Constraint::Length(quote_renderer.height());
 
     let constraints = vec![heading_constraint, quote_constraint, ip_constraint];

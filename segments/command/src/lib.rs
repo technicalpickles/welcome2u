@@ -67,10 +67,6 @@ pub enum CommandError {
 }
 
 impl SegmentRenderer<CommandInfo> for CommandSegmentRenderer {
-    fn new(info: CommandInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         self.info.output.lines().count() as u16
     }
@@ -78,5 +74,11 @@ impl SegmentRenderer<CommandInfo> for CommandSegmentRenderer {
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         frame.render_widget(Paragraph::new(Text::from(self.info.output.clone())), area);
         Ok(())
+    }
+}
+
+impl From<Box<CommandInfo>> for CommandSegmentRenderer {
+    fn from(info: Box<CommandInfo>) -> Self {
+        Self { info: *info }
     }
 }

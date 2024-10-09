@@ -41,10 +41,6 @@ impl MemoryInfoBuilder {
 }
 
 impl SegmentRenderer<MemoryInfo> for MemorySegment {
-    fn new(info: MemoryInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         1
     }
@@ -71,5 +67,11 @@ impl SegmentRenderer<MemoryInfo> for MemorySegment {
         );
 
         Ok(())
+    }
+}
+
+impl From<Box<MemoryInfo>> for MemorySegment {
+    fn from(info: Box<MemoryInfo>) -> Self {
+        Self { info: *info }
     }
 }

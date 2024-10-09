@@ -91,10 +91,6 @@ pub struct HeadingSegmentRenderer {
 }
 
 impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
-    fn new(info: HeadingSegmentInfo) -> Self {
-        Self { info }
-    }
-
     fn height(&self) -> u16 {
         // FIXME: need lines of the figure
         self.info.figure.lines().count() as u16
@@ -113,5 +109,11 @@ impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
         frame.render_widget(paragraph, area);
 
         Ok(())
+    }
+}
+
+impl From<Box<HeadingSegmentInfo>> for HeadingSegmentRenderer {
+    fn from(info: Box<HeadingSegmentInfo>) -> Self {
+        Self { info: *info }
     }
 }
