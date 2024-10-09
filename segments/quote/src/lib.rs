@@ -36,16 +36,15 @@ pub struct QuoteSegmentRenderer {
 
 impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
     fn height(&self) -> u16 {
-        self.info.quote.lines().count() as u16
+        // Add 2 to account for the new padding lines
+        self.info.quote.lines().count() as u16 + 2
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let styled_lines: Vec<Line> = self
-            .info
-            .quote
-            .lines()
-            .map(|line| Line::from(line))
-            .collect();
+        let mut styled_lines = Vec::with_capacity(self.info.quote.lines().count() + 2);
+        styled_lines.push(Line::default()); // Add an empty line for top padding
+        styled_lines.extend(self.info.quote.lines().map(Line::from));
+        styled_lines.push(Line::default()); // Add an empty line for bottom padding
 
         let block = Block::default()
             .borders(Borders::NONE)
