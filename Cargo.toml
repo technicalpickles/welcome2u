@@ -23,6 +23,8 @@ temperatures = { path = "segments/temperatures" }
 thiserror = "1.0.61"
 anyhow = "1.0.86"
 ratatui = "0.28.1"
+tokio = { version = "1.40.0", features = ["full"] }
+futures = "0.3.31"
 
 
 [workspace]

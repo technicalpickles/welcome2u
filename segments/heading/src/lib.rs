@@ -99,15 +99,10 @@ impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        // Use lolcrab to colorize the figure
-        let mut colorized = Vec::new();
-        Lolcrab::new(None, None).colorize_str(&self.info.figure, &mut colorized)?;
+        let mut colorized_figure = Vec::new();
+        Lolcrab::new(None, None).colorize_str(&self.info.figure, &mut colorized_figure)?;
 
-        // Convert the colorized string to Text using ansi-to-tui
-        let text: Text = colorized.into_text()?;
-
-        let paragraph = Paragraph::new(text);
-
+        let paragraph = Paragraph::new(colorized_figure.into_text()?);
         frame.render_widget(paragraph, area);
 
         Ok(())

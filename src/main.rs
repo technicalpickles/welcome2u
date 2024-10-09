@@ -1,16 +1,31 @@
 use anyhow::Result;
+use futures::future::join_all;
 use ratatui::layout::*;
 use ratatui::{backend::CrosstermBackend, *};
 use std::io::stdout;
+use tokio;
 
 use segment::*;
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let backend = CrosstermBackend::new(stdout());
 
-    let ip_info = ip::IpInfoBuilder::default().build()?;
-    let heading_info = heading::HeadingSegmentInfoBuilder::default().build()?;
-    let quote_info = quote::QuoteSegmentInfo::default();
+    // Create async tasks for building segment info
+    let ip_info_future = tokio::spawn(async { ip::IpInfoBuilder::default().build() });
+    let heading_info_future =
+        tokio::spawn(async { heading::HeadingSegmentInfoBuilder::default().build() });
+    let quote_info_future =
+        tokio::spawn(async { Ok::<_, std::io::Error>(quote::QuoteSegmentInfo::default()) });
+
+    // Wait for all futures to complete
+    let (ip_info, heading_info, quote_info) =
+        tokio::try_join!(ip_info_future, heading_info_future, quote_info_future)?;
+
+    // Unwrap results
+    let ip_info = ip_info?;
+    let heading_info = heading_info?;
+    let quote_info = quote_info?;
 
     // -----
 
