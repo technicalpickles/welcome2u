@@ -85,8 +85,3 @@ impl SegmentRenderer<TextInfo> for Text {
         self.content.lines().count() as u16
     }
 }
-
-pub trait Segment<T: Info, U: InfoBuilder<T>, V: SegmentRenderer<T>> {
-    fn info_builder(&self) -> &U;
-    fn renderer(&self) -> &V;
-}
