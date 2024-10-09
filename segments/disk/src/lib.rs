@@ -101,11 +101,6 @@ impl SegmentRenderer<DiskSegmentInfo> for DiskSegmentRenderer {
         (self.info.disks.len() * 2) as u16
     }
 
-    fn prepare(&mut self) -> Result<()> {
-        self.info = DiskInfoBuilder::default().build()?;
-        Ok(())
-    }
-
     fn render(&self, frame: &mut Frame<'_>, area: Rect) -> Result<()> {
         let layout = Layout::default()
             .direction(Direction::Horizontal)

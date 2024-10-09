@@ -6,15 +6,15 @@ use std::process::{Command, ExitStatus, Stdio};
 use thiserror::Error;
 
 #[derive(Debug, Default)]
-struct CommandInfo {
+pub struct CommandInfo {
     output: String,
-    command: String,
+    // command: String,
 }
 
 impl Info for CommandInfo {}
 
 #[derive(Debug, Default)]
-struct CommandInfoBuilder {
+pub struct CommandInfoBuilder {
     command: String,
 }
 
@@ -42,7 +42,7 @@ impl InfoBuilder<CommandInfo> for CommandInfoBuilder {
         let output_str = String::from_utf8(output.stdout)?;
 
         Ok(CommandInfo {
-            command: self.command.clone(),
+            // command: self.command.clone(),
             output: output_str,
         })
     }
@@ -73,14 +73,6 @@ impl SegmentRenderer<CommandInfo> for CommandSegmentRenderer {
 
     fn height(&self) -> u16 {
         self.info.output.lines().count() as u16
-    }
-
-    fn prepare(&mut self) -> Result<()> {
-        self.info = CommandInfoBuilder::default()
-            .command(self.info.command.clone())
-            .build()?;
-
-        Ok(())
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {

@@ -49,11 +49,6 @@ impl SegmentRenderer<MemoryInfo> for MemorySegment {
         1
     }
 
-    fn prepare(&mut self) -> Result<()> {
-        self.info = MemoryInfoBuilder::default().build()?;
-        Ok(())
-    }
-
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         // TODO: find way to re-use label and layout stuff
         let layout = Layout::default()

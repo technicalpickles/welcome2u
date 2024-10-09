@@ -100,10 +100,6 @@ impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
         self.info.figure.lines().count() as u16
     }
 
-    fn prepare(&mut self) -> Result<()> {
-        Ok(())
-    }
-
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let lines: Vec<Line> = self
             .info

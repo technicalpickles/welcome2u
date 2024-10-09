@@ -35,10 +35,6 @@ impl SegmentRenderer<IpInfo> for IpSegmentRenderer {
         1
     }
 
-    fn prepare(&mut self) -> Result<()> {
-        Ok(())
-    }
-
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let layout = Layout::default()
             .direction(Direction::Horizontal)

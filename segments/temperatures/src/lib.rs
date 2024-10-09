@@ -28,10 +28,6 @@ impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
         1
     }
 
-    fn prepare(&mut self) -> Result<()> {
-        Ok(())
-    }
-
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let mut sys = System::new_all();
         sys.refresh_components();

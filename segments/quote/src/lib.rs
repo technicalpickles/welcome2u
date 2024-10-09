@@ -43,11 +43,6 @@ impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
         self.info.quote.lines().count() as u16
     }
 
-    fn prepare(&mut self) -> Result<()> {
-        self.info = QuoteSegmentInfo::default();
-        Ok(())
-    }
-
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let styled_lines: Vec<Line> = self
             .info

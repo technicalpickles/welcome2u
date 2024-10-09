@@ -126,10 +126,6 @@ impl SegmentRenderer<DockerSegmentInfo> for DockerSegmentRenderer {
         self.info.containers.len() as u16
     }
 
-    fn prepare(&mut self) -> Result<()> {
-        Ok(())
-    }
-
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
@@ -158,9 +154,4 @@ impl SegmentRenderer<DockerSegmentInfo> for DockerSegmentRenderer {
 
         Ok(())
     }
-}
-
-pub struct DockerSegment {
-    info_builder: DockerSegmentInfoBuilder,
-    renderer: DockerSegmentRenderer,
 }
