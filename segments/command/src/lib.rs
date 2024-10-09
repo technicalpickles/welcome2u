@@ -26,7 +26,7 @@ impl CommandInfoBuilder {
 }
 
 impl InfoBuilder<CommandInfo> for CommandInfoBuilder {
-    fn build(&self) -> Result<CommandInfo> {
+    async fn build(&self) -> Result<CommandInfo> {
         let output = Command::new(&self.command)
             .stdout(Stdio::piped())
             .output()?;

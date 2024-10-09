@@ -13,7 +13,7 @@ impl Info for OsInfo {}
 pub struct OsInfoBuilder {}
 
 impl InfoBuilder<OsInfo> for OsInfoBuilder {
-    fn build(&self) -> Result<OsInfo> {
+    async fn build(&self) -> Result<OsInfo> {
         let info = os_info::get();
         Ok(OsInfo {
             os_string: info.to_string(),

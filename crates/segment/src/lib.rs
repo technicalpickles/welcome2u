@@ -10,5 +10,5 @@ pub trait SegmentRenderer<T: Info + ?Sized>: Debug + From<Box<T>> {
 pub trait Info: Debug {}
 
 pub trait InfoBuilder<T: Info>: Debug {
-    fn build(&self) -> Result<T>;
+    fn build(&self) -> impl std::future::Future<Output = Result<T>> + Send;
 }

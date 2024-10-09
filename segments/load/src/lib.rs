@@ -20,7 +20,7 @@ impl Info for LoadInfo {}
 pub struct LoadInfoBuilder {}
 
 impl InfoBuilder<LoadInfo> for LoadInfoBuilder {
-    fn build(&self) -> Result<LoadInfo> {
+    async fn build(&self) -> Result<LoadInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();
 

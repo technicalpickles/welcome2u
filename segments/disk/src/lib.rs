@@ -33,15 +33,15 @@ impl Disk {
 }
 
 #[derive(Default, Debug)]
-pub struct DiskSegmentInfo {
+pub struct DiskInfo {
     disks: Vec<Disk>,
 }
 
-impl Info for DiskSegmentInfo {}
+impl Info for DiskInfo {}
 
 #[derive(Debug, Default)]
 pub struct DiskSegmentRenderer {
-    info: DiskSegmentInfo,
+    info: DiskInfo,
 }
 
 #[derive(Debug, Default)]
@@ -55,8 +55,8 @@ impl DiskInfoBuilder {
         self
     }
 }
-impl InfoBuilder<DiskSegmentInfo> for DiskInfoBuilder {
-    fn build(&self) -> Result<DiskSegmentInfo> {
+impl InfoBuilder<DiskInfo> for DiskInfoBuilder {
+    async fn build(&self) -> Result<DiskInfo> {
         let disks = Disks::new_with_refreshed_list();
 
         let disks = disks
@@ -88,11 +88,11 @@ impl InfoBuilder<DiskSegmentInfo> for DiskInfoBuilder {
             })
             .collect();
 
-        Ok(DiskSegmentInfo { disks })
+        Ok(DiskInfo { disks })
     }
 }
 
-impl SegmentRenderer<DiskSegmentInfo> for DiskSegmentRenderer {
+impl SegmentRenderer<DiskInfo> for DiskSegmentRenderer {
     fn height(&self) -> u16 {
         (self.info.disks.len() * 2) as u16
     }
@@ -129,8 +129,8 @@ impl SegmentRenderer<DiskSegmentInfo> for DiskSegmentRenderer {
     }
 }
 
-impl From<Box<DiskSegmentInfo>> for DiskSegmentRenderer {
-    fn from(info: Box<DiskSegmentInfo>) -> Self {
+impl From<Box<DiskInfo>> for DiskSegmentRenderer {
+    fn from(info: Box<DiskInfo>) -> Self {
         Self { info: *info }
     }
 }

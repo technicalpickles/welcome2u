@@ -12,20 +12,25 @@ async fn main() -> Result<()> {
 
     // Create async tasks for building segment info
     let heading_info_future =
-        tokio::spawn(async { heading::HeadingSegmentInfoBuilder::default().build() });
+        tokio::spawn(async { heading::HeadingSegmentInfoBuilder::default().build().await });
     let quote_info_future =
-        tokio::spawn(async { Ok::<_, std::io::Error>(quote::QuoteSegmentInfo::default()) });
-    let user_info_future = tokio::spawn(async { user::UserInfoBuilder::default().build() });
-    let ip_info_future = tokio::spawn(async { ip::IpInfoBuilder::default().build() });
-    let os_info_future = tokio::spawn(async { os::OsInfoBuilder::default().build() });
-    let uptime_info_future = tokio::spawn(async { uptime::UptimeInfoBuilder::default().build() });
-    let load_info_future = tokio::spawn(async { load::LoadInfoBuilder::default().build() });
+        tokio::spawn(async { quote::QuoteInfoBuilder::default().build().await });
+    let user_info_future = tokio::spawn(async { user::UserInfoBuilder::default().build().await });
+    let ip_info_future = tokio::spawn(async { ip::IpInfoBuilder::default().build().await });
+    let os_info_future = tokio::spawn(async { os::OsInfoBuilder::default().build().await });
+    let uptime_info_future =
+        tokio::spawn(async { uptime::UptimeInfoBuilder::default().build().await });
+    let load_info_future = tokio::spawn(async { load::LoadInfoBuilder::default().build().await });
     let disk_info_future = tokio::spawn(async {
         disk::DiskInfoBuilder::default()
             .exclude_mount_point("/System/Volumes/Data".to_string())
             .build()
+            .await
     });
-    let memory_info_future = tokio::spawn(async { memory::MemoryInfoBuilder::default().build() });
+    let memory_info_future =
+        tokio::spawn(async { memory::MemoryInfoBuilder::default().build().await });
+    let docker_info_future =
+        tokio::spawn(async { docker::DockerInfoBuilder::default().build().await });
 
     // Wait for all futures to complete
     let (
@@ -38,6 +43,7 @@ async fn main() -> Result<()> {
         load_info,
         disk_info,
         memory_info,
+        docker_info,
     ) = tokio::try_join!(
         heading_info_future,
         quote_info_future,
@@ -47,7 +53,8 @@ async fn main() -> Result<()> {
         uptime_info_future,
         load_info_future,
         disk_info_future,
-        memory_info_future
+        memory_info_future,
+        docker_info_future
     )?;
 
     // Unwrap results
@@ -60,6 +67,7 @@ async fn main() -> Result<()> {
     let load_info = load_info?;
     let disk_info = disk_info?;
     let memory_info = memory_info?;
+    let docker_info = docker_info?;
 
     // -----
 
@@ -90,6 +98,9 @@ async fn main() -> Result<()> {
     let memory_renderer = memory::MemorySegmentRenderer::from(Box::new(memory_info));
     let memory_constraint = Constraint::Length(memory_renderer.height());
 
+    let docker_renderer = docker::DockerSegmentRenderer::from(Box::new(docker_info));
+    let docker_constraint = Constraint::Length(docker_renderer.height());
+
     let constraints = vec![
         heading_constraint,
         quote_constraint,
@@ -100,6 +111,7 @@ async fn main() -> Result<()> {
         load_constraint,
         disk_constraint,
         memory_constraint,
+        docker_constraint,
     ];
 
     let options = TerminalOptions {
@@ -130,6 +142,7 @@ async fn main() -> Result<()> {
         load_renderer.render(frame, layout[6]).unwrap();
         disk_renderer.render(frame, layout[7]).unwrap();
         memory_renderer.render(frame, layout[8]).unwrap();
+        docker_renderer.render(frame, layout[9]).unwrap();
     })?;
 
     Ok(())

@@ -19,7 +19,7 @@ impl Info for UpdatesInfo {}
 struct UpdatesInfoBuilder {}
 
 impl InfoBuilder<UpdatesInfo> for UpdatesInfoBuilder {
-    fn build(&self) -> Result<UpdatesInfo> {
+    async fn build(&self) -> Result<UpdatesInfo> {
         let output = Command::new("softwareupdate").arg("--list").output()?;
 
         let stdout = String::from_utf8(output.stdout)?;

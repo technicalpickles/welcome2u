@@ -19,7 +19,7 @@ impl Info for UptimeInfo {}
 pub struct UptimeInfoBuilder {}
 
 impl InfoBuilder<UptimeInfo> for UptimeInfoBuilder {
-    fn build(&self) -> Result<UptimeInfo> {
+    async fn build(&self) -> Result<UptimeInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();
 

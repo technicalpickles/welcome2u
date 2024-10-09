@@ -15,13 +15,13 @@ fn choose_fortune() -> Result<String, NoFortunesError> {
 }
 
 #[derive(Debug)]
-pub struct QuoteSegmentInfo {
+pub struct QuoteInfo {
     quote: String,
 }
 
-impl Info for QuoteSegmentInfo {}
+impl Info for QuoteInfo {}
 
-impl Default for QuoteSegmentInfo {
+impl Default for QuoteInfo {
     fn default() -> Self {
         Self {
             quote: choose_fortune().unwrap(),
@@ -30,11 +30,21 @@ impl Default for QuoteSegmentInfo {
 }
 
 #[derive(Debug, Default)]
-pub struct QuoteSegmentRenderer {
-    info: QuoteSegmentInfo,
+pub struct QuoteInfoBuilder;
+
+impl InfoBuilder<QuoteInfo> for QuoteInfoBuilder {
+    async fn build(&self) -> Result<QuoteInfo> {
+        let quote = choose_fortune()?;
+        Ok(QuoteInfo { quote })
+    }
 }
 
-impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
+#[derive(Debug, Default)]
+pub struct QuoteSegmentRenderer {
+    info: QuoteInfo,
+}
+
+impl SegmentRenderer<QuoteInfo> for QuoteSegmentRenderer {
     fn height(&self) -> u16 {
         // Add 2 to account for the new padding lines
         self.info.quote.lines().count() as u16 + 2
@@ -61,8 +71,8 @@ impl SegmentRenderer<QuoteSegmentInfo> for QuoteSegmentRenderer {
     }
 }
 
-impl From<Box<QuoteSegmentInfo>> for QuoteSegmentRenderer {
-    fn from(info: Box<QuoteSegmentInfo>) -> Self {
+impl From<Box<QuoteInfo>> for QuoteSegmentRenderer {
+    fn from(info: Box<QuoteInfo>) -> Self {
         Self { info: *info }
     }
 }

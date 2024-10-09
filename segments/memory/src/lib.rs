@@ -23,7 +23,7 @@ impl Info for MemoryInfo {}
 pub struct MemoryInfoBuilder {}
 
 impl InfoBuilder<MemoryInfo> for MemoryInfoBuilder {
-    fn build(&self) -> Result<MemoryInfo> {
+    async fn build(&self) -> Result<MemoryInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();
 

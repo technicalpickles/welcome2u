@@ -26,7 +26,7 @@ impl Info for UserInfo {}
 pub struct UserInfoBuilder {}
 
 impl InfoBuilder<UserInfo> for UserInfoBuilder {
-    fn build(&self) -> Result<UserInfo> {
+    async fn build(&self) -> Result<UserInfo> {
         let user = get_user_by_uid(get_current_uid()).unwrap();
         let username = user.name().to_str().unwrap();
 

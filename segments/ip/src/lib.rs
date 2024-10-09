@@ -14,7 +14,7 @@ impl Info for IpInfo {}
 pub struct IpInfoBuilder {}
 
 impl InfoBuilder<IpInfo> for IpInfoBuilder {
-    fn build(&self) -> Result<IpInfo> {
+    async fn build(&self) -> Result<IpInfo> {
         let ip = local_ip()?;
         let ip_address = ip.to_string();
         Ok(IpInfo { ip_address })

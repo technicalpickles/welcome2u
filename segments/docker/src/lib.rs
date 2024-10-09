@@ -11,15 +11,15 @@ use segment::*;
 use std::default::Default;
 
 #[derive(Debug, Default)]
-pub struct DockerSegmentInfo {
+pub struct DockerInfo {
     containers: Vec<ContainerInfo>,
 }
 
-impl Info for DockerSegmentInfo {}
+impl Info for DockerInfo {}
 
 #[derive(Debug)]
 pub struct DockerSegmentRenderer {
-    info: DockerSegmentInfo,
+    info: DockerInfo,
 }
 
 #[derive(Debug)]
@@ -28,10 +28,10 @@ struct ContainerInfo {
     status: String,
 }
 
-#[derive(Debug)]
-struct DockerSegmentInfoBuilder;
+#[derive(Debug, Default)]
+pub struct DockerInfoBuilder;
 
-impl DockerSegmentInfoBuilder {
+impl DockerInfoBuilder {
     fn duration_since(str: &str) -> String {
         let now = Timestamp::now_utc();
         let timestamp = Timestamp::parse(str).unwrap();
@@ -86,38 +86,36 @@ impl DockerSegmentInfoBuilder {
     }
 }
 
-impl InfoBuilder<DockerSegmentInfo> for DockerSegmentInfoBuilder {
-    fn build(&self) -> Result<DockerSegmentInfo> {
-        tokio::runtime::Runtime::new()?.block_on(async {
-            let docker = Docker::connect_with_socket(
-                "unix:///Users/josh.nichols/.colima/gusto/docker.sock",
-                5,
-                API_DEFAULT_VERSION,
-            )?;
+impl InfoBuilder<DockerInfo> for DockerInfoBuilder {
+    async fn build(&self) -> Result<DockerInfo> {
+        let docker = Docker::connect_with_socket(
+            "unix:///Users/josh.nichols/.colima/gusto/docker.sock",
+            5,
+            API_DEFAULT_VERSION,
+        )?;
 
-            let options = ListContainersOptions::<String> {
-                all: true,
-                ..Default::default()
-            };
+        let options = ListContainersOptions::<String> {
+            all: true,
+            ..Default::default()
+        };
 
-            let containers = docker.list_containers(Some(options)).await?;
+        let containers = docker.list_containers(Some(options)).await?;
 
-            let futures = containers
-                .iter()
-                .map(|container| Self::fetch_container_info(&docker, container));
+        let futures = containers
+            .iter()
+            .map(|container| Self::fetch_container_info(&docker, container));
 
-            let containers = futures_util::future::join_all(futures)
-                .await
-                .into_iter()
-                .filter_map(Result::ok)
-                .collect();
+        let containers = futures_util::future::join_all(futures)
+            .await
+            .into_iter()
+            .filter_map(Result::ok)
+            .collect();
 
-            Ok(DockerSegmentInfo { containers })
-        })
+        Ok(DockerInfo { containers })
     }
 }
 
-impl SegmentRenderer<DockerSegmentInfo> for DockerSegmentRenderer {
+impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
     fn height(&self) -> u16 {
         self.info.containers.len() as u16
     }
@@ -152,8 +150,8 @@ impl SegmentRenderer<DockerSegmentInfo> for DockerSegmentRenderer {
     }
 }
 
-impl From<Box<DockerSegmentInfo>> for DockerSegmentRenderer {
-    fn from(info: Box<DockerSegmentInfo>) -> Self {
+impl From<Box<DockerInfo>> for DockerSegmentRenderer {
+    fn from(info: Box<DockerInfo>) -> Self {
         Self { info: *info }
     }
 }

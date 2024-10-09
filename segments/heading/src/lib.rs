@@ -64,22 +64,22 @@ fn random_font() -> String {
 }
 
 #[derive(Debug)]
-pub struct HeadingSegmentInfo {
+pub struct HeadingInfo {
     pub heading: String,
     pub figure: String,
     pub font_choice: String,
 }
 
-impl Info for HeadingSegmentInfo {}
+impl Info for HeadingInfo {}
 
 #[derive(Debug, Default)]
 pub struct HeadingSegmentInfoBuilder {}
 
-impl InfoBuilder<HeadingSegmentInfo> for HeadingSegmentInfoBuilder {
-    fn build(&self) -> Result<HeadingSegmentInfo> {
+impl InfoBuilder<HeadingInfo> for HeadingSegmentInfoBuilder {
+    async fn build(&self) -> Result<HeadingInfo> {
         let heading = choose_fortune()?;
         let figure = figlet(random_font(), &heading)?;
-        Ok(HeadingSegmentInfo {
+        Ok(HeadingInfo {
             heading,
             figure,
             font_choice: random_font(),
@@ -89,10 +89,10 @@ impl InfoBuilder<HeadingSegmentInfo> for HeadingSegmentInfoBuilder {
 
 #[derive(Debug)]
 pub struct HeadingSegmentRenderer {
-    pub info: HeadingSegmentInfo,
+    pub info: HeadingInfo,
 }
 
-impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
+impl SegmentRenderer<HeadingInfo> for HeadingSegmentRenderer {
     fn height(&self) -> u16 {
         // Add 1 line padding above and 2 below
         self.info.figure.lines().count() as u16 + 3
@@ -112,8 +112,8 @@ impl SegmentRenderer<HeadingSegmentInfo> for HeadingSegmentRenderer {
     }
 }
 
-impl From<Box<HeadingSegmentInfo>> for HeadingSegmentRenderer {
-    fn from(info: Box<HeadingSegmentInfo>) -> Self {
+impl From<Box<HeadingInfo>> for HeadingSegmentRenderer {
+    fn from(info: Box<HeadingInfo>) -> Self {
         Self { info: *info }
     }
 }
