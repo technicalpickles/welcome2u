@@ -3,7 +3,7 @@ use ratatui::{prelude::*, widgets::*};
 use segment::{Info, InfoBuilder, SegmentRenderer};
 
 #[derive(Debug)]
-struct OsInfo {
+pub struct OsInfo {
     os_string: String,
 }
 
