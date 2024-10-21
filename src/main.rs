@@ -149,12 +149,19 @@ async fn render_segments(
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Set up tracing with FlameLayer
-    let (flame_layer, guard) = FlameLayer::with_file("flame.folded").unwrap();
-    tracing_subscriber::registry()
-        .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
-        .with(flame_layer)
-        .init();
+    // Set up tracing
+    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
+    let subscriber = tracing_subscriber::registry().with(env_filter);
+
+    // Use FlameLayer only if MOTD_PROFILE is set to "debug"
+    let guard = if std::env::var("MOTD_PROFILE").unwrap_or_default() == "debug" {
+        let (flame_layer, guard) = FlameLayer::with_file("flame.folded").unwrap();
+        subscriber.with(flame_layer).init();
+        Some(guard)
+    } else {
+        subscriber.init();
+        None
+    };
 
     // Run your main logic
     let (
@@ -184,10 +191,7 @@ async fn main() -> Result<()> {
     )
     .await;
 
-    // Drop the guard to finish writing the flame graph data
     drop(guard);
-
-    flamescope::dump(&mut File::create("flamescope.json").unwrap()).unwrap();
 
     result
 }
