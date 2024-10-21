@@ -152,11 +152,7 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .margin(1)
-            .constraints([Constraint::Length(1), Constraint::Min(0)])
-            .split(area);
+        let chunks = create_label_data_layout(area);
 
         frame.render_widget(
             Paragraph::new("Docker").style(
