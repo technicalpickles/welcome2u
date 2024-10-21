@@ -171,6 +171,16 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
 
         match &self.info.status {
             DockerStatus::Running => {
+                // Calculate the width of the longest container name plus colon
+                let max_name_width = self
+                    .info
+                    .containers
+                    .iter()
+                    .map(|container| container.name.len())
+                    .max()
+                    .unwrap_or(0)
+                    + 1; // +1 for the colon
+
                 let rows: Vec<Row> = self
                     .info
                     .containers
@@ -187,15 +197,22 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
                         };
 
                         Row::new(vec![
-                            Cell::from(container.name.clone()),
-                            Cell::from(container.status.clone()).style(status_style),
+                            Cell::from(format!(
+                                "{:>width$}:",
+                                container.name,
+                                width = max_name_width - 1
+                            )),
+                            Cell::from(format!("    {}", container.status)).style(status_style),
                         ])
                     })
                     .collect();
 
                 let table = Table::new(rows, &[])
-                    .widths(&[Constraint::Percentage(50), Constraint::Percentage(50)])
-                    .column_spacing(1);
+                    .widths(&[
+                        Constraint::Length(max_name_width as u16),
+                        Constraint::Percentage(100),
+                    ])
+                    .column_spacing(0);
 
                 frame.render_widget(table, chunks[1]);
             }
