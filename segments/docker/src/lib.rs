@@ -171,7 +171,7 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
 
         match &self.info.status {
             DockerStatus::Running => {
-                let items: Vec<ListItem> = self
+                let rows: Vec<Row> = self
                     .info
                     .containers
                     .iter()
@@ -186,15 +186,18 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
                             Style::default().add_modifier(Modifier::DIM)
                         };
 
-                        ListItem::new(Line::from(vec![
-                            Span::styled(format!("{:<40}", container.name), Style::default()),
-                            Span::styled(container.status.to_string(), status_style),
-                        ]))
+                        Row::new(vec![
+                            Cell::from(container.name.clone()),
+                            Cell::from(container.status.clone()).style(status_style),
+                        ])
                     })
                     .collect();
 
-                let list = List::new(items);
-                frame.render_widget(list, chunks[1]);
+                let table = Table::new(rows, &[])
+                    .widths(&[Constraint::Percentage(50), Constraint::Percentage(50)])
+                    .column_spacing(1);
+
+                frame.render_widget(table, chunks[1]);
             }
             DockerStatus::Unavailable(message) => {
                 frame.render_widget(
