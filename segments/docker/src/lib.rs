@@ -33,6 +33,7 @@ pub struct DockerSegmentRenderer {
 struct ContainerInfo {
     name: String,
     status: String,
+    exit_code: Option<i64>,
 }
 
 #[derive(Debug, Default)]
@@ -89,6 +90,11 @@ impl DockerInfoBuilder {
         Ok(ContainerInfo {
             name: name.trim_start_matches('/').to_string(),
             status,
+            exit_code: if state.status == Some(ContainerStateStatusEnum::EXITED) {
+                Some(exit_code)
+            } else {
+                None
+            },
         })
     }
 }
@@ -170,7 +176,20 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
                     .containers
                     .iter()
                     .map(|container| {
-                        ListItem::new(format!("{:<40} {}", container.name, container.status))
+                        let status_style = if container.status.starts_with("Up") {
+                            Style::default()
+                                .fg(Color::Green)
+                                .add_modifier(Modifier::DIM)
+                        } else if container.exit_code.unwrap_or(0) != 0 {
+                            Style::default().fg(Color::Red).add_modifier(Modifier::DIM)
+                        } else {
+                            Style::default().add_modifier(Modifier::DIM)
+                        };
+
+                        ListItem::new(Line::from(vec![
+                            Span::styled(format!("{:<40}", container.name), Style::default()),
+                            Span::styled(container.status.to_string(), status_style),
+                        ]))
                     })
                     .collect();
 
