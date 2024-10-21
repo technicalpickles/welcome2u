@@ -11,9 +11,18 @@ use tracing_subscriber::EnvFilter;
 
 use segment::*;
 
-async fn build_and_render_segments() -> Result<()> {
-    let backend = CrosstermBackend::new(stdout());
-
+async fn build_segments() -> Result<(
+    heading::HeadingSegmentRenderer,
+    quote::QuoteSegmentRenderer,
+    user::UserSegmentRenderer,
+    ip::IpSegmentRenderer,
+    os::OsSegmentRenderer,
+    uptime::UptimeSegmentRenderer,
+    load::LoadSegmentRenderer,
+    disk::DiskSegmentRenderer,
+    memory::MemorySegmentRenderer,
+    docker::DockerSegmentRenderer,
+)> {
     // Create async tasks for building segment info
     let heading_info_future =
         tokio::spawn(async { heading::HeadingSegmentInfoBuilder::default().build().await });
@@ -61,60 +70,47 @@ async fn build_and_render_segments() -> Result<()> {
         docker_info_future
     )?;
 
-    // Unwrap results
-    let heading_info = heading_info?;
-    let quote_info = quote_info?;
-    let user_info = user_info?;
-    let ip_info = ip_info?;
-    let os_info = os_info?;
-    let uptime_info = uptime_info?;
-    let load_info = load_info?;
-    let disk_info = disk_info?;
-    let memory_info = memory_info?;
-    let docker_info = docker_info?;
+    // Unwrap results and create renderers
+    Ok((
+        heading::HeadingSegmentRenderer::from(Box::new(heading_info?)),
+        quote::QuoteSegmentRenderer::from(Box::new(quote_info?)),
+        user::UserSegmentRenderer::from(Box::new(user_info?)),
+        ip::IpSegmentRenderer::from(Box::new(ip_info?)),
+        os::OsSegmentRenderer::from(Box::new(os_info?)),
+        uptime::UptimeSegmentRenderer::from(Box::new(uptime_info?)),
+        load::LoadSegmentRenderer::from(Box::new(load_info?)),
+        disk::DiskSegmentRenderer::from(Box::new(disk_info?)),
+        memory::MemorySegmentRenderer::from(Box::new(memory_info?)),
+        docker::DockerSegmentRenderer::from(Box::new(docker_info?)),
+    ))
+}
 
-    // Create renderers and constraints
-    let heading_renderer = heading::HeadingSegmentRenderer::from(Box::new(heading_info));
-    let heading_constraint = Constraint::Length(heading_renderer.height());
+async fn render_segments(
+    heading_renderer: heading::HeadingSegmentRenderer,
+    quote_renderer: quote::QuoteSegmentRenderer,
+    user_renderer: user::UserSegmentRenderer,
+    ip_renderer: ip::IpSegmentRenderer,
+    os_renderer: os::OsSegmentRenderer,
+    uptime_renderer: uptime::UptimeSegmentRenderer,
+    load_renderer: load::LoadSegmentRenderer,
+    disk_renderer: disk::DiskSegmentRenderer,
+    memory_renderer: memory::MemorySegmentRenderer,
+    docker_renderer: docker::DockerSegmentRenderer,
+) -> Result<()> {
+    let backend = CrosstermBackend::new(stdout());
 
-    let quote_renderer = quote::QuoteSegmentRenderer::from(Box::new(quote_info));
-    let quote_constraint = Constraint::Length(quote_renderer.height());
-
-    let user_renderer = user::UserSegmentRenderer::from(Box::new(user_info));
-    let user_constraint = Constraint::Length(user_renderer.height());
-
-    let ip_renderer = ip::IpSegmentRenderer::from(Box::new(ip_info));
-    let ip_constraint = Constraint::Length(ip_renderer.height());
-
-    let os_renderer = os::OsSegmentRenderer::from(Box::new(os_info));
-    let os_constraint = Constraint::Length(os_renderer.height());
-
-    let uptime_renderer = uptime::UptimeSegmentRenderer::from(Box::new(uptime_info));
-    let uptime_constraint = Constraint::Length(uptime_renderer.height());
-
-    let load_renderer = load::LoadSegmentRenderer::from(Box::new(load_info));
-    let load_constraint = Constraint::Length(load_renderer.height());
-
-    let disk_renderer = disk::DiskSegmentRenderer::from(Box::new(disk_info));
-    let disk_constraint = Constraint::Length(disk_renderer.height());
-
-    let memory_renderer = memory::MemorySegmentRenderer::from(Box::new(memory_info));
-    let memory_constraint = Constraint::Length(memory_renderer.height());
-
-    let docker_renderer = docker::DockerSegmentRenderer::from(Box::new(docker_info));
-    let docker_constraint = Constraint::Length(docker_renderer.height());
-
+    // Create constraints
     let constraints = vec![
-        heading_constraint,
-        quote_constraint,
-        user_constraint,
-        ip_constraint,
-        os_constraint,
-        uptime_constraint,
-        load_constraint,
-        disk_constraint,
-        memory_constraint,
-        docker_constraint,
+        Constraint::Length(heading_renderer.height()),
+        Constraint::Length(quote_renderer.height()),
+        Constraint::Length(user_renderer.height()),
+        Constraint::Length(ip_renderer.height()),
+        Constraint::Length(os_renderer.height()),
+        Constraint::Length(uptime_renderer.height()),
+        Constraint::Length(load_renderer.height()),
+        Constraint::Length(disk_renderer.height()),
+        Constraint::Length(memory_renderer.height()),
+        Constraint::Length(docker_renderer.height()),
     ];
 
     let options = TerminalOptions {
@@ -161,7 +157,32 @@ async fn main() -> Result<()> {
         .init();
 
     // Run your main logic
-    let result = build_and_render_segments().await;
+    let (
+        heading_renderer,
+        quote_renderer,
+        user_renderer,
+        ip_renderer,
+        os_renderer,
+        uptime_renderer,
+        load_renderer,
+        disk_renderer,
+        memory_renderer,
+        docker_renderer,
+    ) = build_segments().await?;
+
+    let result = render_segments(
+        heading_renderer,
+        quote_renderer,
+        user_renderer,
+        ip_renderer,
+        os_renderer,
+        uptime_renderer,
+        load_renderer,
+        disk_renderer,
+        memory_renderer,
+        docker_renderer,
+    )
+    .await;
 
     // Drop the guard to finish writing the flame graph data
     drop(guard);

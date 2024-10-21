@@ -3,6 +3,7 @@ use ratatui::{prelude::*, widgets::*};
 use segment::*;
 use std::process::Command;
 use tracing::instrument;
+
 #[derive(Default, Debug)]
 pub struct UpdatesSegmentRenderer {
     info: UpdatesInfo,
