@@ -120,7 +120,7 @@ async fn main() -> Result<()> {
                 .iter()
                 .map(|c| match c {
                     Constraint::Length(l) => *l,
-                    _ => 0,
+                    _ => panic!("All constraints must be Constraint::Length"),
                 })
                 .sum(),
         ),

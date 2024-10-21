@@ -10,9 +10,16 @@ use ratatui::{prelude::*, widgets::*};
 use segment::*;
 use std::default::Default;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct DockerInfo {
+    status: DockerStatus,
     containers: Vec<ContainerInfo>,
+}
+
+#[derive(Debug)]
+pub enum DockerStatus {
+    Running,
+    Unavailable(String),
 }
 
 impl Info for DockerInfo {}
@@ -88,40 +95,63 @@ impl DockerInfoBuilder {
 
 impl InfoBuilder<DockerInfo> for DockerInfoBuilder {
     async fn build(&self) -> Result<DockerInfo> {
-        let docker = Docker::connect_with_socket(
+        match Docker::connect_with_socket(
             "unix:///Users/josh.nichols/.colima/gusto/docker.sock",
             5,
             API_DEFAULT_VERSION,
-        )?;
+        ) {
+            Ok(docker) => {
+                let options = ListContainersOptions::<String> {
+                    all: true,
+                    ..Default::default()
+                };
 
-        let options = ListContainersOptions::<String> {
-            all: true,
-            ..Default::default()
-        };
+                match docker.list_containers(Some(options)).await {
+                    Ok(containers) => {
+                        let futures = containers
+                            .iter()
+                            .map(|container| Self::fetch_container_info(&docker, container));
 
-        let containers = docker.list_containers(Some(options)).await?;
+                        let containers = futures_util::future::join_all(futures)
+                            .await
+                            .into_iter()
+                            .filter_map(Result::ok)
+                            .collect();
 
-        let futures = containers
-            .iter()
-            .map(|container| Self::fetch_container_info(&docker, container));
-
-        let containers = futures_util::future::join_all(futures)
-            .await
-            .into_iter()
-            .filter_map(Result::ok)
-            .collect();
-
-        Ok(DockerInfo { containers })
+                        Ok(DockerInfo {
+                            status: DockerStatus::Running,
+                            containers,
+                        })
+                    }
+                    Err(e) => Ok(DockerInfo {
+                        status: DockerStatus::Unavailable(format!(
+                            "Unable to list containers: {}",
+                            e
+                        )),
+                        containers: vec![],
+                    }),
+                }
+            }
+            Err(e) => Ok(DockerInfo {
+                status: DockerStatus::Unavailable(format!(
+                    "Docker is not running or not accessible: {}",
+                    e
+                )),
+                containers: vec![],
+            }),
+        }
     }
 }
 
 impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
     fn height(&self) -> u16 {
-        self.info.containers.len() as u16
+        match self.info.status {
+            DockerStatus::Running => self.info.containers.len() as u16,
+            DockerStatus::Unavailable(_) => 1,
+        }
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        // TODO: figure out how to use create_label_data_layout here
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .margin(1)
@@ -137,15 +167,27 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
             chunks[0],
         );
 
-        let items: Vec<ListItem> = self
-            .info
-            .containers
-            .iter()
-            .map(|container| ListItem::new(format!("{:<40} {}", container.name, container.status)))
-            .collect();
+        match &self.info.status {
+            DockerStatus::Running => {
+                let items: Vec<ListItem> = self
+                    .info
+                    .containers
+                    .iter()
+                    .map(|container| {
+                        ListItem::new(format!("{:<40} {}", container.name, container.status))
+                    })
+                    .collect();
 
-        let list = List::new(items);
-        frame.render_widget(list, chunks[1]);
+                let list = List::new(items);
+                frame.render_widget(list, chunks[1]);
+            }
+            DockerStatus::Unavailable(message) => {
+                frame.render_widget(
+                    Paragraph::new(message.as_str()).style(Style::default().fg(Color::Red)),
+                    chunks[1],
+                );
+            }
+        }
 
         Ok(())
     }
