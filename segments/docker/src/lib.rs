@@ -9,7 +9,7 @@ use iso8601_timestamp::Timestamp;
 use ratatui::{prelude::*, widgets::*};
 use segment::*;
 use std::default::Default;
-
+use tracing::instrument;
 #[derive(Debug)]
 pub struct DockerInfo {
     status: DockerStatus,
@@ -100,6 +100,7 @@ impl DockerInfoBuilder {
 }
 
 impl InfoBuilder<DockerInfo> for DockerInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "DockerInfoBuilder"))]
     async fn build(&self) -> Result<DockerInfo> {
         match Docker::connect_with_socket(
             "unix:///Users/josh.nichols/.colima/gusto/docker.sock",

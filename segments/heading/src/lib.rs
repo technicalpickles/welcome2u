@@ -8,7 +8,7 @@ use thiserror::Error;
 use ansi_to_tui::IntoText;
 use fortune::{Fortunes, NoFortunesError};
 use lolcrab::Lolcrab;
-
+use tracing::instrument;
 fn choose_fortune() -> Result<String, NoFortunesError> {
     let fortune_path = String::from("/opt/homebrew/opt/fortune/share/games/fortunes/intro");
     let fortune_file = Fortunes::from_file(&fortune_path).unwrap();
@@ -76,6 +76,7 @@ impl Info for HeadingInfo {}
 pub struct HeadingSegmentInfoBuilder {}
 
 impl InfoBuilder<HeadingInfo> for HeadingSegmentInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "HeadingSegmentInfoBuilder"))]
     async fn build(&self) -> Result<HeadingInfo> {
         let heading = choose_fortune()?;
         let figure = figlet(random_font(), &heading)?;

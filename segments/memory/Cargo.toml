@@ -12,3 +12,4 @@ segment = { path = "../../crates/segment" }
 anyhow = "1.0.89"
 ratatui = "0.28.1"
 ansi_term = "0.12.1"
+tracing = "0.1.40"

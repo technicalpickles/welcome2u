@@ -2,6 +2,7 @@ use anyhow::Result;
 use local_ip_address::local_ip;
 use ratatui::{prelude::*, widgets::*};
 use segment::*;
+use tracing::instrument;
 
 #[derive(Debug)]
 pub struct IpInfo {
@@ -14,6 +15,7 @@ impl Info for IpInfo {}
 pub struct IpInfoBuilder {}
 
 impl InfoBuilder<IpInfo> for IpInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "IpInfoBuilder"))]
     async fn build(&self) -> Result<IpInfo> {
         let ip = local_ip()?;
         let ip_address = ip.to_string();

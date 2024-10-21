@@ -2,7 +2,7 @@ use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
 use segment::*;
 use std::process::Command;
-
+use tracing::instrument;
 #[derive(Default, Debug)]
 pub struct UpdatesSegmentRenderer {
     info: UpdatesInfo,
@@ -19,6 +19,7 @@ impl Info for UpdatesInfo {}
 struct UpdatesInfoBuilder {}
 
 impl InfoBuilder<UpdatesInfo> for UpdatesInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "UpdatesInfoBuilder"))]
     async fn build(&self) -> Result<UpdatesInfo> {
         let output = Command::new("softwareupdate").arg("--list").output()?;
 

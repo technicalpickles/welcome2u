@@ -1,7 +1,7 @@
 use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
 use segment::*;
-
+use tracing::instrument;
 #[derive(Debug)]
 pub struct OsInfo {
     os_string: String,
@@ -13,6 +13,7 @@ impl Info for OsInfo {}
 pub struct OsInfoBuilder {}
 
 impl InfoBuilder<OsInfo> for OsInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "OsInfoBuilder"))]
     async fn build(&self) -> Result<OsInfo> {
         let info = os_info::get();
         Ok(OsInfo {

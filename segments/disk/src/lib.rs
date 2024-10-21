@@ -8,7 +8,7 @@ use sysinfo::Disks;
 
 use anyhow::Result;
 use segment::*;
-
+use tracing::instrument;
 #[derive(Debug)]
 struct Disk {
     name: String,
@@ -56,6 +56,7 @@ impl DiskInfoBuilder {
     }
 }
 impl InfoBuilder<DiskInfo> for DiskInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "DiskInfoBuilder"))]
     async fn build(&self) -> Result<DiskInfo> {
         let disks = Disks::new_with_refreshed_list();
 

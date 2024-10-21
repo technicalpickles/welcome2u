@@ -4,6 +4,7 @@ use ratatui::widgets::*;
 use segment::*;
 use std::process::{Command, ExitStatus, Stdio};
 use thiserror::Error;
+use tracing::instrument;
 
 #[derive(Debug, Default)]
 pub struct CommandInfo {
@@ -26,6 +27,7 @@ impl CommandInfoBuilder {
 }
 
 impl InfoBuilder<CommandInfo> for CommandInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "CommandInfoBuilder"))]
     async fn build(&self) -> Result<CommandInfo> {
         let output = Command::new(&self.command)
             .stdout(Stdio::piped())

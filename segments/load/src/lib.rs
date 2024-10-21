@@ -2,6 +2,7 @@ use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
 use segment::*;
 use sysinfo::{LoadAvg, System};
+use tracing::instrument;
 
 #[derive(Default, Debug)]
 pub struct LoadSegmentRenderer {
@@ -20,6 +21,7 @@ impl Info for LoadInfo {}
 pub struct LoadInfoBuilder {}
 
 impl InfoBuilder<LoadInfo> for LoadInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "LoadInfoBuilder"))]
     async fn build(&self) -> Result<LoadInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();

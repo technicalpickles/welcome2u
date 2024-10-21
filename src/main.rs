@@ -5,10 +5,9 @@ use ratatui::{backend::CrosstermBackend, *};
 use std::fs::File;
 use std::io::stdout;
 use tokio;
-use tracing::{info_span, Instrument};
 use tracing_flame::FlameLayer;
 use tracing_subscriber::prelude::*;
-use tracing_subscriber::{fmt, prelude::*, EnvFilter};
+use tracing_subscriber::EnvFilter;
 
 use segment::*;
 
@@ -155,11 +154,19 @@ async fn build_and_render_segments() -> Result<()> {
 #[tokio::main]
 async fn main() -> Result<()> {
     // Set up tracing with FlameLayer
-    let flame_layer = FlameLayer::new(File::create("flame.folded").unwrap());
+    let (flame_layer, guard) = FlameLayer::with_file("flame.folded").unwrap();
     tracing_subscriber::registry()
         .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
         .with(flame_layer)
         .init();
 
-    build_and_render_segments().await
+    // Run your main logic
+    let result = build_and_render_segments().await;
+
+    // Drop the guard to finish writing the flame graph data
+    drop(guard);
+
+    flamescope::dump(&mut File::create("flamescope.json").unwrap()).unwrap();
+
+    result
 }

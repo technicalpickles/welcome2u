@@ -379,6 +379,7 @@ dependencies = [
  "segment",
  "sysinfo 0.31.4",
  "thiserror",
+ "tracing",
 ]
 
 [[package]]
@@ -499,6 +500,7 @@ dependencies = [
  "segment",
  "sysinfo 0.30.12",
  "thiserror",
+ "tracing",
 ]
 
 [[package]]
@@ -516,6 +518,7 @@ dependencies = [
  "ratatui",
  "segment",
  "tokio",
+ "tracing",
 ]
 
 [[package]]
@@ -758,6 +761,7 @@ dependencies = [
  "regex",
  "segment",
  "thiserror",
+ "tracing",
 ]
 
 [[package]]
@@ -996,6 +1000,7 @@ dependencies = [
  "local-ip-address",
  "ratatui",
  "segment",
+ "tracing",
 ]
 
 [[package]]
@@ -1081,6 +1086,7 @@ dependencies = [
  "ratatui",
  "segment",
  "sysinfo 0.30.12",
+ "tracing",
 ]
 
 [[package]]
@@ -1172,6 +1178,7 @@ dependencies = [
  "ratatui",
  "segment",
  "sysinfo 0.30.12",
+ "tracing",
 ]
 
 [[package]]
@@ -1317,6 +1324,7 @@ dependencies = [
  "os_info",
  "ratatui",
  "segment",
+ "tracing",
 ]
 
 [[package]]
@@ -1956,6 +1964,7 @@ dependencies = [
  "ratatui",
  "segment",
  "sysinfo 0.26.9",
+ "tracing",
 ]
 
 [[package]]
@@ -2309,6 +2318,7 @@ dependencies = [
  "ratatui",
  "segment",
  "tokio",
+ "tracing",
 ]
 
 [[package]]
@@ -2320,6 +2330,7 @@ dependencies = [
  "ratatui",
  "segment",
  "sysinfo 0.30.12",
+ "tracing",
 ]
 
 [[package]]
@@ -2342,6 +2353,7 @@ dependencies = [
  "hostname",
  "ratatui",
  "segment",
+ "tracing",
  "users",
 ]
 

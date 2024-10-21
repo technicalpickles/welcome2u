@@ -2,7 +2,7 @@ use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
 use segment::*;
 use sysinfo::System;
-
+use tracing::instrument;
 #[derive(Debug)]
 pub struct UptimeSegmentRenderer {
     info: UptimeInfo,
@@ -19,6 +19,7 @@ impl Info for UptimeInfo {}
 pub struct UptimeInfoBuilder {}
 
 impl InfoBuilder<UptimeInfo> for UptimeInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "UptimeInfoBuilder"))]
     async fn build(&self) -> Result<UptimeInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();

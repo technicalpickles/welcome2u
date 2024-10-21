@@ -1,6 +1,7 @@
 use anyhow::Result;
 use ratatui::{prelude::*, widgets::*};
 use segment::*;
+use tracing::instrument;
 use users::{get_current_uid, get_user_by_uid};
 
 #[derive(Debug)]
@@ -26,6 +27,7 @@ impl Info for UserInfo {}
 pub struct UserInfoBuilder {}
 
 impl InfoBuilder<UserInfo> for UserInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "UserInfoBuilder"))]
     async fn build(&self) -> Result<UserInfo> {
         let user = get_user_by_uid(get_current_uid()).unwrap();
         let username = user.name().to_str().unwrap();

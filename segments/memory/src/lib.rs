@@ -4,7 +4,7 @@ use fmtsize::{Conventional, FmtSize};
 use ratatui::{prelude::*, widgets::*};
 use segment::*;
 use sysinfo::System;
-
+use tracing::instrument;
 #[derive(Debug)]
 pub struct MemorySegmentRenderer {
     info: MemoryInfo,
@@ -23,6 +23,7 @@ impl Info for MemoryInfo {}
 pub struct MemoryInfoBuilder {}
 
 impl InfoBuilder<MemoryInfo> for MemoryInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "MemoryInfoBuilder"))]
     async fn build(&self) -> Result<MemoryInfo> {
         let mut sys = System::new_all();
         sys.refresh_all();
