@@ -3,6 +3,7 @@ use fortune::{Fortunes, NoFortunesError};
 use ratatui::prelude::*;
 use ratatui::widgets::*;
 use segment::*;
+use tracing::instrument;
 
 fn choose_fortune() -> Result<String, NoFortunesError> {
     // TODO: support multiple fortune files: pickleisms, collected-quotes
@@ -32,8 +33,9 @@ impl Default for QuoteInfo {
 #[derive(Debug, Default)]
 pub struct QuoteInfoBuilder;
 
-impl InfoBuilder<QuoteInfo> for QuoteInfoBuilder {
-    async fn build(&self) -> Result<QuoteInfo> {
+impl QuoteInfoBuilder {
+    #[instrument(skip(self), fields(builder_type = "QuoteInfoBuilder"))]
+    pub async fn build(&self) -> Result<QuoteInfo> {
         let quote = choose_fortune()?;
         Ok(QuoteInfo { quote })
     }

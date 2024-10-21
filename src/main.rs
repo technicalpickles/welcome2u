@@ -1,13 +1,18 @@
 use anyhow::Result;
+use flamescope;
 use ratatui::layout::*;
 use ratatui::{backend::CrosstermBackend, *};
+use std::fs::File;
 use std::io::stdout;
 use tokio;
+use tracing::{info_span, Instrument};
+use tracing_flame::FlameLayer;
+use tracing_subscriber::prelude::*;
+use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
 use segment::*;
 
-#[tokio::main]
-async fn main() -> Result<()> {
+async fn build_and_render_segments() -> Result<()> {
     let backend = CrosstermBackend::new(stdout());
 
     // Create async tasks for building segment info
@@ -69,8 +74,7 @@ async fn main() -> Result<()> {
     let memory_info = memory_info?;
     let docker_info = docker_info?;
 
-    // -----
-
+    // Create renderers and constraints
     let heading_renderer = heading::HeadingSegmentRenderer::from(Box::new(heading_info));
     let heading_constraint = Constraint::Length(heading_renderer.height());
 
@@ -146,4 +150,16 @@ async fn main() -> Result<()> {
     })?;
 
     Ok(())
+}
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    // Set up tracing with FlameLayer
+    let flame_layer = FlameLayer::new(File::create("flame.folded").unwrap());
+    tracing_subscriber::registry()
+        .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
+        .with(flame_layer)
+        .init();
+
+    build_and_render_segments().await
 }
