@@ -70,7 +70,7 @@ impl SegmentRenderer<LoadInfo> for LoadSegmentRenderer {
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let [label_area, data_area] = create_label_data_layout(area);
 
-        frame.render_widget(label("Load average"), label_area);
+        frame.render_widget(label("Load"), label_area);
 
         let formatted_loads = self.format_loads(&self.info);
         frame.render_widget(Paragraph::new(Line::from(formatted_loads)), data_area);
