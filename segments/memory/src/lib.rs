@@ -1,5 +1,4 @@
 use anyhow::Result;
-use fmtsize::{Conventional, FmtSize};
 use ratatui::{
     prelude::*,
     style::{Color, Style},
