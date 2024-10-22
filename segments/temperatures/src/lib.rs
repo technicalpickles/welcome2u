@@ -24,7 +24,6 @@ impl Info for TemperaturesInfo {}
 
 impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
     fn height(&self) -> u16 {
-        // Update height to match the number of temperatures
         self.info.temperatures.len() as u16 + 1 // +1 for the header
     }
 
@@ -50,10 +49,6 @@ impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
             lines.push(Line::from(vec![
                 Span::raw(format!("{}: ", name)),
                 temp_span,
-                Span::raw(format!(
-                    " (High: {:.1}°C, Critical: {:.1}°C)",
-                    high, critical
-                )),
             ]));
         }
 
