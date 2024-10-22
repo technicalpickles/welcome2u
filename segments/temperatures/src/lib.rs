@@ -50,37 +50,36 @@ pub struct TemperaturesSegmentRenderer {
 
 impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
     fn height(&self) -> u16 {
-        self.info.sensors.len() as u16 + 1 // +1 for the header
+        1
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let mut lines = vec![Line::from(vec![Span::styled(
-            "Temperatures",
-            Style::default()
-                .fg(Color::Blue)
-                .add_modifier(Modifier::BOLD),
-        )])];
+        let [label_area, data_area] = create_label_data_layout(area);
 
-        for sensor in &self.info.sensors {
+        frame.render_widget(Paragraph::new("Temps").fg(Color::Blue).bold(), label_area);
+
+        let mut spans = Vec::new();
+
+        for (index, sensor) in self.info.sensors.iter().enumerate() {
             let color = match sensor.status() {
                 TemperatureStatus::Critical => Color::Red,
                 TemperatureStatus::High => Color::Yellow,
                 TemperatureStatus::Ok => Color::Green,
             };
 
-            let temp_span = Span::styled(
-                format!("{:.1}°C", sensor.temperature),
+            spans.push(Span::styled(
+                format!("{} {:.1}°C", sensor.name, sensor.temperature),
                 Style::default().fg(color),
-            );
+            ));
 
-            lines.push(Line::from(vec![
-                Span::raw(format!("{}: ", sensor.name)),
-                temp_span,
-            ]));
+            if index < self.info.sensors.len() - 1 {
+                spans.push(Span::raw(", "));
+            }
         }
 
-        let temps_paragraph = Paragraph::new(lines);
-        frame.render_widget(temps_paragraph, area);
+        let temps_line = Line::from(spans);
+        let temps_paragraph = Paragraph::new(temps_line);
+        frame.render_widget(temps_paragraph, data_area);
 
         Ok(())
     }
@@ -100,25 +99,87 @@ impl InfoBuilder<TemperaturesInfo> for TemperaturesInfoBuilder {
         let mut sys = System::new_all();
         sys.refresh_components();
 
-        let temperatures = sys
-            .components()
-            .iter()
-            .map(|component| {
-                let name = component.label().to_string();
-                let temp = component.temperature();
-                let critical = component.critical().unwrap_or(100.0);
-                let high = component.max();
-                SensorTemperature {
-                    name,
-                    temperature: temp,
-                    high,
-                    critical,
+        let mut cpu_temp = 0.0;
+        let mut cpu_count = 0;
+        let mut cpu_high = 0.0;
+        let mut cpu_critical = 0.0;
+
+        let mut gpu_temp = 0.0;
+        let mut gpu_count = 0;
+        let mut gpu_high = 0.0;
+        let mut gpu_critical = 0.0;
+
+        let mut battery_temp = 0.0;
+        let mut battery_count = 0;
+        let mut battery_high = 0.0;
+        let mut battery_critical = 0.0;
+
+        for component in sys.components() {
+            let name = component.label().to_lowercase();
+            let temp = component.temperature();
+
+            if name.contains("cpu") || name.contains("tdie") {
+                cpu_temp += temp;
+                cpu_count += 1;
+                if cpu_count == 1 {
+                    cpu_high = component.max();
+                    cpu_critical = component.critical().unwrap_or(100.0);
                 }
-            })
-            .collect();
+            } else if name.contains("gpu") {
+                gpu_temp += temp;
+                gpu_count += 1;
+                if gpu_count == 1 {
+                    gpu_high = component.max();
+                    gpu_critical = component.critical().unwrap_or(100.0);
+                }
+            } else if name.contains("battery") {
+                battery_temp += temp;
+                battery_count += 1;
+                if battery_count == 1 {
+                    battery_high = component.max();
+                    battery_critical = component.critical().unwrap_or(60.0);
+                }
+            }
+        }
+
+        let temperatures = vec![
+            SensorTemperature {
+                name: "CPU".to_string(),
+                temperature: if cpu_count > 0 {
+                    cpu_temp / cpu_count as f32
+                } else {
+                    0.0
+                },
+                high: cpu_high,
+                critical: cpu_critical,
+            },
+            SensorTemperature {
+                name: "GPU".to_string(),
+                temperature: if gpu_count > 0 {
+                    gpu_temp / gpu_count as f32
+                } else {
+                    0.0
+                },
+                high: gpu_high,
+                critical: gpu_critical,
+            },
+            SensorTemperature {
+                name: "Battery".to_string(),
+                temperature: if battery_count > 0 {
+                    battery_temp / battery_count as f32
+                } else {
+                    0.0
+                },
+                high: battery_high,
+                critical: battery_critical,
+            },
+        ];
 
         Ok(TemperaturesInfo {
-            sensors: temperatures,
+            sensors: temperatures
+                .into_iter()
+                .filter(|s| s.temperature > 0.0)
+                .collect(),
         })
     }
 }
