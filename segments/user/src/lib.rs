@@ -52,7 +52,10 @@ impl SegmentRenderer<UserInfo> for UserSegmentRenderer {
 
         frame.render_widget(label("User"), label_area);
 
-        frame.render_widget(Paragraph::new(self.info.user_with_hostname()), data_area);
+        frame.render_widget(
+            Paragraph::new(self.info.user_with_hostname()).style(Style::default().dim()),
+            data_area,
+        );
 
         Ok(())
     }
