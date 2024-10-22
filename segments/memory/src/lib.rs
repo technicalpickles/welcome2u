@@ -98,7 +98,7 @@ impl InfoBuilder<MemoryInfo> for MemoryInfoBuilder {
 
 impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
     fn height(&self) -> u16 {
-        1
+        2
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
@@ -106,29 +106,39 @@ impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
 
         frame.render_widget(label("RAM"), label_area);
 
-        let available_percentage = (self.info.available_memory / self.info.total_memory) * 100.0;
-        let free_color = if available_percentage >= self.info.warning_threshold_percent {
-            Color::Green
-        } else if available_percentage >= self.info.critical_threshold_percent {
+        let used_percentage = (self.info.used_memory / self.info.total_memory) * 100.0;
+        let free_percentage = 100.0 - used_percentage;
+
+        let free_color = if free_percentage <= self.info.critical_threshold_percent {
+            Color::Red
+        } else if free_percentage <= self.info.warning_threshold_percent {
             Color::Yellow
         } else {
-            Color::Red
+            Color::Green
         };
 
-        let formatted_memory = Line::from(vec![
+        let summary = Line::from(vec![
             Span::raw(format!(
                 "{} used / {} total (",
                 self.info.used_memory_formatted(),
                 self.info.total_memory_formatted()
             )),
             Span::styled(
-                self.info.available_memory_formatted(),
+                format!("{} free", self.info.available_memory_formatted()),
                 Style::default().fg(free_color),
             ),
-            Span::raw(" free)"),
+            Span::raw(")"),
         ]);
 
-        frame.render_widget(Paragraph::new(formatted_memory), data_area);
+        frame.render_widget(
+            LineGauge::default()
+                .block(Block::default().title(summary))
+                .filled_style(Style::default().fg(Color::Red).add_modifier(Modifier::BOLD))
+                .unfilled_style(Style::default().fg(Color::Green))
+                .line_set(symbols::line::THICK)
+                .ratio(used_percentage / 100.0),
+            data_area,
+        );
 
         Ok(())
     }
