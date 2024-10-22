@@ -46,7 +46,6 @@ impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        // TODO: find way to re-use label and layout stuff
         let [label_area, data_area] = create_label_data_layout(area);
 
         frame.render_widget(label("RAM"), label_area);

@@ -14,7 +14,6 @@ pub trait InfoBuilder<T: Info>: Debug {
     fn build(&self) -> impl std::future::Future<Output = Result<T>> + Send;
 }
 
-// Add this function to the file
 pub fn create_label_data_layout(area: Rect) -> [Rect; 2] {
     let layout = Layout::default()
         .direction(Direction::Horizontal)
@@ -23,7 +22,6 @@ pub fn create_label_data_layout(area: Rect) -> [Rect; 2] {
     layout.areas(area)
 }
 
-// Add this new function
 pub fn label(text: &str) -> Paragraph<'_> {
     Paragraph::new(text).fg(Color::Blue).bold()
 }
