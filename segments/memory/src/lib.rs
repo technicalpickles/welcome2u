@@ -102,7 +102,7 @@ impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let [label_area, data_area] = create_label_data_layout(area);
+        let [label_area, data_area, _padding] = create_label_data_layout(area);
 
         frame.render_widget(label("RAM"), label_area);
 

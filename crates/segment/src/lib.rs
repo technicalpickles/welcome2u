@@ -14,10 +14,14 @@ pub trait InfoBuilder<T: Info>: Debug {
     fn build(&self) -> impl std::future::Future<Output = Result<T>> + Send;
 }
 
-pub fn create_label_data_layout(area: Rect) -> [Rect; 2] {
+pub fn create_label_data_layout(area: Rect) -> [Rect; 3] {
     let layout = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
+        .constraints(vec![
+            Constraint::Length(16),
+            Constraint::Fill(1),
+            Constraint::Length(4),
+        ]);
 
     layout.areas(area)
 }
