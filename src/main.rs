@@ -1,16 +1,20 @@
 use anyhow::Result;
-use flamescope;
 use ratatui::layout::*;
 use ratatui::{backend::CrosstermBackend, *};
-use std::fs::File;
 use std::io::stdout;
+use std::process::exit;
 use tokio;
+use tracing::{debug, info, instrument, span};
+use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_flame::FlameLayer;
+use tracing_subscriber::fmt::format::FmtSpan;
+use tracing_subscriber::fmt::writer::MakeWriterExt;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::EnvFilter;
 
 use segment::*;
 
+#[instrument()]
 async fn build_segments() -> Result<(
     heading::HeadingSegmentRenderer,
     quote::QuoteSegmentRenderer,
@@ -150,20 +154,50 @@ async fn render_segments(
 #[tokio::main]
 async fn main() -> Result<()> {
     // Set up tracing
-    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-    let subscriber = tracing_subscriber::registry().with(env_filter);
-
-    // Use FlameLayer only if MOTD_PROFILE is set to "debug"
-    let guard = if std::env::var("MOTD_PROFILE").unwrap_or_default() == "debug" {
-        let (flame_layer, guard) = FlameLayer::with_file("flame.folded").unwrap();
-        subscriber.with(flame_layer).init();
-        Some(guard)
+    let env_filter = if std::env::var("MOTD_PROFILE").unwrap_or_default() == "debug" {
+        EnvFilter::try_from_default_env()
+            .unwrap_or_else(|_| EnvFilter::new("debug"))
+            .add_directive("bollard::docker=info".parse().unwrap())
     } else {
-        subscriber.init();
-        None
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"))
     };
 
-    // Run your main logic
+    let subscriber = tracing_subscriber::registry().with(env_filter);
+
+    // Use FlameLayer and file logging only if MOTD_PROFILE is set to "debug"
+    let (guard, _file_appender_guard) =
+        if std::env::var("MOTD_PROFILE").unwrap_or_default() == "debug" {
+            let (flame_layer, guard) = FlameLayer::with_file("flame.folded").unwrap();
+
+            // Set up file logging
+            let file_appender = RollingFileAppender::new(Rotation::NEVER, "log", "debug.log");
+            let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
+            let file_layer = tracing_subscriber::fmt::layer()
+                .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
+                .with_writer(non_blocking.with_max_level(tracing::Level::DEBUG));
+
+            subscriber.with(flame_layer).with(file_layer).init();
+
+            (Some(guard), Some(_guard))
+        } else {
+            subscriber.init();
+            (None, None)
+        };
+
+    main_inner().await?;
+
+    // Ensure the flame guard is dropped before the file appender guard
+    drop(guard);
+
+    Ok(())
+}
+
+#[instrument(name = "main")]
+async fn main_inner() -> Result<()> {
+    info!("starting");
+
+    let span = span!(tracing::Level::DEBUG, "build_segments");
+    let _enter = span.enter();
     let (
         heading_renderer,
         quote_renderer,
@@ -176,7 +210,10 @@ async fn main() -> Result<()> {
         memory_renderer,
         docker_renderer,
     ) = build_segments().await?;
+    drop(_enter);
 
+    let span = span!(tracing::Level::DEBUG, "render_segments");
+    let _enter = span.enter();
     let result = render_segments(
         heading_renderer,
         quote_renderer,
@@ -189,9 +226,8 @@ async fn main() -> Result<()> {
         memory_renderer,
         docker_renderer,
     )
-    .await;
+    .await?;
+    drop(_enter);
 
-    drop(guard);
-
-    result
+    Ok(result)
 }
