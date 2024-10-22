@@ -107,11 +107,10 @@ impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
         frame.render_widget(label("RAM"), label_area);
 
         let used_percentage = (self.info.used_memory / self.info.total_memory) * 100.0;
-        let free_percentage = 100.0 - used_percentage;
 
-        let free_color = if free_percentage <= self.info.critical_threshold_percent {
+        let usage_color = if used_percentage >= self.info.critical_threshold_percent {
             Color::Red
-        } else if free_percentage <= self.info.warning_threshold_percent {
+        } else if used_percentage >= self.info.warning_threshold_percent {
             Color::Yellow
         } else {
             Color::Green
@@ -125,7 +124,7 @@ impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
             )),
             Span::styled(
                 format!("{} free", self.info.available_memory_formatted()),
-                Style::default().fg(free_color),
+                Style::default().fg(usage_color),
             ),
             Span::raw(")"),
         ]);

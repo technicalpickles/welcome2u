@@ -52,8 +52,8 @@ async fn build_segments() -> Result<(
     });
     let memory_info_future = tokio::spawn(async {
         memory::MemoryInfoBuilder::default()
-            .warning_threshold_percent(5.0)
-            .critical_threshold_percent(10.0)
+            .warning_threshold_percent(80.0)
+            .critical_threshold_percent(90.0)
             .build()
             .await
     });
