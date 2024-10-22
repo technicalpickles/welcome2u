@@ -69,7 +69,7 @@ impl SegmentRenderer<UptimeInfo> for UptimeSegmentRenderer {
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let [label_area, data_area] = create_label_data_layout(area);
 
-        frame.render_widget(Paragraph::new("Uptime").fg(Color::Blue).bold(), label_area);
+        frame.render_widget(label("Uptime"), label_area);
 
         let uptime_color = if self.info.uptime.contains("day") || self.info.uptime.contains("days")
         {

@@ -35,7 +35,7 @@ impl SegmentRenderer<OsInfo> for OsSegmentRenderer {
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let [label_area, data_area] = create_label_data_layout(area);
 
-        frame.render_widget(Paragraph::new("OS").fg(Color::Blue).bold(), label_area);
+        frame.render_widget(label("OS"), label_area);
 
         frame.render_widget(Paragraph::new(self.info.os_string.clone()), data_area);
 

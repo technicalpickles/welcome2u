@@ -56,7 +56,7 @@ impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let [label_area, data_area] = create_label_data_layout(area);
 
-        frame.render_widget(Paragraph::new("Temps").fg(Color::Blue).bold(), label_area);
+        frame.render_widget(label("Temps"), label_area);
 
         let mut spans = Vec::new();
 

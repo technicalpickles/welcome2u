@@ -36,11 +36,7 @@ impl SegmentRenderer<IpInfo> for IpSegmentRenderer {
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let [label_area, data_area] = create_label_data_layout(area);
 
-        frame.render_widget(
-            Paragraph::new("IP address").fg(Color::Blue).bold(),
-            label_area,
-        );
-
+        frame.render_widget(label("IP"), label_area);
         frame.render_widget(Paragraph::new(self.info.ip_address.clone()), data_area);
 
         Ok(())

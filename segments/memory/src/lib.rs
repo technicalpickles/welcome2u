@@ -1,4 +1,3 @@
-use ansi_term::Colour::Blue;
 use anyhow::Result;
 use fmtsize::{Conventional, FmtSize};
 use ratatui::{prelude::*, widgets::*};
@@ -50,10 +49,7 @@ impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
         // TODO: find way to re-use label and layout stuff
         let [label_area, data_area] = create_label_data_layout(area);
 
-        frame.render_widget(
-            Paragraph::new(Blue.bold().paint("RAM").to_string()),
-            label_area,
-        );
+        frame.render_widget(label("RAM"), label_area);
 
         frame.render_widget(
             Paragraph::new(format!(

@@ -161,14 +161,7 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let chunks = create_label_data_layout(area);
 
-        frame.render_widget(
-            Paragraph::new("Docker").style(
-                Style::default()
-                    .fg(Color::Blue)
-                    .add_modifier(Modifier::BOLD),
-            ),
-            chunks[0],
-        );
+        frame.render_widget(label("Docker"), chunks[0]);
 
         match &self.info.status {
             DockerStatus::Running => {

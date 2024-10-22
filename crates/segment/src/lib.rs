@@ -1,5 +1,6 @@
 use anyhow::Result;
 use ratatui::prelude::*;
+use ratatui::widgets::Paragraph;
 use std::fmt::Debug;
 
 pub trait SegmentRenderer<T: Info + ?Sized>: Debug + From<Box<T>> {
@@ -20,4 +21,9 @@ pub fn create_label_data_layout(area: Rect) -> [Rect; 2] {
         .constraints(vec![Constraint::Length(16), Constraint::Fill(1)]);
 
     layout.areas(area)
+}
+
+// Add this new function
+pub fn label(text: &str) -> Paragraph<'_> {
+    Paragraph::new(text).fg(Color::Blue).bold()
 }

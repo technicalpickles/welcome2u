@@ -101,14 +101,7 @@ impl SegmentRenderer<DiskInfo> for DiskSegmentRenderer {
     fn render(&self, frame: &mut Frame<'_>, area: Rect) -> Result<()> {
         let [label_area, data_area] = create_label_data_layout(area);
 
-        frame.render_widget(
-            Paragraph::new("Disk").style(
-                Style::default()
-                    .fg(Color::Blue)
-                    .add_modifier(Modifier::BOLD),
-            ),
-            label_area,
-        );
+        frame.render_widget(label("Disk"), label_area);
 
         for disk in self.info.disks.iter() {
             frame.render_widget(

@@ -109,14 +109,7 @@ impl SegmentRenderer<UpdatesInfo> for UpdatesSegmentRenderer {
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
         let [label_area, data_area] = create_label_data_layout(area);
 
-        frame.render_widget(
-            Paragraph::new("Updates").style(
-                Style::default()
-                    .fg(Color::Blue)
-                    .add_modifier(Modifier::BOLD),
-            ),
-            label_area,
-        );
+        frame.render_widget(label("Updates"), label_area);
 
         let updates_text = if self.info.updates.is_empty() {
             "No updates available".to_string()
