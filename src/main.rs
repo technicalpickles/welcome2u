@@ -102,10 +102,10 @@ async fn render_segments(
     os_renderer: os::OsSegmentRenderer,
     uptime_renderer: uptime::UptimeSegmentRenderer,
     load_renderer: load::LoadSegmentRenderer,
+    updates_renderer: updates::UpdatesSegmentRenderer,
     disk_renderer: disk::DiskSegmentRenderer,
     memory_renderer: memory::MemorySegmentRenderer,
     docker_renderer: docker::DockerSegmentRenderer,
-    updates_renderer: updates::UpdatesSegmentRenderer,
 ) -> Result<()> {
     let backend = CrosstermBackend::new(stdout());
 
@@ -150,10 +150,10 @@ async fn render_segments(
         os_renderer.render(frame, layout[4]).unwrap();
         uptime_renderer.render(frame, layout[5]).unwrap();
         load_renderer.render(frame, layout[6]).unwrap();
-        disk_renderer.render(frame, layout[7]).unwrap();
-        memory_renderer.render(frame, layout[8]).unwrap();
-        docker_renderer.render(frame, layout[9]).unwrap();
-        updates_renderer.render(frame, layout[10]).unwrap();
+        updates_renderer.render(frame, layout[7]).unwrap();
+        disk_renderer.render(frame, layout[8]).unwrap();
+        memory_renderer.render(frame, layout[9]).unwrap();
+        docker_renderer.render(frame, layout[10]).unwrap();
     })?;
 
     Ok(())
@@ -231,10 +231,10 @@ async fn main_inner() -> Result<()> {
         os_renderer,
         uptime_renderer,
         load_renderer,
+        updates_renderer,
         disk_renderer,
         memory_renderer,
         docker_renderer,
-        updates_renderer,
     )
     .await?;
     drop(_enter);
