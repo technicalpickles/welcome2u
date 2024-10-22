@@ -9,78 +9,56 @@ use sysinfo::{ComponentExt, System, SystemExt};
 
 use segment::*;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct TemperaturesSegmentRenderer {
     info: TemperaturesInfo,
 }
 
-#[derive(Debug, Default)]
-pub struct TemperaturesInfo;
+// Update the TemperaturesInfo struct to include the component name
+#[derive(Debug)]
+pub struct TemperaturesInfo {
+    temperatures: Vec<(String, f32, f32, f32)>, // (name, temperature, high, critical)
+}
 
 impl Info for TemperaturesInfo {}
 
 impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
     fn height(&self) -> u16 {
-        1
+        // Update height to match the number of temperatures
+        self.info.temperatures.len() as u16 + 1 // +1 for the header
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
-        let mut sys = System::new_all();
-        sys.refresh_components();
+        let mut lines = vec![Line::from(vec![Span::styled(
+            "Temperatures",
+            Style::default()
+                .fg(Color::Blue)
+                .add_modifier(Modifier::BOLD),
+        )])];
 
-        let temps = sys
-            .components()
-            .iter()
-            .filter(|component| component.label().starts_with("Core"))
-            .map(|component| {
-                let temp = component.temperature();
-                let critical = component.critical().unwrap_or(100.0);
-                let high = if critical == 100.0 {
-                    80.0
-                } else {
-                    critical - 20.0
-                };
+        for (name, temp, high, critical) in &self.info.temperatures {
+            let color = if *temp >= *critical {
+                Color::Red
+            } else if *temp >= *high {
+                Color::Yellow
+            } else {
+                Color::Green
+            };
 
-                let color = if temp >= critical {
-                    Color::Red
-                } else if temp >= high {
-                    Color::Yellow
-                } else {
-                    Color::Green
-                };
+            let temp_span = Span::styled(format!("{:.1}°C", temp), Style::default().fg(color));
 
-                Span::styled(format!("{:.1}°C", temp), Style::default().fg(color))
-            })
-            .collect::<Vec<_>>();
+            lines.push(Line::from(vec![
+                Span::raw(format!("{}: ", name)),
+                temp_span,
+                Span::raw(format!(
+                    " (High: {:.1}°C, Critical: {:.1}°C)",
+                    high, critical
+                )),
+            ]));
+        }
 
-        let temps_line = Line::from(
-            temps
-                .into_iter()
-                .enumerate()
-                .flat_map(|(i, span)| {
-                    if i > 0 {
-                        vec![Span::raw(", "), span]
-                    } else {
-                        vec![span]
-                    }
-                })
-                .collect::<Vec<Span>>(),
-        );
-
-        let temps_paragraph = Paragraph::new(vec![temps_line]);
-
-        let [label_area, data_area] = create_label_data_layout(area);
-
-        frame.render_widget(
-            Paragraph::new("Temperatures").style(
-                Style::default()
-                    .fg(Color::Blue)
-                    .add_modifier(Modifier::BOLD),
-            ),
-            label_area,
-        );
-
-        frame.render_widget(temps_paragraph, data_area);
+        let temps_paragraph = Paragraph::new(lines);
+        frame.render_widget(temps_paragraph, area);
 
         Ok(())
     }
@@ -89,5 +67,29 @@ impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
 impl From<Box<TemperaturesInfo>> for TemperaturesSegmentRenderer {
     fn from(info: Box<TemperaturesInfo>) -> Self {
         Self { info: *info }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct TemperaturesInfoBuilder;
+
+impl InfoBuilder<TemperaturesInfo> for TemperaturesInfoBuilder {
+    async fn build(&self) -> Result<TemperaturesInfo> {
+        let mut sys = System::new_all();
+        sys.refresh_components();
+
+        let temperatures = sys
+            .components()
+            .iter()
+            .map(|component| {
+                let name = component.label().to_string();
+                let temp = component.temperature();
+                let critical = component.critical().unwrap_or(100.0);
+                let high = component.max();
+                (name, temp, high, critical)
+            })
+            .collect();
+
+        Ok(TemperaturesInfo { temperatures })
     }
 }

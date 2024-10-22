@@ -22,6 +22,7 @@ async fn build_segments() -> Result<(
     os::OsSegmentRenderer,
     uptime::UptimeSegmentRenderer,
     load::LoadSegmentRenderer,
+    temperatures::TemperaturesSegmentRenderer,
     disk::DiskSegmentRenderer,
     memory::MemorySegmentRenderer,
     docker::DockerSegmentRenderer,
@@ -38,6 +39,11 @@ async fn build_segments() -> Result<(
     let uptime_info_future =
         tokio::spawn(async { uptime::UptimeInfoBuilder::default().build().await });
     let load_info_future = tokio::spawn(async { load::LoadInfoBuilder::default().build().await });
+    let temperatures_info_future = tokio::spawn(async {
+        temperatures::TemperaturesInfoBuilder::default()
+            .build()
+            .await
+    });
     let disk_info_future = tokio::spawn(async {
         disk::DiskInfoBuilder::default()
             .exclude_mount_point("/System/Volumes/Data".to_string())
@@ -60,6 +66,7 @@ async fn build_segments() -> Result<(
         os_info,
         uptime_info,
         load_info,
+        temperatures_info,
         disk_info,
         memory_info,
         docker_info,
@@ -72,6 +79,7 @@ async fn build_segments() -> Result<(
         os_info_future,
         uptime_info_future,
         load_info_future,
+        temperatures_info_future,
         disk_info_future,
         memory_info_future,
         docker_info_future,
@@ -87,6 +95,7 @@ async fn build_segments() -> Result<(
         os::OsSegmentRenderer::from(Box::new(os_info?)),
         uptime::UptimeSegmentRenderer::from(Box::new(uptime_info?)),
         load::LoadSegmentRenderer::from(Box::new(load_info?)),
+        temperatures::TemperaturesSegmentRenderer::from(Box::new(temperatures_info?)),
         disk::DiskSegmentRenderer::from(Box::new(disk_info?)),
         memory::MemorySegmentRenderer::from(Box::new(memory_info?)),
         docker::DockerSegmentRenderer::from(Box::new(docker_info?)),
@@ -102,6 +111,7 @@ async fn render_segments(
     os_renderer: os::OsSegmentRenderer,
     uptime_renderer: uptime::UptimeSegmentRenderer,
     load_renderer: load::LoadSegmentRenderer,
+    temperatures_renderer: temperatures::TemperaturesSegmentRenderer,
     updates_renderer: updates::UpdatesSegmentRenderer,
     disk_renderer: disk::DiskSegmentRenderer,
     memory_renderer: memory::MemorySegmentRenderer,
@@ -118,6 +128,7 @@ async fn render_segments(
         Constraint::Length(os_renderer.height()),
         Constraint::Length(uptime_renderer.height()),
         Constraint::Length(load_renderer.height()),
+        Constraint::Length(temperatures_renderer.height()),
         Constraint::Length(updates_renderer.height()),
         Constraint::Length(disk_renderer.height()),
         Constraint::Length(memory_renderer.height()),
@@ -150,10 +161,11 @@ async fn render_segments(
         os_renderer.render(frame, layout[4]).unwrap();
         uptime_renderer.render(frame, layout[5]).unwrap();
         load_renderer.render(frame, layout[6]).unwrap();
-        updates_renderer.render(frame, layout[7]).unwrap();
-        disk_renderer.render(frame, layout[8]).unwrap();
-        memory_renderer.render(frame, layout[9]).unwrap();
-        docker_renderer.render(frame, layout[10]).unwrap();
+        temperatures_renderer.render(frame, layout[7]).unwrap();
+        updates_renderer.render(frame, layout[8]).unwrap();
+        disk_renderer.render(frame, layout[9]).unwrap();
+        memory_renderer.render(frame, layout[10]).unwrap();
+        docker_renderer.render(frame, layout[11]).unwrap();
     })?;
 
     Ok(())
@@ -214,6 +226,7 @@ async fn main_inner() -> Result<()> {
         os_renderer,
         uptime_renderer,
         load_renderer,
+        temperatures_renderer,
         disk_renderer,
         memory_renderer,
         docker_renderer,
@@ -231,6 +244,7 @@ async fn main_inner() -> Result<()> {
         os_renderer,
         uptime_renderer,
         load_renderer,
+        temperatures_renderer,
         updates_renderer,
         disk_renderer,
         memory_renderer,
