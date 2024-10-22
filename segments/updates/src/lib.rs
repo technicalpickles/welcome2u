@@ -117,7 +117,13 @@ impl SegmentRenderer<UpdatesInfo> for UpdatesSegmentRenderer {
             self.info.updates.join("\n")
         };
 
-        frame.render_widget(Paragraph::new(updates_text), data_area);
+        let paragraph = if self.info.updates.is_empty() {
+            Paragraph::new(updates_text).style(Style::default().dim())
+        } else {
+            Paragraph::new(updates_text)
+        };
+
+        frame.render_widget(paragraph, data_area);
 
         Ok(())
     }
