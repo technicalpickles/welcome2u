@@ -10,21 +10,47 @@ use sysinfo::{ComponentExt, System, SystemExt};
 use segment::*;
 
 #[derive(Debug)]
-pub struct TemperaturesSegmentRenderer {
-    info: TemperaturesInfo,
+pub enum TemperatureStatus {
+    Ok,
+    High,
+    Critical,
 }
 
-// Update the TemperaturesInfo struct to include the component name
+#[derive(Debug)]
+pub struct SensorTemperature {
+    name: String,
+    temperature: f32,
+    high: f32,
+    critical: f32,
+}
+
+impl SensorTemperature {
+    fn status(&self) -> TemperatureStatus {
+        if self.temperature >= self.critical {
+            TemperatureStatus::Critical
+        } else if self.temperature >= self.high {
+            TemperatureStatus::High
+        } else {
+            TemperatureStatus::Ok
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct TemperaturesInfo {
-    temperatures: Vec<(String, f32, f32, f32)>, // (name, temperature, high, critical)
+    sensors: Vec<SensorTemperature>,
 }
 
 impl Info for TemperaturesInfo {}
 
+#[derive(Debug)]
+pub struct TemperaturesSegmentRenderer {
+    info: Box<TemperaturesInfo>,
+}
+
 impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
     fn height(&self) -> u16 {
-        self.info.temperatures.len() as u16 + 1 // +1 for the header
+        self.info.sensors.len() as u16 + 1 // +1 for the header
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
@@ -35,19 +61,20 @@ impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
                 .add_modifier(Modifier::BOLD),
         )])];
 
-        for (name, temp, high, critical) in &self.info.temperatures {
-            let color = if *temp >= *critical {
-                Color::Red
-            } else if *temp >= *high {
-                Color::Yellow
-            } else {
-                Color::Green
+        for sensor in &self.info.sensors {
+            let color = match sensor.status() {
+                TemperatureStatus::Critical => Color::Red,
+                TemperatureStatus::High => Color::Yellow,
+                TemperatureStatus::Ok => Color::Green,
             };
 
-            let temp_span = Span::styled(format!("{:.1}°C", temp), Style::default().fg(color));
+            let temp_span = Span::styled(
+                format!("{:.1}°C", sensor.temperature),
+                Style::default().fg(color),
+            );
 
             lines.push(Line::from(vec![
-                Span::raw(format!("{}: ", name)),
+                Span::raw(format!("{}: ", sensor.name)),
                 temp_span,
             ]));
         }
@@ -61,7 +88,7 @@ impl SegmentRenderer<TemperaturesInfo> for TemperaturesSegmentRenderer {
 
 impl From<Box<TemperaturesInfo>> for TemperaturesSegmentRenderer {
     fn from(info: Box<TemperaturesInfo>) -> Self {
-        Self { info: *info }
+        Self { info: info }
     }
 }
 
@@ -81,10 +108,17 @@ impl InfoBuilder<TemperaturesInfo> for TemperaturesInfoBuilder {
                 let temp = component.temperature();
                 let critical = component.critical().unwrap_or(100.0);
                 let high = component.max();
-                (name, temp, high, critical)
+                SensorTemperature {
+                    name,
+                    temperature: temp,
+                    high,
+                    critical,
+                }
             })
             .collect();
 
-        Ok(TemperaturesInfo { temperatures })
+        Ok(TemperaturesInfo {
+            sensors: temperatures,
+        })
     }
 }
