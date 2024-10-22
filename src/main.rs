@@ -2,9 +2,8 @@ use anyhow::Result;
 use ratatui::layout::*;
 use ratatui::{backend::CrosstermBackend, *};
 use std::io::stdout;
-use std::process::exit;
 use tokio;
-use tracing::{debug, info, instrument, span};
+use tracing::{info, instrument, span};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_flame::FlameLayer;
 use tracing_subscriber::fmt::format::FmtSpan;
@@ -26,6 +25,7 @@ async fn build_segments() -> Result<(
     disk::DiskSegmentRenderer,
     memory::MemorySegmentRenderer,
     docker::DockerSegmentRenderer,
+    updates::UpdatesSegmentRenderer,
 )> {
     // Create async tasks for building segment info
     let heading_info_future =
@@ -48,6 +48,8 @@ async fn build_segments() -> Result<(
         tokio::spawn(async { memory::MemoryInfoBuilder::default().build().await });
     let docker_info_future =
         tokio::spawn(async { docker::DockerInfoBuilder::default().build().await });
+    let updates_info_future =
+        tokio::spawn(async { updates::UpdatesInfoBuilder::default().build().await });
 
     // Wait for all futures to complete
     let (
@@ -61,6 +63,7 @@ async fn build_segments() -> Result<(
         disk_info,
         memory_info,
         docker_info,
+        updates_info,
     ) = tokio::try_join!(
         heading_info_future,
         quote_info_future,
@@ -71,7 +74,8 @@ async fn build_segments() -> Result<(
         load_info_future,
         disk_info_future,
         memory_info_future,
-        docker_info_future
+        docker_info_future,
+        updates_info_future
     )?;
 
     // Unwrap results and create renderers
@@ -86,6 +90,7 @@ async fn build_segments() -> Result<(
         disk::DiskSegmentRenderer::from(Box::new(disk_info?)),
         memory::MemorySegmentRenderer::from(Box::new(memory_info?)),
         docker::DockerSegmentRenderer::from(Box::new(docker_info?)),
+        updates::UpdatesSegmentRenderer::from(Box::new(updates_info?)),
     ))
 }
 
@@ -100,6 +105,7 @@ async fn render_segments(
     disk_renderer: disk::DiskSegmentRenderer,
     memory_renderer: memory::MemorySegmentRenderer,
     docker_renderer: docker::DockerSegmentRenderer,
+    updates_renderer: updates::UpdatesSegmentRenderer,
 ) -> Result<()> {
     let backend = CrosstermBackend::new(stdout());
 
@@ -112,6 +118,7 @@ async fn render_segments(
         Constraint::Length(os_renderer.height()),
         Constraint::Length(uptime_renderer.height()),
         Constraint::Length(load_renderer.height()),
+        Constraint::Length(updates_renderer.height()),
         Constraint::Length(disk_renderer.height()),
         Constraint::Length(memory_renderer.height()),
         Constraint::Length(docker_renderer.height()),
@@ -146,6 +153,7 @@ async fn render_segments(
         disk_renderer.render(frame, layout[7]).unwrap();
         memory_renderer.render(frame, layout[8]).unwrap();
         docker_renderer.render(frame, layout[9]).unwrap();
+        updates_renderer.render(frame, layout[10]).unwrap();
     })?;
 
     Ok(())
@@ -209,6 +217,7 @@ async fn main_inner() -> Result<()> {
         disk_renderer,
         memory_renderer,
         docker_renderer,
+        updates_renderer,
     ) = build_segments().await?;
     drop(_enter);
 
@@ -225,6 +234,7 @@ async fn main_inner() -> Result<()> {
         disk_renderer,
         memory_renderer,
         docker_renderer,
+        updates_renderer,
     )
     .await?;
     drop(_enter);

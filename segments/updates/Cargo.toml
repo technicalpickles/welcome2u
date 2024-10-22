@@ -9,3 +9,6 @@ anyhow = "1.0.90"
 ratatui = "0.28.1"
 tokio = { version = "1.41.0", features = ["full"] }
 tracing = "0.1.40"
+plist = "1.7.0"
+os_info = "3.8.2"
+semver = "1.0.23"
