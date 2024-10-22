@@ -1,6 +1,10 @@
 use anyhow::Result;
 use fmtsize::{Conventional, FmtSize};
-use ratatui::{prelude::*, widgets::*};
+use ratatui::{
+    prelude::*,
+    style::{Color, Style},
+    widgets::*,
+};
 use segment::*;
 use sysinfo::System;
 use tracing::instrument;
@@ -11,9 +15,31 @@ pub struct MemorySegmentRenderer {
 
 #[derive(Debug)]
 pub struct MemoryInfo {
-    used_memory: String,
-    available_memory: String,
-    total_memory: String,
+    used_memory: f64,
+    available_memory: f64,
+    total_memory: f64,
+}
+
+impl MemoryInfo {
+    fn format_gb(&self, value: f64) -> String {
+        if value < 2.0 {
+            format!("{:.2} GB", value)
+        } else {
+            format!("{} GB", value.round() as u64)
+        }
+    }
+
+    fn used_memory_formatted(&self) -> String {
+        self.format_gb(self.used_memory)
+    }
+
+    fn available_memory_formatted(&self) -> String {
+        self.format_gb(self.available_memory)
+    }
+
+    fn total_memory_formatted(&self) -> String {
+        self.format_gb(self.total_memory)
+    }
 }
 
 impl Info for MemoryInfo {}
@@ -27,15 +53,14 @@ impl InfoBuilder<MemoryInfo> for MemoryInfoBuilder {
         let mut sys = System::new_all();
         sys.refresh_all();
 
-        // TODO: use consistent units, instead of letting Conventional decide
-        let used_memory = sys.used_memory().fmt_size(Conventional).to_string();
-        let available_memory = sys.available_memory().fmt_size(Conventional).to_string();
-        let total_memory = sys.total_memory().fmt_size(Conventional).to_string();
+        let bytes_to_gb = |bytes: u64| -> f64 {
+            bytes as f64 / 1_073_741_824.0 // 1024^3
+        };
 
         Ok(MemoryInfo {
-            used_memory,
-            available_memory,
-            total_memory,
+            used_memory: bytes_to_gb(sys.used_memory()),
+            available_memory: bytes_to_gb(sys.available_memory()),
+            total_memory: bytes_to_gb(sys.total_memory()),
         })
     }
 }
@@ -50,13 +75,29 @@ impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
 
         frame.render_widget(label("RAM"), label_area);
 
-        frame.render_widget(
-            Paragraph::new(format!(
-                "{} used, {} available / {}",
-                self.info.used_memory, self.info.available_memory, self.info.total_memory
+        let available_percentage = (self.info.available_memory / self.info.total_memory) * 100.0;
+        let free_color = if available_percentage >= 20.0 {
+            Color::Green
+        } else if available_percentage >= 10.0 {
+            Color::Yellow
+        } else {
+            Color::Red
+        };
+
+        let formatted_memory = Line::from(vec![
+            Span::raw(format!(
+                "{} used / {} total (",
+                self.info.used_memory_formatted(),
+                self.info.total_memory_formatted()
             )),
-            data_area,
-        );
+            Span::styled(
+                self.info.available_memory_formatted(),
+                Style::default().fg(free_color),
+            ),
+            Span::raw(" free)"),
+        ]);
+
+        frame.render_widget(Paragraph::new(formatted_memory), data_area);
 
         Ok(())
     }
