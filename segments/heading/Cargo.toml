@@ -11,8 +11,8 @@ rand = "0.8.5"
 fortune = { path = "../../crates/fortune" }
 segment = { path = "../../crates/segment" }
 lolcat = { path = "../../crates/lolcat" }
-anyhow = "1.0.86"
-thiserror = "1.0.61"
+anyhow = "1.0.90"
+thiserror = "1.0.64"
 ratatui = "0.28.1"
 regex = "1.11.0"
 lolcrab = "0.4.0"

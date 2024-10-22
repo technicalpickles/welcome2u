@@ -20,10 +20,10 @@ uptime = { path = "segments/uptime" }
 user = { path = "segments/user" }
 updates = { path = "segments/updates" }
 temperatures = { path = "segments/temperatures" }
-thiserror = "1.0.61"
-anyhow = "1.0.86"
+thiserror = "1.0.64"
+anyhow = "1.0.90"
 ratatui = "0.28.1"
-tokio = { version = "1.40.0", features = ["full"] }
+tokio = { version = "1.41.0", features = ["full"] }
 futures = "0.3.31"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

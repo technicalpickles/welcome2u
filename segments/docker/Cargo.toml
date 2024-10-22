@@ -10,11 +10,11 @@ segment = { path = "../../crates/segment" }
 bollard = "0.16.1"
 chrono = "0.4.38"
 chrono-humanize = "0.2.3"
-futures-util = "0.3.30"
-human-panic = "2.0.0"
+futures-util = "0.3.31"
+human-panic = "2.0.2"
 iso8601-timestamp = "0.2.17"
-tokio = { version = "1.38.0", features = ["full"] }
-anyhow = "1.0.89"
+tokio = { version = "1.41.0", features = ["full"] }
+anyhow = "1.0.90"
 ratatui = "0.28.1"
 crossterm = "0.28.1"
 tracing = "0.1.40"

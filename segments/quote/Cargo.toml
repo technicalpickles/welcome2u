@@ -10,7 +10,7 @@ ansi_term = "0.12.1"
 fortune = { path = "../../crates/fortune" }
 segment = { path = "../../crates/segment" }
 textwrap = "0.16.1"
-thiserror = "1.0.61"
-anyhow = "1.0.86"
+thiserror = "1.0.64"
+anyhow = "1.0.90"
 ratatui = "0.28.1"
 tracing = "0.1.40"

@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sysinfo = "0.26.1"
+sysinfo = "0.26.9"
 segment = { path = "../../crates/segment" }
 ratatui = "0.28.1"
-anyhow = "1.0.89"
+anyhow = "1.0.90"
 tracing = "0.1.40"

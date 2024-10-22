@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 ansi_term = "0.12.1"
-anyhow = "1.0.86"
+anyhow = "1.0.90"
 ratatui = "0.28.1"
