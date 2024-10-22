@@ -10,14 +10,14 @@ pub struct UpdatesSegmentRenderer {
 }
 
 #[derive(Debug, Default)]
-struct UpdatesInfo {
+pub struct UpdatesInfo {
     updates_available: String,
 }
 
 impl Info for UpdatesInfo {}
 
 #[derive(Debug, Default)]
-struct UpdatesInfoBuilder {}
+pub struct UpdatesInfoBuilder {}
 
 impl InfoBuilder<UpdatesInfo> for UpdatesInfoBuilder {
     #[instrument(skip(self), fields(builder_type = "UpdatesInfoBuilder"))]
