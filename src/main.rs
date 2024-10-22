@@ -50,8 +50,13 @@ async fn build_segments() -> Result<(
             .build()
             .await
     });
-    let memory_info_future =
-        tokio::spawn(async { memory::MemoryInfoBuilder::default().build().await });
+    let memory_info_future = tokio::spawn(async {
+        memory::MemoryInfoBuilder::default()
+            .warning_threshold_percent(5.0)
+            .critical_threshold_percent(10.0)
+            .build()
+            .await
+    });
     let docker_info_future =
         tokio::spawn(async { docker::DockerInfoBuilder::default().build().await });
     let updates_info_future =

@@ -18,6 +18,8 @@ pub struct MemoryInfo {
     used_memory: f64,
     available_memory: f64,
     total_memory: f64,
+    warning_threshold_percent: f64,
+    critical_threshold_percent: f64,
 }
 
 impl MemoryInfo {
@@ -44,8 +46,36 @@ impl MemoryInfo {
 
 impl Info for MemoryInfo {}
 
-#[derive(Debug, Default)]
-pub struct MemoryInfoBuilder {}
+#[derive(Debug)]
+pub struct MemoryInfoBuilder {
+    warning_threshold_percent: f64,
+    critical_threshold_percent: f64,
+}
+
+impl Default for MemoryInfoBuilder {
+    fn default() -> Self {
+        Self {
+            warning_threshold_percent: 20.0,
+            critical_threshold_percent: 10.0,
+        }
+    }
+}
+
+impl MemoryInfoBuilder {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn warning_threshold_percent(mut self, percent: f64) -> Self {
+        self.warning_threshold_percent = percent;
+        self
+    }
+
+    pub fn critical_threshold_percent(mut self, percent: f64) -> Self {
+        self.critical_threshold_percent = percent;
+        self
+    }
+}
 
 impl InfoBuilder<MemoryInfo> for MemoryInfoBuilder {
     #[instrument(skip(self), fields(builder_type = "MemoryInfoBuilder"))]
@@ -61,6 +91,8 @@ impl InfoBuilder<MemoryInfo> for MemoryInfoBuilder {
             used_memory: bytes_to_gb(sys.used_memory()),
             available_memory: bytes_to_gb(sys.available_memory()),
             total_memory: bytes_to_gb(sys.total_memory()),
+            warning_threshold_percent: self.warning_threshold_percent,
+            critical_threshold_percent: self.critical_threshold_percent,
         })
     }
 }
@@ -76,9 +108,9 @@ impl SegmentRenderer<MemoryInfo> for MemorySegmentRenderer {
         frame.render_widget(label("RAM"), label_area);
 
         let available_percentage = (self.info.available_memory / self.info.total_memory) * 100.0;
-        let free_color = if available_percentage >= 20.0 {
+        let free_color = if available_percentage >= self.info.warning_threshold_percent {
             Color::Green
-        } else if available_percentage >= 10.0 {
+        } else if available_percentage >= self.info.critical_threshold_percent {
             Color::Yellow
         } else {
             Color::Red
