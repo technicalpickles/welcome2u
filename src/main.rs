@@ -192,7 +192,7 @@ async fn main() -> Result<()> {
     // Use FlameLayer and file logging only if MOTD_PROFILE is set to "debug"
     let (guard, _file_appender_guard) =
         if std::env::var("MOTD_PROFILE").unwrap_or_default() == "debug" {
-            let (flame_layer, guard) = FlameLayer::with_file("flame.folded").unwrap();
+            let (flame_layer, guard) = FlameLayer::with_file("log/flame.folded").unwrap();
 
             // Set up file logging
             let file_appender = RollingFileAppender::new(Rotation::NEVER, "log", "debug.log");
