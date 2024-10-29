@@ -65,10 +65,6 @@ impl Disk {
     fn percent_used(&self) -> f64 {
         self.used_space as f64 / self.total_space as f64 * 100.0
     }
-
-    fn percent_free(&self) -> f64 {
-        self.free_space as f64 / self.total_space as f64 * 100.0
-    }
 }
 
 impl Info for DiskInfo {}
