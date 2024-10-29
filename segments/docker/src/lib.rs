@@ -153,7 +153,12 @@ impl InfoBuilder<DockerInfo> for DockerInfoBuilder {
 impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
     fn height(&self) -> u16 {
         match self.info.status {
-            DockerStatus::Running => self.info.containers.len() as u16,
+            DockerStatus::Running => self
+                .info
+                .containers
+                .iter()
+                .filter(|c| !c.status.starts_with("Exited"))
+                .count() as u16,
             DockerStatus::Unavailable(_) => 1,
         }
     }
@@ -165,27 +170,29 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
 
         match &self.info.status {
             DockerStatus::Running => {
-                // Calculate the width of the longest container name plus colon
-                let max_name_width = self
+                // Filter out exited containers
+                let active_containers: Vec<&ContainerInfo> = self
                     .info
                     .containers
+                    .iter()
+                    .filter(|c| !c.status.starts_with("Exited"))
+                    .collect();
+
+                // Calculate the width of the longest container name plus colon
+                let max_name_width = active_containers
                     .iter()
                     .map(|container| container.name.len())
                     .max()
                     .unwrap_or(0)
                     + 1; // +1 for the colon
 
-                let rows: Vec<Row> = self
-                    .info
-                    .containers
+                let rows: Vec<Row> = active_containers
                     .iter()
                     .map(|container| {
                         let status_style = if container.status.starts_with("Up") {
                             Style::default()
                                 .fg(Color::Green)
                                 .add_modifier(Modifier::DIM)
-                        } else if container.exit_code.unwrap_or(0) != 0 {
-                            Style::default().fg(Color::Red).add_modifier(Modifier::DIM)
                         } else {
                             Style::default().add_modifier(Modifier::DIM)
                         };
