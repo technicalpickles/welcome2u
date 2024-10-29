@@ -150,6 +150,38 @@ impl InfoBuilder<DockerInfo> for DockerInfoBuilder {
     }
 }
 
+impl DockerSegmentRenderer {
+    fn get_hours_since_exit(status: &str) -> Option<f64> {
+        if !status.starts_with("Exited") {
+            return None;
+        }
+
+        // Extract the "X ago" part from "Exited (143) 2 hours ago"
+        let parts: Vec<&str> = status.split(" ago").collect();
+        if parts.len() != 2 {
+            return None;
+        }
+
+        let time_part = parts[0]
+            .split_whitespace()
+            .rev()
+            .take(2)
+            .collect::<Vec<_>>();
+        if time_part.len() != 2 {
+            return None;
+        }
+
+        let amount: f64 = time_part[1].parse().ok()?;
+
+        match time_part[0] {
+            "minutes" | "minute" => Some(amount / 60.0),
+            "hours" | "hour" => Some(amount),
+            "days" | "day" => Some(amount * 24.0),
+            _ => None,
+        }
+    }
+}
+
 impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
     fn height(&self) -> u16 {
         match self.info.status {
@@ -157,7 +189,13 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
                 .info
                 .containers
                 .iter()
-                .filter(|c| !c.status.starts_with("Exited"))
+                .filter(|c| {
+                    if let Some(hours) = Self::get_hours_since_exit(&c.status) {
+                        hours <= 8.0
+                    } else {
+                        true // Keep non-exited containers
+                    }
+                })
                 .count() as u16,
             DockerStatus::Unavailable(_) => 1,
         }
@@ -175,7 +213,13 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
                     .info
                     .containers
                     .iter()
-                    .filter(|c| !c.status.starts_with("Exited"))
+                    .filter(|c| {
+                        if let Some(hours) = Self::get_hours_since_exit(&c.status) {
+                            hours <= 8.0
+                        } else {
+                            true // Keep non-exited containers
+                        }
+                    })
                     .collect();
 
                 // Calculate the width of the longest container name plus colon
