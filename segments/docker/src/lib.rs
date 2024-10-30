@@ -34,17 +34,15 @@ struct ContainerInfo {
     name: String,
     status: ContainerStateStatusEnum,
     exit_code: i64,
+    duration_seconds: f64,
 }
 
 #[derive(Debug, Default)]
 pub struct DockerInfoBuilder;
 
 impl DockerInfoBuilder {
-    fn duration_since(str: &str) -> String {
-        let now = Timestamp::now_utc();
-        let timestamp = Timestamp::parse(str).unwrap();
-        let iso8601_duration = (*now - *timestamp).as_seconds_f32();
-        let dt = chrono::Duration::seconds(iso8601_duration.round() as i64);
+    fn duration_since(seconds: &f64) -> String {
+        let dt = chrono::Duration::seconds(seconds.round() as i64);
         let ht = HumanTime::from(dt);
         ht.to_text_en(Accuracy::Rough, Tense::Present)
     }
@@ -64,10 +62,23 @@ impl DockerInfoBuilder {
         let state = info.state.unwrap();
         let exit_code = state.exit_code.unwrap_or(0);
 
+        let duration_seconds = if let Some(time_str) = match state.status {
+            Some(ContainerStateStatusEnum::RUNNING) => state.started_at,
+            Some(ContainerStateStatusEnum::EXITED) => state.finished_at,
+            _ => None,
+        } {
+            let now = Timestamp::now_utc();
+            let timestamp = Timestamp::parse(&time_str).unwrap();
+            (*now - *timestamp).as_seconds_f32() as f64
+        } else {
+            0.0
+        };
+
         Ok(ContainerInfo {
             name: name.trim_start_matches('/').to_string(),
             status: state.status.unwrap_or(ContainerStateStatusEnum::EMPTY),
             exit_code,
+            duration_seconds,
         })
     }
 }
@@ -126,9 +137,17 @@ impl InfoBuilder<DockerInfo> for DockerInfoBuilder {
 impl DockerSegmentRenderer {
     fn get_hours_since_exit(&self, container: &ContainerInfo) -> Option<f64> {
         if matches!(container.status, ContainerStateStatusEnum::EXITED) {
-            None
+            Some(container.duration_seconds / 3600.0)
         } else {
             None
+        }
+    }
+
+    fn is_container_visible(&self, container: &ContainerInfo) -> bool {
+        if let Some(hours) = self.get_hours_since_exit(container) {
+            hours <= 8.0
+        } else {
+            true // Keep non-exited containers
         }
     }
 }
@@ -138,12 +157,7 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
         self.info
             .containers
             .iter()
-            .filter(|container| {
-                matches!(
-                    container.status,
-                    ContainerStateStatusEnum::RUNNING | ContainerStateStatusEnum::EXITED
-                )
-            })
+            .filter(|c| self.is_container_visible(c))
             .count() as u16
     }
 
@@ -154,21 +168,13 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
 
         match &self.info.status {
             DockerStatus::Running => {
-                // Filter out exited containers
                 let active_containers: Vec<&ContainerInfo> = self
                     .info
                     .containers
                     .iter()
-                    .filter(|c| {
-                        if let Some(hours) = self.get_hours_since_exit(c) {
-                            hours <= 8.0
-                        } else {
-                            true // Keep non-exited containers
-                        }
-                    })
+                    .filter(|c| self.is_container_visible(c))
                     .collect();
 
-                // Calculate the width of the longest container name plus colon
                 let max_name_width = active_containers
                     .iter()
                     .map(|container| container.name.len())
@@ -195,9 +201,18 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
                         };
 
                         let status_text = match container.status {
-                            ContainerStateStatusEnum::RUNNING => "Up".to_string(),
+                            ContainerStateStatusEnum::RUNNING => {
+                                format!(
+                                    "Up {}",
+                                    DockerInfoBuilder::duration_since(&container.duration_seconds)
+                                )
+                            }
                             ContainerStateStatusEnum::EXITED => {
-                                format!("Exited ({})", container.exit_code)
+                                format!(
+                                    "Exited ({}) {}",
+                                    container.exit_code,
+                                    DockerInfoBuilder::duration_since(&container.duration_seconds)
+                                )
                             }
                             _ => container.status.to_string(),
                         };
