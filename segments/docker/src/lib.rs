@@ -144,10 +144,13 @@ impl DockerSegmentRenderer {
     }
 
     fn is_container_visible(&self, container: &ContainerInfo) -> bool {
-        if let Some(hours) = self.get_hours_since_exit(container) {
-            hours <= 8.0
-        } else {
-            true // Keep non-exited containers
+        match container.status {
+            ContainerStateStatusEnum::RUNNING => true,
+            ContainerStateStatusEnum::EXITED => {
+                let hours = container.duration_seconds / 3600.0;
+                hours <= 8.0
+            }
+            _ => false, // Hide containers with other states
         }
     }
 }
