@@ -32,8 +32,8 @@ pub struct DockerSegmentRenderer {
 #[derive(Debug)]
 struct ContainerInfo {
     name: String,
-    status: String,
-    exit_code: Option<i64>,
+    status: ContainerStateStatusEnum,
+    exit_code: i64,
 }
 
 #[derive(Debug, Default)]
@@ -62,39 +62,12 @@ impl DockerInfoBuilder {
 
         let name = info.name.unwrap();
         let state = info.state.unwrap();
-
         let exit_code = state.exit_code.unwrap_or(0);
-        let started_at = state.started_at.as_ref().unwrap().as_str();
-        let finished_at = state.finished_at.as_ref().unwrap().as_str();
-
-        let status = match state.status {
-            Some(ContainerStateStatusEnum::EMPTY) => "Empty".to_string(),
-            Some(ContainerStateStatusEnum::CREATED) => "Created".to_string(),
-            Some(ContainerStateStatusEnum::RUNNING) => {
-                format!("Up {}", Self::duration_since(started_at))
-            }
-            Some(ContainerStateStatusEnum::PAUSED) => "Paused".to_string(),
-            Some(ContainerStateStatusEnum::RESTARTING) => "Restarting".to_string(),
-            Some(ContainerStateStatusEnum::REMOVING) => "Removing".to_string(),
-            Some(ContainerStateStatusEnum::EXITED) => {
-                format!(
-                    "Exited ({}) {} ago",
-                    exit_code,
-                    Self::duration_since(finished_at)
-                )
-            }
-            Some(ContainerStateStatusEnum::DEAD) => "Dead".to_string(),
-            None => String::new(),
-        };
 
         Ok(ContainerInfo {
             name: name.trim_start_matches('/').to_string(),
-            status,
-            exit_code: if state.status == Some(ContainerStateStatusEnum::EXITED) {
-                Some(exit_code)
-            } else {
-                None
-            },
+            status: state.status.unwrap_or(ContainerStateStatusEnum::EMPTY),
+            exit_code,
         })
     }
 }
@@ -151,54 +124,27 @@ impl InfoBuilder<DockerInfo> for DockerInfoBuilder {
 }
 
 impl DockerSegmentRenderer {
-    fn get_hours_since_exit(status: &str) -> Option<f64> {
-        if !status.starts_with("Exited") {
-            return None;
-        }
-
-        // Extract the "X ago" part from "Exited (143) 2 hours ago"
-        let parts: Vec<&str> = status.split(" ago").collect();
-        if parts.len() != 2 {
-            return None;
-        }
-
-        let time_part = parts[0]
-            .split_whitespace()
-            .rev()
-            .take(2)
-            .collect::<Vec<_>>();
-        if time_part.len() != 2 {
-            return None;
-        }
-
-        let amount: f64 = time_part[1].parse().ok()?;
-
-        match time_part[0] {
-            "minutes" | "minute" => Some(amount / 60.0),
-            "hours" | "hour" => Some(amount),
-            "days" | "day" => Some(amount * 24.0),
-            _ => None,
+    fn get_hours_since_exit(&self, container: &ContainerInfo) -> Option<f64> {
+        if matches!(container.status, ContainerStateStatusEnum::EXITED) {
+            None
+        } else {
+            None
         }
     }
 }
 
 impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
     fn height(&self) -> u16 {
-        match self.info.status {
-            DockerStatus::Running => self
-                .info
-                .containers
-                .iter()
-                .filter(|c| {
-                    if let Some(hours) = Self::get_hours_since_exit(&c.status) {
-                        hours <= 8.0
-                    } else {
-                        true // Keep non-exited containers
-                    }
-                })
-                .count() as u16,
-            DockerStatus::Unavailable(_) => 1,
-        }
+        self.info
+            .containers
+            .iter()
+            .filter(|container| {
+                matches!(
+                    container.status,
+                    ContainerStateStatusEnum::RUNNING | ContainerStateStatusEnum::EXITED
+                )
+            })
+            .count() as u16
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) -> Result<()> {
@@ -214,7 +160,7 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
                     .containers
                     .iter()
                     .filter(|c| {
-                        if let Some(hours) = Self::get_hours_since_exit(&c.status) {
+                        if let Some(hours) = self.get_hours_since_exit(c) {
                             hours <= 8.0
                         } else {
                             true // Keep non-exited containers
@@ -232,23 +178,38 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
 
                 let rows: Vec<Row> = active_containers
                     .iter()
-                    .map(|container| {
-                        let status_style = if container.status.starts_with("Up") {
-                            Style::default()
-                                .fg(Color::Green)
-                                .add_modifier(Modifier::DIM)
-                        } else {
-                            Style::default().add_modifier(Modifier::DIM)
+                    .filter_map(|container| {
+                        let status_style = match container.status {
+                            ContainerStateStatusEnum::RUNNING => {
+                                Some(Style::default().fg(Color::Green))
+                            }
+                            ContainerStateStatusEnum::EXITED => {
+                                if let Some(hours) = self.get_hours_since_exit(container) {
+                                    if hours > 8.0 {
+                                        return None;
+                                    }
+                                }
+                                Some(Style::default().fg(Color::Red))
+                            }
+                            _ => Some(Style::default()),
                         };
 
-                        Row::new(vec![
+                        let status_text = match container.status {
+                            ContainerStateStatusEnum::RUNNING => "Up".to_string(),
+                            ContainerStateStatusEnum::EXITED => {
+                                format!("Exited ({})", container.exit_code)
+                            }
+                            _ => container.status.to_string(),
+                        };
+
+                        Some(Row::new(vec![
                             Cell::from(format!(
                                 "{:>width$}:",
                                 container.name,
                                 width = max_name_width - 1
                             )),
-                            Cell::from(format!("    {}", container.status)).style(status_style),
-                        ])
+                            Cell::from(status_text).style(status_style.unwrap_or_default()),
+                        ]))
                     })
                     .collect();
 
@@ -257,7 +218,7 @@ impl SegmentRenderer<DockerInfo> for DockerSegmentRenderer {
                         Constraint::Length(max_name_width as u16),
                         Constraint::Percentage(100),
                     ])
-                    .column_spacing(0);
+                    .column_spacing(1);
 
                 frame.render_widget(table, chunks[1]);
             }
