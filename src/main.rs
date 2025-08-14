@@ -178,6 +178,18 @@ async fn render_segments(
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Honor WELCOME2U environment variable for output control
+    // WELCOME2U=0 disables all output (program exits immediately)
+    // WELCOME2U=1 (or unset) enables normal behavior
+    let enabled = match std::env::var("WELCOME2U") {
+        Ok(value) if value == "0" => false,
+        _ => true,
+    };
+
+    if !enabled {
+        return Ok(());
+    }
+
     // Set up tracing
     let env_filter = if std::env::var("MOTD_PROFILE").unwrap_or_default() == "debug" {
         EnvFilter::try_from_default_env()
